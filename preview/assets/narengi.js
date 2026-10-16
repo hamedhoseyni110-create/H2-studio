@@ -1,6 +1,14 @@
 /* نارنگی (Tangerine) — chubby orange cat mascot + ambient sound toggle.
    Vanilla JS, no modules. Runs after copy-data.js + app.js.
-   Zero external requests. */
+   Zero external requests.
+
+   STATES:
+     working   — working.mp4 muted autoplay loop (default)
+     talk      — loop paused, bubble with quick-action chips (6s idle → working)
+     making    — making_something.mp4 plays ONCE after a chip action
+     milestone — milestone_level_up.mp4 plays ONCE after a completed chip action
+                 (+ synthesized meow, only when site sound is ON)
+     poster    — prefers-reduced-motion: static poster.jpg, no video, no talk */
 
 (function () {
   "use strict";
@@ -48,6 +56,8 @@
       audio.pause();
     }
     renderSoundToggle();
+    /* one master sound concept — the music player listens for this */
+    try { window.dispatchEvent(new CustomEvent("h2:sound", { detail: { on: !!on } })); } catch (e) {}
   }
 
   function initSoundToggle() {
@@ -99,14 +109,17 @@
 
   var cat = byId("narengi");
   var bubble = byId("narengi-bubble");
-  var bubbleKey = null;   /* which scripted moment is currently shown */
+  var bubbleKey = null;   /* greeting | portfolio_tip | wizard_tip | talk */
   var hideTimer = null;
+  var talkTimer = null;
+  var talkOpen = false;
+  var pendingCelebrate = false;  /* set by the «سفارش» chip: milestone after making ends */
   var seen = { greeting: false, portfolio: false, wizard: false };
 
   function renderMascotChrome() {
     if (!cat) return;
     cat.setAttribute("aria-label", M().aria);
-    if (bubbleKey && bubble && !bubble.hidden) showBubble(bubbleKey, true);
+    if (bubbleKey && bubble && !bubble.hidden) renderBubble();
     renderSoundToggle();
   }
 
@@ -118,23 +131,61 @@
   });
   langObs.observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
 
-  function showBubble(key, keep) {
-    if (!bubble || REDUCED) return;
-    bubbleKey = key;
-    var txt = M()[key];
-    bubble.innerHTML = "";
-    var span = document.createElement("span");
-    span.textContent = txt;
-    bubble.appendChild(span);
+  function closeButton() {
     var close = document.createElement("button");
+    close.type = "button";
     close.className = "narengi-close";
     close.textContent = "×";
     close.setAttribute("aria-label", UI().close);
-    close.addEventListener("click", function (e) { e.stopPropagation(); hideBubble(); });
-    bubble.appendChild(close);
+    close.addEventListener("click", function (e) {
+      e.stopPropagation();
+      if (talkOpen) closeTalk(); else hideBubble();
+    });
+    return close;
+  }
+
+  function renderBubble() {
+    if (!bubble || REDUCED) return;
+    bubble.innerHTML = "";
+    if (bubbleKey === "talk") {
+      var txt = document.createElement("div");
+      txt.className = "narengi-talk-text";
+      txt.textContent = M().talk;
+      bubble.appendChild(txt);
+
+      var chips = document.createElement("div");
+      chips.className = "narengi-chips";
+      chips.appendChild(chipButton("portfolio", M().chips.portfolio, chipPortfolio));
+      chips.appendChild(chipButton("order", M().chips.order, chipOrder));
+      chips.appendChild(chipButton("sound", M().chips.sound, chipSound));
+      bubble.appendChild(chips);
+      bubble.appendChild(closeButton());
+    } else {
+      var span = document.createElement("span");
+      span.textContent = M()[bubbleKey] || "";
+      bubble.appendChild(span);
+      bubble.appendChild(closeButton());
+    }
+  }
+
+  function chipButton(kind, label, action) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "narengi-chip";
+    b.setAttribute("data-chip", kind);
+    b.textContent = label;
+    b.addEventListener("click", function (e) { e.stopPropagation(); action(); });
+    return b;
+  }
+
+  function showBubble(key) {
+    if (!bubble || REDUCED) return;
+    if (talkOpen) return; /* never clobber the open talk bubble with a scripted tip */
+    bubbleKey = key;
+    renderBubble();
     bubble.hidden = false;
     if (hideTimer) clearTimeout(hideTimer);
-    if (!keep) hideTimer = setTimeout(hideBubble, 5000);
+    hideTimer = setTimeout(hideBubble, 5000);
   }
 
   function hideBubble() {
@@ -165,13 +216,12 @@
     io.observe(port);
   }
 
-  /* (c) is handled by the video state machine below (wizard open → making clip + tip) */
-
   /* ================= video mascot state machine =================
-     working.mp4   — default: muted autoplay loop (cat typing at laptop)
-     milestone_level_up.mp4 — plays ONCE on mascot click (+ meow if sound on)
-     making_something.mp4   — plays ONCE when the wizard opens
-     poster.jpg    — static frame for prefers-reduced-motion (no video) */
+     working.mp4            — default: muted autoplay loop (cat typing at laptop)
+     making_something.mp4   — plays ONCE after a chip action ("doing the task")
+     milestone_level_up.mp4 — plays ONCE after a completed chip action
+                              (+ meow only when site sound is ON)
+     poster.jpg             — static frame for prefers-reduced-motion (no video) */
 
   var VID = {
     working:   "assets/narengi/working.mp4",
@@ -202,6 +252,14 @@
     document.head.appendChild(l);
   }
 
+  function playVideo() {
+    if (!video) return;
+    try {
+      var p = video.play();
+      if (p && p.catch) p.catch(function () {});
+    } catch (e) {}
+  }
+
   function setVState(key, once) {
     if (!video || REDUCED) return;
     if (vstate !== key) {
@@ -211,26 +269,98 @@
     } else {
       video.loop = !once;
     }
-    try {
-      var p = video.play();
-      if (p && p.catch) p.catch(function () {});
-    } catch (e) {}
+    playVideo();
+  }
+
+  function resumeWorking() {
+    if (!video) return;
+    if (vstate === "working") { video.loop = true; playVideo(); }
+    else { playVideo(); } /* resume whatever once-clip was paused */
   }
 
   if (video) {
     video.muted = true; /* belt & braces for autoplay policy */
-    try {
-      var ap = video.play();
-      if (ap && ap.catch) ap.catch(function () {});
-    } catch (e) {}
+    playVideo();
     video.addEventListener("ended", function () {
-      if (vstate !== "working") setVState("working", false);
+      if (vstate === "working") return;
+      if (pendingCelebrate && vstate === "making") {
+        pendingCelebrate = false;
+        setVState("milestone", true);
+        if (soundOn()) meow(); /* silent celebration when sound is off */
+      } else {
+        setVState("working", false);
+      }
     });
     /* first-need preload triggers */
-    if (cat) cat.addEventListener("pointerenter", function () { lazyPreload("milestone"); }, { once: true });
+    if (cat) cat.addEventListener("pointerenter", function () {
+      lazyPreload("milestone"); lazyPreload("making");
+    }, { once: true });
     document.addEventListener("pointerover", function (e) {
       if (e.target && e.target.closest && e.target.closest("[data-wizard-open]")) lazyPreload("making");
     }, { passive: true });
+  }
+
+  /* ================= TALK MODE =================
+     click → pause loop, show «گوش می‌دم!» + 3 chips.
+     click again (or ×) → close, resume. 6s idle → close, resume. */
+
+  function showTalk() {
+    if (!bubble || REDUCED || !video) return;
+    if (video && !video.paused) video.pause();
+    talkOpen = true;
+    bubbleKey = "talk";
+    renderBubble();
+    bubble.hidden = false;
+    if (talkTimer) clearTimeout(talkTimer);
+    talkTimer = setTimeout(function () { closeTalk(); }, 6000);
+  }
+
+  function closeTalk() {
+    talkOpen = false;
+    if (talkTimer) { clearTimeout(talkTimer); talkTimer = null; }
+    hideBubble();
+    resumeWorking();
+  }
+
+  function afterChip() {
+    /* "doing the task": play making_something.mp4 once, then back to the loop */
+    closeTalk();
+    lazyPreload("making");
+    setVState("making", true);
+  }
+
+  function chipPortfolio() {
+    afterChip();
+    var p = byId("portfolio");
+    if (p && p.scrollIntoView) p.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function chipOrder() {
+    closeTalk();
+    lazyPreload("making");
+    pendingCelebrate = true; /* milestone (+meow if sound on) after making ends */
+    var wz = byId("wizard");
+    var wasOpen = wz && !wz.hidden;
+    if (typeof openWizard === "function") openWizard(cat);
+    else if (wz) wz.hidden = false;
+    /* wizard-open observer fires making only on a hidden→shown mutation;
+       if it was already open, start the clip directly */
+    if (wasOpen) setVState("making", true);
+  }
+
+  function chipSound() {
+    afterChip(); /* toggles first, then the clip plays — same as the nav toggle */
+    var t = byId("soundToggle");
+    if (t) t.click(); else setAmbient(!soundOn());
+  }
+
+  /* click the cat → toggle talk mode (no more direct milestone on click) */
+  if (cat) {
+    cat.addEventListener("click", function () {
+      if (REDUCED) return;
+      lazyPreload("milestone"); lazyPreload("making");
+      if (talkOpen) closeTalk(); else showTalk();
+    });
   }
 
   /* (c) encouragement + "making" clip when the wizard opens */
@@ -259,16 +389,6 @@
       }
     }
   });
-
-  /* click → celebration clip once (+ synthesized meow only when site sound is ON) */
-  if (cat) {
-    cat.addEventListener("click", function () {
-      if (REDUCED) return;
-      lazyPreload("milestone");
-      setVState("milestone", true);
-      if (soundOn()) meow(); /* silent celebration when sound is off */
-    });
-  }
 
   /* ================= init ================= */
   initSoundToggle();
