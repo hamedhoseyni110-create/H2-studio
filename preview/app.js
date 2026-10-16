@@ -143,6 +143,9 @@ function renderPage() {
 
   /* scroll reveals last — everything must exist first */
   initReveals();
+
+  /* music player labels (bilingual; preserves playback state) */
+  try { if (window.H2MP && window.H2MP.refresh) window.H2MP.refresh(); } catch (e) {}
 }
 
 /* ================= 3D tilt + glare on cards ================= */

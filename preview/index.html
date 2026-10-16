@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="assets/narengi.css">
 </head>
 <body>
+<div class="aurora" aria-hidden="true"><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span></div>
 <a class="skip" id="skipLink" href="#main">پرش به محتوا</a>
 
 <header class="nav" id="nav">
@@ -28,7 +29,11 @@
 
 <main id="main">
   <section class="hero" id="top">
-    <canvas id="hero3d" aria-hidden="true"></canvas>
+    <video id="heroVideo" class="hero-video" autoplay muted loop playsinline preload="auto" poster="assets/hero-poster.jpg" aria-hidden="true">
+      <source src="assets/hero.mp4" type="video/mp4">
+    </video>
+    <div class="hero-shade" aria-hidden="true"></div>
+    <canvas id="heroFx" aria-hidden="true"></canvas>
     <div class="hero-inner">
       <h1 id="heroTitle"></h1>
       <p class="hero-sub" id="heroSubtitle"></p>
@@ -103,9 +108,7 @@
 <script src="assets/copy-data.js"></script>
 <script src="app.js"></script>
 <script src="assets/narengi.js"></script>
-<script type="module">
-  import { initHero3D } from './assets/hero-3d.js';
-  initHero3D(document.getElementById('hero3d'));
-</script>
+<script src="assets/hero-particles.js"></script>
+<script src="assets/music-player.js"></script>
 </body>
 </html>
