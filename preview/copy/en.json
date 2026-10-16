@@ -1,0 +1,521 @@
+{
+  "about": {
+    "heading": "About",
+    "paragraphs": [
+      "I built H2 Studio from scratch: a one-person studio that turns ideas into cinematic video and web experiences. I work near Isfahan and collaborate with clients across Iran and worldwide.",
+      "My standard is simple: what I deliver has to be good enough that you want to show it off. You tell me what you want — I handle the rest."
+    ]
+  },
+  "footer": {
+    "rights": "All rights reserved to H2 Studio. © 2026",
+    "tagline": "Making ideas cinematic — H2 Studio"
+  },
+  "hero": {
+    "cta_primary": "Consult & order a project",
+    "cta_secondary": "See the work",
+    "hint": "Scroll — step inside the studio",
+    "interact": "Tap it for a burst",
+    "subtitle": "AI-crafted cinematic video, 3D immersive websites, and apps — from brief to delivery, a one-person studio with big-studio standards.",
+    "title": "I make your idea cinematic."
+  },
+  "mascot": {
+    "aria": "Tangerine, the studio guide",
+    "chips": {
+      "order": "Order",
+      "portfolio": "Portfolio",
+      "sound": "Sound"
+    },
+    "greeting": "Hi! I'm Tangerine 🍊, your studio guide",
+    "portfolio_tip": "These are real shipped projects — hover to see them come alive",
+    "talk": "I'm listening! What can I do for you?",
+    "wizard_tip": "Just a few quick questions — your brief will be ready for WhatsApp"
+  },
+  "nav": {
+    "about": "About",
+    "contact": "Contact",
+    "cta": "Consult & order a project",
+    "portfolio": "Portfolio",
+    "lab": "Lab",
+    "process": "Process",
+    "services": "Services",
+    "faq": "FAQ",
+    "pricing": "Pricing"
+  },
+  "portfolio": {
+    "heading": "Work I've shipped",
+    "items": [
+      {
+        "desc": "Interactive menu, burger builder and WhatsApp ordering; scrolling assembles the burger before your eyes.",
+        "id": "ramin-berger",
+        "tag": "Cinematic website",
+        "title": "Burger restaurant site",
+        "client": "A friend’s restaurant",
+        "case": "A real order for a friend’s restaurant: an interactive menu and WhatsApp ordering wired to his actual products and prices."
+      },
+      {
+        "desc": "Mint-green theme, clickable photo menu and an AI-generated video hero.",
+        "id": "coffee-nozhe",
+        "tag": "Interactive website",
+        "title": "Nozhe Café site",
+        "client": "Nozhe Café, Isfahan",
+        "case": "The official site of Nozhe Café in Isfahan; menu and atmosphere shown cinematically, with an AI-generated video hero."
+      },
+      {
+        "desc": "A cinematic journey from entrance to stations; interactive multi-day booking sent via WhatsApp.",
+        "id": "gym-site-demo",
+        "tag": "Cinematic website",
+        "title": "Gym site",
+        "client": "White-label gym demo",
+        "case": "A ready-made demo for gyms; rebranded with each gym’s brand and schedule, sending bookings straight to WhatsApp."
+      },
+      {
+        "desc": "56-second AI-made watercolor film; Persian narration and music.",
+        "id": "qatre",
+        "tag": "Short film",
+        "title": "Qatre — 56s watercolor film",
+        "client": "Qatre brand",
+        "case": "A 56-second watercolor short film, made entirely with AI; Persian narration and original music."
+      }
+    ],
+    "preview": "Animated preview",
+    "sub": "Each project is a small world — take a look, then decide.",
+    "view_live": "View live"
+  },
+  "process": {
+    "heading": "How ordering works",
+    "steps": [
+      {
+        "title": "Brief",
+        "desc": "In a few minutes I learn exactly what you want — and what you don’t; the result is a clear brief we both sign off on."
+      },
+      {
+        "title": "Concept",
+        "desc": "I propose a few creative directions; you pick one, and that’s the one we build — nothing else."
+      },
+      {
+        "title": "Preview",
+        "desc": "Before the final version you see a real preview: a visual storyboard for video, a clickable demo for websites."
+      },
+      {
+        "title": "Revisions",
+        "desc": "Your notes come in and get applied exactly; we keep going until you say “that’s it”."
+      },
+      {
+        "title": "Delivery",
+        "desc": "Final files, clean and ready to publish — with a usage guide and post-delivery support."
+      }
+    ]
+  },
+  "services": [
+    {
+      "desc": "AI-crafted cinematic video: visual storyboards, controlled motion and music-driven editing — from 60-second Shorts to short films.",
+      "id": "video",
+      "title": "AI video production"
+    },
+    {
+      "desc": "3D scroll-driven websites built from your own real photos: virtual tours, interactive menus, carts and ordering.",
+      "id": "web",
+      "title": "Cinematic websites"
+    },
+    {
+      "desc": "Your raw footage turned into video people watch to the end: tight cuts, right rhythm, music and sound.",
+      "id": "editing",
+      "title": "Video editing"
+    },
+    {
+      "desc": "Full design and build of web apps plus Android and iOS apps from a single codebase; store publishing via your own developer accounts, with our technical support.",
+      "flow": [
+        {
+          "desc": "we listen to your needs and map the app — which features, which platforms, in which order.",
+          "title": "Step 1 — Brief & roadmap"
+        },
+        {
+          "desc": "before a single line of code, you click through a prototype, touch it, and approve it.",
+          "title": "Step 2 — Prototype"
+        },
+        {
+          "desc": "we build the app and test it on real Android and iOS devices, so everything works flawlessly on launch day.",
+          "title": "Step 3 — Build & test"
+        },
+        {
+          "desc": "store publishing goes through your own developer accounts — we do the technical work, stay with you until the app is live, and support you after.",
+          "title": "Step 4 — Launch, together"
+        }
+      ],
+      "id": "app",
+      "title": "App development"
+    },
+    {
+      "desc": "Ready-made site concepts for restaurants and gyms; rebranded with your brand and content, fast and clean.",
+      "id": "whitelabel",
+      "title": "White-label models"
+    }
+  ],
+  "ui": {
+    "app_flow_title": "How we build your app",
+    "close": "Close",
+    "contact_body": "Have a project in mind? Answer a few quick questions and send the pre-filled brief straight to my WhatsApp.",
+    "contact_title": "Contact",
+    "external_link": "External link",
+    "lang_label": "Switch language to Persian",
+    "menu": "Menu",
+    "play_video": "Play video",
+    "skip": "Skip to content",
+    "sound_off": "Turn background sound off",
+    "sound_on": "Turn background sound on",
+    "player": {
+      "title": "Music player",
+      "play": "Play",
+      "pause": "Pause",
+      "list_title": "Track list",
+      "empty": "Soon",
+      "expand": "Show track list",
+      "collapse": "Hide track list",
+      "master_off_note": "Turn the site's master sound on first",
+      "unknown": "Track"
+    },
+    "wizard_panel_title": "Order wizard",
+    "sticky_order": "Consult & order"
+  },
+  "wizard": {
+    "steps": [
+      {
+        "id": "type",
+        "options": [
+          {
+            "id": "video",
+            "label": "AI video / motion graphics"
+          },
+          {
+            "id": "web",
+            "label": "Cinematic website"
+          },
+          {
+            "id": "app",
+            "label": "App (mobile / web)"
+          },
+          {
+            "id": "editing",
+            "label": "Editing / videography"
+          }
+        ],
+        "title": "What kind of project do you have?"
+      },
+      {
+        "id": "brief",
+        "per_type": {
+          "app": [
+            {
+              "kind": "choice",
+              "options": [
+                "Android",
+                "iPhone (iOS)",
+                "Web app",
+                "Cross-platform (Android + iOS)"
+              ],
+              "q": "Which platform(s) should the app run on?"
+            },
+            {
+              "kind": "text",
+              "q": "Describe the app's core features (optional)"
+            },
+            {
+              "kind": "choice",
+              "options": [
+                "Yes, designs are ready",
+                "No, build from scratch",
+                "Just a rough idea"
+              ],
+              "q": "Do you have designs ready?"
+            }
+          ],
+          "editing": [
+            {
+              "kind": "choice",
+              "options": [
+                "Yes, I have raw footage",
+                "No, filming is needed too",
+                "Use stock footage"
+              ],
+              "q": "Is the raw footage ready?"
+            },
+            {
+              "kind": "choice",
+              "options": [
+                "Under 1 minute",
+                "1 to 5 minutes",
+                "5 to 15 minutes",
+                "Over 15 minutes"
+              ],
+              "q": "Roughly how long should the final video be?"
+            },
+            {
+              "kind": "choice",
+              "options": [
+                "Add music and sound",
+                "Editing only, no music",
+                "I need voiceover / narration too",
+                "Not sure, I need guidance"
+              ],
+              "q": "What about music and sound?"
+            }
+          ],
+          "video": [
+            {
+              "kind": "choice",
+              "options": [
+                "Business introduction",
+                "Advertising",
+                "Social media content",
+                "Educational / documentary"
+              ],
+              "q": "What's the goal of this video?"
+            },
+            {
+              "kind": "choice",
+              "options": [
+                "Under 15 seconds",
+                "15 to 60 seconds",
+                "1 to 3 minutes",
+                "Over 3 minutes"
+              ],
+              "q": "Roughly how long should the video be?"
+            },
+            {
+              "kind": "text",
+              "q": "Link a reference or describe the style you like (optional)"
+            }
+          ],
+          "web": [
+            {
+              "kind": "choice",
+              "options": [
+                "Online store",
+                "Business / personal showcase",
+                "Booking and appointments",
+                "Content / blog"
+              ],
+              "q": "What should this website do?"
+            },
+            {
+              "kind": "choice",
+              "options": [
+                "Single page (landing)",
+                "A few pages (1 to 5)",
+                "Many pages (over 5)",
+                "Full shop with cart"
+              ],
+              "q": "Which pages or sections do you need?"
+            },
+            {
+              "kind": "choice",
+              "options": [
+                "Yes, logo and colors are ready",
+                "No, I'd like it designed",
+                "No, and I don't need it"
+              ],
+              "q": "Do you have a logo and brand identity?"
+            }
+          ]
+        },
+        "title": "A few quick questions about your project"
+      },
+      {
+        "budget_ranges": [
+          "Under $100",
+          "$100 – $300",
+          "$300 – $1,000",
+          "Above $1,000",
+          "Negotiable"
+        ],
+        "id": "budget",
+        "timeline_label": "Timeline",
+        "timelines": [
+          "ASAP",
+          "1–2 weeks",
+          "About a month",
+          "Flexible"
+        ],
+        "title": "What's your budget range? (Toman equivalent, fully negotiable)"
+      },
+      {
+        "fields": [
+          {
+            "id": "name",
+            "label": "Your name"
+          },
+          {
+            "hint": "e.g. WhatsApp number or Telegram ID",
+            "id": "contact_handle",
+            "label": "How to reach you (WhatsApp / Telegram / email)"
+          }
+        ],
+        "id": "contact",
+        "title": "Last step: how can I reach you?"
+      }
+    ],
+    "ui": {
+      "back": "Back",
+      "copied": "Copied",
+      "copy_message": "Copy message",
+      "err_contact": "Enter a valid contact (number, handle, or email)",
+      "err_name": "Please enter your name (min 3 characters)",
+      "err_pick": "Please choose one",
+      "err_required": "This field is required",
+      "err_step3": "Please choose both budget and timeline",
+      "guard_close": "Your progress will be lost. Close anyway?",
+      "next": "Next",
+      "restart": "Start over",
+      "send_whatsapp": "Consult & order a project",
+      "step_of": "Step {n} of 4",
+      "success_body": "Tap the button below to open WhatsApp with your brief pre-filled — we'll get back to you shortly.",
+      "success_title": "Your brief is ready!",
+      "wa_button": "Send via WhatsApp",
+      "whatsapp_number": "989375732165"
+    },
+    "wa_template": "Hi! I have a new project.\nProject type: {project_type}\n{brief_lines}\nBudget: {budget_range}\nTimeline: {timeline}\nName: {name}\nContact: {contact_handle}"
+  },
+  "faq": {
+    "heading": "FAQ",
+    "sub": "Short, honest answers to the things everyone asks.",
+    "items": [
+      {
+        "q": "How much does a project cost?",
+        "a": "There’s no fixed price list; every project is quoted on its scope and complexity. The Pricing section shows what drives the price, and the “Get an exact quote” wizard gives you your project’s price in minutes."
+      },
+      {
+        "q": "How long does delivery take?",
+        "a": "Anywhere from a few days to a few weeks depending on scope; we lock the exact timeline in the brief and stick to it."
+      },
+      {
+        "q": "How many revisions can I request?",
+        "a": "The workflow is built so you see and approve a preview at every stage; revisions until you approve the result are a natural part of the process."
+      },
+      {
+        "q": "Is AI video quality really professional?",
+        "a": "Yes — with a precise storyboard, locked references and human editing. Watch “Qatre”: a 56-second film made entirely with AI. AI is the tool; the cinematic eye is human."
+      },
+      {
+        "q": "What formats do I get on delivery?",
+        "a": "Video as high-quality MP4, sized for each platform (Reels, YouTube, web). Websites ship as ready-to-publish files on your own host, with a management guide."
+      }
+    ]
+  },
+  "pricing": {
+    "heading": "Pricing",
+    "sub": "The exact quote comes after the brief — but these are the things that set it.",
+    "factors_title": "What drives the price?",
+    "factors": [
+      "Project type: AI video, cinematic website, app, or editing",
+      "Scope: video length, number of site pages, number of app features",
+      "Customization level: ready-made template vs. bespoke design",
+      "Ready content: do you have photos, copy and a logo, or must they be created?",
+      "Timeline: rush delivery compresses the production schedule"
+    ],
+    "tiers_title": "Starter packages",
+    "soon": "Coming soon",
+    "tiers_soon_note": "Real prices will be filled in here soon; for now, get your exact quote from the wizard.",
+    "tiers": [
+      {
+        "name": "Starter package",
+        "desc": "For small beginnings; one compact, polished deliverable."
+      },
+      {
+        "name": "Standard package",
+        "desc": "The most popular choice for businesses; a complete, professional deliverable."
+      },
+      {
+        "name": "Custom package",
+        "desc": "Large, fully bespoke projects; special handling from idea to delivery."
+      }
+    ],
+    "cta": "Get an exact quote",
+    "note": "Prices are negotiable, in Toman; no hidden fees, ever."
+  },
+  "stats": {
+    "heading": "The studio in numbers",
+    "items": [
+      {
+        "value": "4",
+        "label": "Projects delivered and live"
+      },
+      {
+        "value": "9",
+        "label": "AI tools in the production stack"
+      },
+      {
+        "value": "1",
+        "label": "Person; you talk to me directly, no middlemen"
+      }
+    ],
+    "quotes_heading": "Client words",
+    "quotes_empty": "Coming soon",
+    "quotes_empty_body": "Future clients’ feedback will be published right here."
+  },
+  "callback": {
+    "heading": "Request a callback",
+    "body": "Leave your number; I’ll call you myself. No complicated forms, no waiting.",
+    "name": "Name",
+    "phone": "Phone number",
+    "time": "Good time to call",
+    "time_hint": "e.g. tomorrow evening, or Saturday mornings",
+    "submit": "Request callback via WhatsApp",
+    "err_name": "Please enter your name (min 3 characters)",
+    "err_phone": "Please enter your phone number",
+    "wa_template": "Hi! I’d like a callback.\nName: {name}\nPhone: {phone}\nGood time: {time}"
+  },
+  "lab": {
+    "heading": "The Lab",
+    "sub": "The studio's playground — small toys that show what AI can do.",
+    "prompt": {
+      "title": "Cinematic prompt builder",
+      "desc": "Pick a subject, an action and a mood; get a copy-ready English production prompt — the same formula we use to make videos (~45 words, one action + one camera move).",
+      "groups": {
+        "subject": "Subject",
+        "action": "Action",
+        "camera": "Camera move",
+        "mood": "Mood & light"
+      },
+      "subjects": [
+        "A chubby orange astronaut cat",
+        "The old bazaar of Isfahan",
+        "A surfer riding the clouds",
+        "A tiny robot chef"
+      ],
+      "actions": [
+        "soaring above a neon city",
+        "walking through the rain",
+        "dancing under moonlight",
+        "exploring a glowing cave"
+      ],
+      "cameras": [
+        "Slow dolly-in",
+        "180-degree orbit around the subject",
+        "Descending aerial shot",
+        "Gentle push-in zoom"
+      ],
+      "moods": [
+        "Golden-hour glow",
+        "Cinematic fog",
+        "Night neon",
+        "Soft morning light"
+      ],
+      "generate": "Build it",
+      "output_label": "Ready prompt",
+      "copy": "Copy prompt",
+      "copied": "Copied",
+      "note": "Output is in English — video generators work best with English prompts."
+    },
+    "palette": {
+      "title": "Cinematic palette",
+      "desc": "Recolor the studio live and find your vibe.",
+      "palettes": [
+        "Emerald (default)",
+        "Sunset",
+        "Ocean",
+        "Neon violet"
+      ],
+      "reset": "Back to default"
+    }
+  }
+}
