@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>H2 Studio</title>
+<meta name="description" content="H2 Studio — ویدیوهای سینمایی با هوش مصنوعی، سایت‌های سه‌بعدی و اپلیکیشن">
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="assets/narengi.css">
+</head>
+<body>
+<a class="skip" id="skipLink" href="#main">پرش به محتوا</a>
+
+<header class="nav" id="nav">
+  <a class="brand" href="#top" aria-label="H2 Studio">
+    <img src="assets/logo.svg" alt="" width="42" height="42">
+    <span class="brand-name" dir="ltr">H2 Studio</span>
+  </a>
+  <button class="hamburger" id="hamburger" aria-expanded="false" aria-label="منو"><span></span><span></span><span></span></button>
+  <nav class="nav-links" id="navLinks"></nav>
+  <div class="nav-actions">
+    <button class="sound-toggle" id="soundToggle" aria-pressed="false" aria-label="روشن کردن صدای پس‌زمینه">🔇</button>
+    <button class="lang-toggle" id="langToggle">EN</button>
+    <button class="btn btn-primary" id="navCta" data-wizard-open></button>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero" id="top">
+    <canvas id="hero3d" aria-hidden="true"></canvas>
+    <div class="hero-inner">
+      <h1 id="heroTitle"></h1>
+      <p class="hero-sub" id="heroSubtitle"></p>
+      <div class="hero-ctas">
+        <button class="btn btn-primary" id="heroCtaPrimary" data-wizard-open></button>
+        <a class="btn btn-ghost" id="heroCtaSecondary" href="#portfolio"></a>
+      </div>
+      <div class="scroll-hint" aria-hidden="true">
+        <span id="scrollHintText"></span>
+        <span class="scroll-line"></span>
+      </div>
+      <div class="interact-hint" id="interactHint" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <section class="section" id="services">
+    <h2 class="section-title" id="servicesTitle"></h2>
+    <div class="services-grid" id="servicesGrid"></div>
+  </section>
+
+  <section class="section" id="portfolio">
+    <h2 class="section-title" id="portfolioTitle"></h2>
+    <p class="section-sub" id="portfolioSub"></p>
+    <div class="portfolio-grid" id="portfolioGrid"></div>
+  </section>
+
+  <section class="section" id="process">
+    <h2 class="section-title" id="processTitle"></h2>
+    <ol class="process-steps" id="processSteps"></ol>
+  </section>
+
+  <section class="section" id="about">
+    <h2 class="section-title" id="aboutTitle"></h2>
+    <div class="about-body" id="aboutBody"></div>
+  </section>
+
+  <section class="section contact" id="contact">
+    <h2 class="section-title" id="contactTitle"></h2>
+    <p class="section-sub" id="contactBody"></p>
+    <button class="btn btn-primary btn-lg" id="contactCta" data-wizard-open></button>
+  </section>
+</main>
+
+<footer class="footer">
+  <img src="assets/logo.svg" alt="" width="32" height="32">
+  <p class="footer-tagline" id="footerTagline"></p>
+  <p class="footer-rights" id="footerRights"></p>
+</footer>
+
+<div id="narengi" aria-label="نارنگی، راهنمای استودیو" role="img">
+  <video id="narengi-video" muted playsinline loop autoplay preload="metadata" poster="assets/narengi/poster.jpg" aria-hidden="true">
+    <source src="assets/narengi/working.mp4" type="video/mp4">
+  </video>
+  <div id="narengi-bubble" hidden></div>
+</div>
+
+<div class="wizard-overlay" id="wizard" hidden>
+  <div class="wizard" role="dialog" aria-modal="true" aria-labelledby="wizardTitle">
+    <div class="wizard-head">
+      <div class="progress" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
+      <span class="step-of" id="wizardStepOf"></span>
+      <button class="wizard-close" id="wizardClose">×</button>
+    </div>
+    <div class="wizard-body" id="wizardBody"></div>
+    <div class="wizard-foot" id="wizardFoot">
+      <button class="btn btn-ghost" id="wizardBack"></button>
+      <button class="btn btn-primary" id="wizardNext"></button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/copy-data.js"></script>
+<script src="app.js"></script>
+<script src="assets/narengi.js"></script>
+<script type="module">
+  import { initHero3D } from './assets/hero-3d.js';
+  initHero3D(document.getElementById('hero3d'));
+</script>
+</body>
+</html>
