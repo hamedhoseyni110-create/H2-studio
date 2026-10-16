@@ -189,6 +189,7 @@
   }
 
   function hideBubble() {
+    if (talkOpen) return; /* never hide the open talk bubble via scripted timers */
     if (bubble) bubble.hidden = true;
     bubbleKey = null;
     if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
@@ -311,6 +312,7 @@
     bubbleKey = "talk";
     renderBubble();
     bubble.hidden = false;
+    if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; } /* scripted tips must not clobber talk */
     if (talkTimer) clearTimeout(talkTimer);
     talkTimer = setTimeout(function () { closeTalk(); }, 6000);
   }
