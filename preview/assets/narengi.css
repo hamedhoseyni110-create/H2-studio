@@ -1,0 +1,114 @@
+/* نارنگی (Tangerine) — chubby orange cat mascot + ambient sound toggle.
+   ALL mascot styles live here; styles.css is untouched. */
+
+/* ============ mascot: circular video badge ============ */
+#narengi {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  width: 168px;
+  height: 168px;
+  z-index: 90;
+  cursor: pointer;
+  /* NOTE: the happy-wiggle animation runs on #narengi itself; the fixed-position
+     speech bubble child needs this wrapper to keep a stable box. */
+}
+#narengi video,
+#narengi img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), 0 0 0 3px rgba(242, 165, 74, 0.55);
+  background: #1a120a;
+}
+@media (max-width: 640px) {
+  #narengi { width: 118px; height: 118px; left: 12px; bottom: 12px; }
+}
+
+/* happy wiggle when hovering any CTA button on the page */
+#narengi.happy { animation: narengi-wiggle 0.6s ease-in-out; }
+@keyframes narengi-wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25%      { transform: rotate(-5deg); }
+  50%      { transform: rotate(4deg); }
+  75%      { transform: rotate(-2deg); }
+}
+
+/* ============ speech bubble ============ */
+#narengi-bubble {
+  position: fixed;
+  left: 204px;
+  bottom: 72px;
+  max-width: min(280px, calc(100vw - 240px));
+  z-index: 91;
+  background: #fffdf8;
+  color: #3a2a18;
+  border: 2px solid #f2a54a;
+  border-radius: 16px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+  animation: narengi-pop 0.35s ease-out;
+}
+#narengi-bubble[hidden] { display: none; }
+#narengi-bubble::before {
+  content: "";
+  position: absolute;
+  left: -11px;
+  bottom: 12px;
+  border-width: 8px 12px 8px 0;
+  border-style: solid;
+  border-color: transparent #f2a54a transparent transparent;
+}
+#narengi-bubble .narengi-close {
+  pointer-events: auto;
+  position: absolute;
+  top: -12px;
+  inset-inline-end: -10px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid #f2a54a;
+  background: #fffdf8;
+  color: #8a5a20;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+@keyframes narengi-pop {
+  from { transform: scale(0.85) translateY(6px); opacity: 0; }
+  to   { transform: scale(1) translateY(0);     opacity: 1; }
+}
+
+@media (max-width: 640px) {
+  #narengi-bubble { left: 142px; bottom: 30px; max-width: min(280px, calc(100vw - 170px)); }
+}
+
+/* ============ ambient sound toggle ============ */
+.sound-toggle {
+  background: transparent;
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 7px 12px;
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 1rem;
+  line-height: 1;
+}
+.sound-toggle:hover { background: rgba(52, 211, 153, 0.12); }
+.sound-toggle[aria-pressed="true"] {
+  background: rgba(52, 211, 153, 0.18);
+  border-color: rgba(52, 211, 153, 0.7);
+}
+
+/* ============ reduced motion ============ */
+@media (prefers-reduced-motion: reduce) {
+  #narengi.happy { animation: none; }
+  #narengi-bubble { animation: none; }
+}
