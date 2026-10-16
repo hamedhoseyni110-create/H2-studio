@@ -21,11 +21,9 @@ var LIVE_URLS = {
   "ramin-berger": "https://hamedhoseyni110-create.github.io/ramin-berger/",
   "coffee-nozhe": "https://hamedhoseyni110-create.github.io/coffee-nozhe/",
   "gym-site-demo": "https://hamedhoseyni110-create.github.io/gym-site-demo/",
-  "navidka2ni":   "https://hamedhoseyni110-create.github.io/navidka2ni/"
 };
 function previewSrc(id) {
   if (id === "qatre") return "assets/previews/qatre-preview.mp4";
-  if (id === "rdr")   return "assets/previews/rdr-preview.mp4";
   return "assets/previews/" + id + ".mp4";
 }
 
@@ -42,7 +40,8 @@ function renderPage() {
   /* nav */
   var nav = c.nav;
   var links = [
-    ["services", nav.services], ["portfolio", nav.portfolio], ["process", nav.process],
+    ["services", nav.services], ["portfolio", nav.portfolio], ["lab", nav.lab], ["process", nav.process],
+    ["faq", nav.faq], ["pricing", nav.pricing],
     ["about", nav.about], ["contact", nav.contact]
   ];
   el("navLinks").innerHTML = links.map(function(p){
@@ -54,6 +53,8 @@ function renderPage() {
   tg.textContent = state.lang === "fa" ? "EN" : "فا";
   tg.setAttribute("aria-label", u.lang_label);
   el("navCta").textContent = nav.cta;
+  el("stickyCta").textContent = u.sticky_order;
+  el("stickyCta").setAttribute("aria-label", u.sticky_order);
 
   /* hero */
   el("heroTitle").textContent = c.hero.title;
@@ -97,7 +98,9 @@ function renderPage() {
     var cap = '<div class="portfolio-cap">' +
       '<span class="tag">' + esc(item.tag) + "</span>" +
       "<h3>" + esc(item.title) + "</h3>" +
-      "<p>" + esc(item.desc) + "</p>";
+      '<p class="client-line">' + esc(item.client) + "</p>" +
+      "<p>" + esc(item.desc) + "</p>" +
+      '<p class="case-line">' + esc(item.case) + "</p>";
     if (live) {
       cap += '<a class="live-link" href="' + live + '" target="_blank" rel="noopener">' +
         esc(c.portfolio.view_live) + ' <span aria-hidden="true">↗</span>' +
@@ -113,6 +116,13 @@ function renderPage() {
   });
   initTilt();
   initLazyVideos();
+  /* playful layer: re-collect scroll-parallax targets after grids re-render */
+  try { window.dispatchEvent(new CustomEvent("h2:grids")); } catch (e) {}
+
+  /* lab (playground; toys rendered by assets/playful.js) */
+  el("labTitle").textContent = c.lab.heading;
+  el("labSub").textContent = c.lab.sub;
+  if (window.H2Lab && window.H2Lab.render) window.H2Lab.render();
 
   /* process */
   el("processTitle").textContent = c.process.heading;
@@ -125,6 +135,42 @@ function renderPage() {
     ps.appendChild(li);
   });
 
+  /* faq */
+  el("faqTitle").textContent = c.faq.heading;
+  el("faqSub").textContent = c.faq.sub;
+  el("faqList").innerHTML = c.faq.items.map(function(it, i){
+    return '<details class="faq-item"' + (i === 0 ? " open" : "") + ">" +
+      "<summary>" + esc(it.q) + "</summary><p>" + esc(it.a) + "</p></details>";
+  }).join("");
+
+  /* pricing */
+  var pr = c.pricing;
+  el("pricingTitle").textContent = pr.heading;
+  el("pricingSub").textContent = pr.sub;
+  el("pricingFactorsTitle").textContent = pr.factors_title;
+  el("pricingFactors").innerHTML = pr.factors.map(function(f){
+    return "<li>" + esc(f) + "</li>";
+  }).join("");
+  el("pricingTiersTitle").textContent = pr.tiers_title;
+  el("pricingTiers").innerHTML = pr.tiers.map(function(t){
+    return '<div class="tier-card"><span class="soon-badge">' + esc(pr.soon) + "</span>" +
+      "<h4>" + esc(t.name) + "</h4><p>" + esc(t.desc) + "</p></div>";
+  }).join("");
+  el("pricingSoonNote").textContent = pr.tiers_soon_note;
+  el("pricingCta").textContent = pr.cta;
+  el("pricingNote").textContent = pr.note;
+
+  /* stats + testimonials */
+  el("statsTitle").textContent = c.stats.heading;
+  el("statsGrid").innerHTML = c.stats.items.map(function(s){
+    return '<div class="stat-card"><div class="stat-value" dir="auto">' + esc(s.value) + "</div>" +
+      '<div class="stat-label">' + esc(s.label) + "</div></div>";
+  }).join("");
+  el("quotesTitle").textContent = c.stats.quotes_heading;
+  el("quotesEmpty").innerHTML =
+    '<div class="soon-badge">' + esc(c.stats.quotes_empty) + "</div>" +
+    "<p>" + esc(c.stats.quotes_empty_body) + "</p>";
+
   /* about */
   el("aboutTitle").textContent = c.about.heading;
   el("aboutBody").innerHTML = c.about.paragraphs.map(function(p){
@@ -134,7 +180,19 @@ function renderPage() {
   /* contact */
   el("contactTitle").textContent = u.contact_title;
   el("contactBody").textContent = u.contact_body;
+  el("wizardPanelTitle").textContent = u.wizard_panel_title;
+  el("wizardPanelBody").textContent = u.contact_body;
   el("contactCta").textContent = wiz.ui.send_whatsapp;
+
+  /* callback form (static HTML, bilingual labels) */
+  var cb = c.callback;
+  el("callbackTitle").textContent = cb.heading;
+  el("callbackBody").textContent = cb.body;
+  el("cbNameLabel").textContent = cb.name;
+  el("cbPhoneLabel").textContent = cb.phone;
+  el("cbTimeLabel").textContent = cb.time;
+  el("cbTimeHint").textContent = cb.time_hint;
+  el("cbSubmit").textContent = cb.submit;
 
   /* footer */
   el("footerTagline").textContent = c.footer.tagline;
@@ -148,7 +206,9 @@ function renderPage() {
   try { if (window.H2MP && window.H2MP.refresh) window.H2MP.refresh(); } catch (e) {}
 }
 
-/* ================= 3D tilt + glare on cards ================= */
+/* ================= 3D tilt on cards =================
+   Writes --rx/--ry CSS vars; the actual transform lives in playful.css and
+   composes with the scroll-parallax --par var. Reduced-motion: untouched. */
 
 function initTilt() {
   if (window.matchMedia("(hover: none)").matches) return;
@@ -158,14 +218,14 @@ function initTilt() {
       var r = card.getBoundingClientRect();
       var x = (e.clientX - r.left) / r.width - 0.5;
       var y = (e.clientY - r.top) / r.height - 0.5;
-      card.style.transform = "rotateX(" + (-y * 9).toFixed(2) + "deg) rotateY(" + (x * 11).toFixed(2) + "deg) translateZ(6px)";
+      card.style.setProperty("--rx", (-y * 9).toFixed(2) + "deg");
+      card.style.setProperty("--ry", (x * 11).toFixed(2) + "deg");
       card.style.setProperty("--mx", ((x + 0.5) * 100).toFixed(1) + "%");
       card.style.setProperty("--my", ((y + 0.5) * 100).toFixed(1) + "%");
     });
     card.addEventListener("mouseleave", function(){
-      card.style.transition = "transform .35s ease";
-      card.style.transform = "";
-      setTimeout(function(){ card.style.transition = ""; }, 360);
+      card.style.setProperty("--rx", "0deg");
+      card.style.setProperty("--ry", "0deg");
     });
   });
 }
@@ -175,6 +235,7 @@ function initTilt() {
 function initReveals() {
   if (!("IntersectionObserver" in window)) return;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  if (revealIO) revealIO.disconnect();
   var io = new IntersectionObserver(function(entries){
     entries.forEach(function(en){
       if (en.isIntersecting) {
@@ -188,21 +249,32 @@ function initReveals() {
       }
     });
   }, { threshold: 0.12 });
-  [
-    ".section-title",
-    "#servicesGrid .service-card",
-    "#processSteps li",
-    "#portfolioGrid .portfolio-card",
-    "#aboutBody p"
-  ].forEach(function(sel){
-    document.querySelectorAll(sel).forEach(function(node, i){
-      if (node.classList.contains("reveal-3d")) return;
-      node.classList.add("reveal-3d");
-      node.style.transitionDelay = ((i % 6) * 70) + "ms";
-      io.observe(node);
+  /* exposed for the playful layer: dynamically rendered nodes (Lab toys)
+     join the same reveal system */
+  revealIO = io;
+  window.H2Reveal = function(nodes){
+    Array.prototype.forEach.call(nodes, function(node, i){
+      if (!node) return;
+      /* NOTE: always (re-)observe. initReveals disconnects the previous
+         observer on re-render, so a node enrolled just before the swap
+         (e.g. Lab toys) would otherwise be orphaned on a dead observer —
+         the class guard alone can't tell a live enrollment from a dead one.
+         Re-observing an already-watched node is a harmless no-op. */
+      if (!node.classList.contains("reveal-3d")) {
+        node.classList.add("reveal-3d");
+        node.style.transitionDelay = ((i % 6) * 70) + "ms";
+      }
+      revealIO.observe(node);
     });
-  });
+  };
+  window.H2Reveal(document.querySelectorAll(
+    ".section-title, #servicesGrid .service-card, #processSteps li, " +
+    "#portfolioGrid .portfolio-card, #aboutBody p, #labGrid .lab-toy"
+  ));
 }
+
+/* reveal observer handle shared with the playful layer */
+var revealIO = null;
 
 /* ================= lazy motion previews ================= */
 
@@ -532,6 +604,41 @@ function trapTab(e, container) {
 /* ================= screen-reader only helper ================= */
 /* (styled inline via JS-injected class below) */
 
+/* ================= callback form (no backend: composes a WhatsApp message) ================= */
+
+function initCallbackForm() {
+  var form = el("callbackForm");
+  if (!form) return;
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    var cb = C().callback;
+    var name = el("cbName").value.trim();
+    var phone = el("cbPhone").value.trim();
+    var time = el("cbTime").value.trim();
+    var ok = true;
+    el("cbNameErr").textContent = "";
+    el("cbPhoneErr").textContent = "";
+    el("cbName").classList.remove("invalid");
+    el("cbPhone").classList.remove("invalid");
+    if (name.length < MIN_TEXT) {
+      el("cbNameErr").textContent = cb.err_name;
+      el("cbName").classList.add("invalid");
+      ok = false;
+    }
+    if (!validContact(phone)) {
+      el("cbPhoneErr").textContent = cb.err_phone;
+      el("cbPhone").classList.add("invalid");
+      ok = false;
+    }
+    if (!ok) return;
+    var msg = cb.wa_template
+      .replace("{name}", name)
+      .replace("{phone}", phone)
+      .replace("{time}", time || "—");
+    window.open("https://wa.me/" + waNumber() + "?text=" + encodeURIComponent(msg), "_blank", "noopener");
+  });
+}
+
 /* ================= wiring ================= */
 
 function init() {
@@ -540,6 +647,8 @@ function init() {
   document.head.appendChild(style);
 
   renderPage();
+
+  initCallbackForm();
 
   document.querySelectorAll("[data-wizard-open]").forEach(function(b){
     b.addEventListener("click", function(){ openWizard(b); });
@@ -587,7 +696,7 @@ function init() {
       }
     });
   }, { rootMargin: "-40% 0px -55% 0px" });
-  ["services", "portfolio", "process", "about", "contact"].forEach(function(id){ io.observe(el(id)); });
+  ["services", "portfolio", "lab", "process", "faq", "pricing", "stats", "about", "contact"].forEach(function(id){ io.observe(el(id)); });
 }
 
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
