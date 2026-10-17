@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://hamedhoseyni110-create.github.io/H2-studio/sitemap.xml

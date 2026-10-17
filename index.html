@@ -2,117 +2,211 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>H2 Studio</title>
-<meta name="description" content="H2 Studio — ویدیوهای سینمایی با هوش مصنوعی، سایت‌های ایمِرسیو و اپلیکیشن">
+<meta name="description" content="H2 Studio — ویدیوهای سینمایی با هوش مصنوعی، سایت‌های سه‌بعدی و اپلیکیشن">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fa_IR">
+<meta property="og:url" content="https://hamedhoseyni110-create.github.io/H2-studio/">
+<meta property="og:title" content="H2 Studio — ایده‌ات را سینمایی می‌سازم">
+<meta property="og:description" content="ویدیوهای سینمایی با هوش مصنوعی، سایت‌های سه‌بعدی و ایمِرسیو، اپلیکیشن؛ از بریف تا تحویل، یک استودیوی یک‌نفره با استاندارد استودیوهای بزرگ.">
+<meta property="og:image" content="https://hamedhoseyni110-create.github.io/H2-studio/assets/hero-poster.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="H2 Studio — ایده‌ات را سینمایی می‌سازم">
+<meta name="twitter:description" content="ویدیوهای سینمایی با هوش مصنوعی، سایت‌های سه‌بعدی و ایمِرسیو، اپلیکیشن.">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"ProfessionalService","name":"H2 Studio","description":"AI-crafted cinematic video, 3D immersive websites, and apps — from brief to delivery.","url":"https://hamedhoseyni110-create.github.io/H2-studio/","telephone":"+98-937-573-2165","areaServed":["IR","Worldwide"],"priceRange":"توافقی","sameAs":[]}
+</script>
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
 <link rel="stylesheet" href="styles.css">
-<link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+<link rel="stylesheet" href="assets/narengi.css">
+<link rel="stylesheet" href="assets/playful.css">
 </head>
 <body>
-
-<a class="skip" href="#services" id="skipLink"></a>
+<div class="aurora" aria-hidden="true"><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span></div>
+<a class="skip" id="skipLink" href="#main">پرش به محتوا</a>
 
 <header class="nav" id="nav">
-  <a class="wordmark" href="#top" dir="ltr"><img src="assets/logo.svg" alt="H2 Studio" class="wordmark-logo">H<b>2</b> Studio</a>
-  <nav class="nav-links" id="navLinks" aria-label="main"></nav>
+  <a class="brand" href="#top" aria-label="H2 Studio">
+    <img src="assets/logo.svg" alt="" width="42" height="42">
+    <span class="brand-name" dir="ltr">H2 Studio</span>
+  </a>
+  <button class="hamburger" id="hamburger" aria-expanded="false" aria-label="منو"><span></span><span></span><span></span></button>
+  <nav class="nav-links" id="navLinks"></nav>
   <div class="nav-actions">
-    <button class="lang-toggle" id="langToggle" type="button"></button>
-    <button class="btn btn-primary btn-compact" id="navCta" type="button" data-wizard-open></button>
-    <button class="hamburger" id="hamburger" type="button" aria-expanded="false" aria-controls="navLinks">&#9776;</button>
+    <button class="sound-toggle" id="soundToggle" aria-pressed="false" aria-label="روشن کردن صدای پس‌زمینه">🔇</button>
+    <button class="lang-toggle" id="langToggle">EN</button>
+    <button class="btn btn-primary" id="navCta" data-wizard-open></button>
   </div>
 </header>
 
-<main>
-  <section class="hero" id="top" aria-label="hero">
-    <div class="hero-media">
-      <img class="hero-poster" src="assets/hero-poster.jpg" alt="" fetchpriority="high">
-      <video class="hero-video" id="heroVideo" muted autoplay loop playsinline
-             preload="metadata" poster="assets/hero-poster.jpg" aria-hidden="true" tabindex="-1">
-        <source src="assets/hero.mp4" type="video/mp4">
-      </video>
-      <div class="hero-scrim"></div>
-    </div>
-    <div class="hero-text">
-      <h1 id="heroHeadline"></h1>
-      <p class="hero-sub" id="heroSub"></p>
-      <button class="btn btn-primary btn-lg" id="heroCta" type="button" data-wizard-open></button>
+<main id="main">
+  <section class="hero" id="top">
+    <video id="heroVideo" class="hero-video" autoplay muted loop playsinline preload="auto" poster="assets/hero-poster.jpg" aria-hidden="true">
+      <source src="assets/hero.mp4" type="video/mp4">
+    </video>
+    <div class="hero-shade" aria-hidden="true"></div>
+    <canvas id="heroFx" aria-hidden="true"></canvas>
+    <div class="hero-inner">
+      <h1 id="heroTitle"></h1>
+      <p class="hero-sub" id="heroSubtitle"></p>
+      <div class="hero-ctas">
+        <button class="btn btn-primary" id="heroCtaPrimary" data-wizard-open></button>
+        <a class="btn btn-ghost" id="heroCtaSecondary" href="#portfolio"></a>
+      </div>
+      <div class="scroll-hint" aria-hidden="true">
+        <span id="scrollHintText"></span>
+        <span class="scroll-line"></span>
+      </div>
+      <div class="interact-hint" id="interactHint" aria-hidden="true"></div>
     </div>
   </section>
+
+  <div class="divider-scene" data-scene aria-hidden="true"><canvas></canvas></div>
 
   <section class="section" id="services">
-    <div class="wrap">
-      <h2 class="section-title" id="servicesTitle"></h2>
-      <div class="services-grid" id="servicesGrid"></div>
-    </div>
+    <h2 class="section-title" id="servicesTitle"></h2>
+    <div class="services-grid" id="servicesGrid"></div>
   </section>
 
-  <section class="section" id="work">
-    <div class="wrap">
-      <h2 class="section-title" id="workTitle"></h2>
-      <p class="section-sub" id="workSub"></p>
-      <div class="work-grid" id="workGrid"></div>
-      <div class="section-cta">
-        <button class="btn btn-primary" id="workCta" type="button" data-wizard-open></button>
-      </div>
-    </div>
+  <section class="section" id="portfolio">
+    <h2 class="section-title" id="portfolioTitle"></h2>
+    <p class="section-sub" id="portfolioSub"></p>
+    <div class="portfolio-grid" id="portfolioGrid"></div>
+  </section>
+
+  <section class="section" id="videos">
+    <h2 class="section-title" id="videosTitle"></h2>
+    <p class="section-sub" id="videosSub"></p>
+    <div class="videos-grid" id="videosGrid"></div>
+  </section>
+
+  <div class="divider-scene" data-scene aria-hidden="true"><canvas></canvas></div>
+
+  <section class="section" id="lab">
+    <h2 class="section-title" id="labTitle"></h2>
+    <p class="section-sub" id="labSub"></p>
+    <div class="lab-grid" id="labGrid"></div>
   </section>
 
   <section class="section" id="process">
-    <div class="wrap">
-      <h2 class="section-title" id="processTitle"></h2>
-      <ol class="process-steps" id="processSteps"></ol>
+    <h2 class="section-title" id="processTitle"></h2>
+    <ol class="process-steps" id="processSteps"></ol>
+  </section>
+
+  <section class="section" id="faq">
+    <h2 class="section-title" id="faqTitle"></h2>
+    <p class="section-sub" id="faqSub"></p>
+    <div class="faq-list" id="faqList"></div>
+  </section>
+
+  <section class="section" id="pricing">
+    <h2 class="section-title" id="pricingTitle"></h2>
+    <p class="section-sub" id="pricingSub"></p>
+    <h3 class="block-title" id="pricingFactorsTitle"></h3>
+    <ul class="factors-list" id="pricingFactors"></ul>
+    <h3 class="block-title" id="pricingTiersTitle"></h3>
+    <div class="tiers-grid" id="pricingTiers"></div>
+    <p class="pricing-note" id="pricingSoonNote"></p>
+    <div class="pricing-cta">
+      <button class="btn btn-primary btn-lg" id="pricingCta" data-wizard-open></button>
+      <p class="pricing-note" id="pricingNote"></p>
     </div>
+  </section>
+
+  <section class="section" id="stats">
+    <h2 class="section-title" id="statsTitle"></h2>
+    <div class="stats-grid" id="statsGrid"></div>
+    <h3 class="block-title" id="quotesTitle"></h3>
+    <div class="quotes-empty" id="quotesEmpty"></div>
   </section>
 
   <section class="section" id="about">
-    <div class="wrap">
-      <h2 class="section-title" id="aboutTitle"></h2>
-      <p class="about-body" id="aboutBody"></p>
-    </div>
+    <h2 class="section-title" id="aboutTitle"></h2>
+    <div class="about-body" id="aboutBody"></div>
   </section>
 
-  <section class="section" id="contact">
-    <div class="wrap contact-box">
-      <h2 class="section-title" id="contactTitle"></h2>
-      <p id="contactBody"></p>
-      <button class="btn btn-primary btn-lg" id="contactCta" type="button" data-wizard-open></button>
+  <section class="section contact" id="contact">
+    <h2 class="section-title" id="contactTitle"></h2>
+    <p class="section-sub" id="contactBody"></p>
+    <div class="contact-grid">
+      <div class="contact-panel">
+        <h3 id="wizardPanelTitle"></h3>
+        <p id="wizardPanelBody"></p>
+        <button class="btn btn-primary btn-lg" id="contactCta" data-wizard-open></button>
+      </div>
+      <div class="contact-panel">
+        <h3 id="callbackTitle"></h3>
+        <p id="callbackBody"></p>
+        <form id="callbackForm" novalidate>
+          <div class="field">
+            <label for="cbName" id="cbNameLabel"></label>
+            <input type="text" id="cbName" autocomplete="name">
+            <div class="error-msg" id="cbNameErr" role="alert"></div>
+          </div>
+          <div class="field">
+            <label for="cbPhone" id="cbPhoneLabel"></label>
+            <input type="tel" id="cbPhone" dir="ltr" autocomplete="tel">
+            <div class="error-msg" id="cbPhoneErr" role="alert"></div>
+          </div>
+          <div class="field">
+            <label for="cbTime" id="cbTimeLabel"></label>
+            <input type="text" id="cbTime">
+            <div class="field-hint" id="cbTimeHint"></div>
+          </div>
+          <button type="submit" class="btn btn-wa" id="cbSubmit"></button>
+        </form>
+      </div>
     </div>
   </section>
 </main>
 
 <footer class="footer">
-  <div class="wrap">
-    <p class="footer-tagline" id="footerTagline"></p>
-    <a class="footer-ig" id="footerIg" href="https://www.instagram.com/hamed_hoseyni110/" target="_blank" rel="noopener" dir="ltr">Instagram</a>
-    <p class="footer-copy">© <span dir="ltr">H2 Studio</span></p>
-  </div>
+  <img src="assets/logo.svg" alt="" width="32" height="32">
+  <p class="footer-tagline" id="footerTagline"></p>
+  <p class="footer-rights" id="footerRights"></p>
 </footer>
 
-<div class="overlay" id="wizard" role="dialog" aria-modal="true" aria-labelledby="wizardTitle" hidden>
-  <div class="wizard-shell">
+<div id="narengi" aria-label="نارنگی، راهنمای استودیو" role="img">
+  <video id="narengi-video" muted playsinline loop autoplay preload="metadata" poster="assets/narengi/poster.jpg" aria-hidden="true">
+    <source src="assets/narengi/working.mp4" type="video/mp4">
+  </video>
+  <div id="narengi-bubble" hidden></div>
+</div>
+
+<button class="sticky-cta" id="stickyCta" data-wizard-open></button>
+
+<div class="lightbox-overlay" id="lightbox" hidden>
+  <div class="lightbox" role="dialog" aria-modal="true" aria-labelledby="lightboxTitle">
+    <div class="lightbox-head">
+      <h3 id="lightboxTitle"></h3>
+      <button class="lightbox-close" id="lightboxClose">×</button>
+    </div>
+    <video id="lightboxVideo" controls playsinline preload="metadata"></video>
+    <p class="lightbox-desc" id="lightboxDesc"></p>
+  </div>
+</div>
+
+<div class="wizard-overlay" id="wizard" hidden>
+  <div class="wizard" role="dialog" aria-modal="true" aria-labelledby="wizardTitle">
     <div class="wizard-head">
-      <div class="wizard-stepof" id="wizardStepOf"></div>
       <div class="progress" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
-      <button class="wizard-close" id="wizardClose" type="button"></button>
+      <span class="step-of" id="wizardStepOf"></span>
+      <button class="wizard-close" id="wizardClose">×</button>
     </div>
     <div class="wizard-body" id="wizardBody"></div>
     <div class="wizard-foot" id="wizardFoot">
-      <button class="btn btn-ghost" id="wizardBack" type="button"></button>
-      <button class="btn btn-primary" id="wizardNext" type="button"></button>
+      <button class="btn btn-ghost" id="wizardBack"></button>
+      <button class="btn btn-primary" id="wizardNext"></button>
     </div>
   </div>
 </div>
 
-<div class="overlay" id="videoModal" role="dialog" aria-modal="true" aria-labelledby="videoModalTitle" hidden>
-  <div class="video-shell">
-    <div class="video-head">
-      <h2 id="videoModalTitle"></h2>
-      <button class="wizard-close" id="videoClose" type="button"></button>
-    </div>
-    <video id="modalVideo" controls playsinline preload="none"></video>
-  </div>
-</div>
-
+<script src="assets/copy-data.js"></script>
 <script src="app.js"></script>
+<script src="assets/narengi.js"></script>
+<script src="assets/hero-particles.js"></script>
+<script src="assets/music-player.js"></script>
+<script src="assets/playful.js"></script>
 </body>
 </html>
