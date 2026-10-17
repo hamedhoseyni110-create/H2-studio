@@ -16,7 +16,7 @@
   var REDUCED = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   function byId(id) { return document.getElementById(id); }
-  function lang() { return document.documentElement.lang === "en" ? "en" : "fa"; }
+  function lang() { var l = document.documentElement.lang; return (l === "en" || l === "ar") ? l : "fa"; }
   function M() { return COPY[lang()].mascot; }
   function UI() { return COPY[lang()].ui; }
 

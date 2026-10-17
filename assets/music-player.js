@@ -42,7 +42,7 @@ var MUSIC_TRACKS = [
   function lang() {
     try {
       var s = localStorage.getItem("h2-lang");
-      if (s === "en" || s === "fa") return s;
+      if (s === "en" || s === "fa" || s === "ar") return s;
     } catch (e) { /* noop */ }
     return (typeof COPY !== "undefined" && COPY.en) ? "fa" : "fa";
   }
