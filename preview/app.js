@@ -26,6 +26,10 @@ function previewSrc(id) {
   if (id === "qatre") return "assets/previews/qatre-preview.mp4";
   return "assets/previews/" + id + ".mp4";
 }
+function previewPoster(id) {
+  if (id === "qatre") return "assets/previews/qatre-preview.jpg";
+  return "assets/previews/" + id + ".jpg";
+}
 
 /* ================= Page render ================= */
 
@@ -40,7 +44,7 @@ function renderPage() {
   /* nav */
   var nav = c.nav;
   var links = [
-    ["services", nav.services], ["portfolio", nav.portfolio], ["lab", nav.lab], ["process", nav.process],
+    ["services", nav.services], ["portfolio", nav.portfolio], ["videos", nav.videos], ["lab", nav.lab], ["process", nav.process],
     ["faq", nav.faq], ["pricing", nav.pricing],
     ["about", nav.about], ["contact", nav.contact]
   ];
@@ -108,15 +112,52 @@ function renderPage() {
     }
     cap += "</div>";
     var badge = '<span class="media-badge">' + esc(c.portfolio.preview) + "</span>";
+    var playBtn = '<span class="play-btn" aria-hidden="true"><i></i></span>';
     card.innerHTML =
-      '<div class="portfolio-media">' +
-      '<video data-src="' + esc(previewSrc(item.id)) + '" muted loop playsinline preload="none" aria-label="' + esc(item.title) + '"></video>' +
-      badge + "</div>" + cap;
+      '<div class="portfolio-media" tabindex="0" role="button" aria-label="' + esc(c.videos.watch + ": " + item.title) + '">' +
+      '<video data-src="' + esc(previewSrc(item.id)) + '" muted loop playsinline preload="none" aria-hidden="true"></video>' +
+      badge + playBtn + "</div>" + cap;
+    (function(it){
+      var media = card.querySelector(".portfolio-media");
+      function open(){ openLightbox(previewSrc(it.id), previewPoster(it.id), it.title, it.desc); }
+      media.addEventListener("click", open);
+      media.addEventListener("keydown", function(e){
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); }
+      });
+    })(item);
     pg.appendChild(card);
   });
   initTilt();
   initLazyVideos();
   /* playful layer: re-collect scroll-parallax targets after grids re-render */
+  try { window.dispatchEvent(new CustomEvent("h2:grids")); } catch (e) {}
+
+  /* videos (advertising showcase; click -> lightbox with sound) */
+  el("videosTitle").textContent = c.videos.heading;
+  el("videosSub").textContent = c.videos.sub;
+  var vg = el("videosGrid");
+  vg.innerHTML = "";
+  c.videos.items.forEach(function(item){
+    var card = document.createElement("article");
+    card.className = "video-card";
+    card.innerHTML =
+      '<div class="video-media" tabindex="0" role="button" aria-label="' + esc(c.videos.watch + ": " + item.title) + '">' +
+      '<img src="' + esc(item.poster) + '" alt="" loading="lazy">' +
+      '<span class="play-btn" aria-hidden="true"><i></i></span>' +
+      '<span class="duration-badge">' + esc(item.duration) + "</span>" +
+      '<span class="sound-badge">' + esc(u.lightbox.sound_hint) + "</span>" +
+      "</div>" +
+      '<div class="video-cap"><h3>' + esc(item.title) + "</h3><p>" + esc(item.desc) + "</p></div>";
+    (function(it){
+      var media = card.querySelector(".video-media");
+      function open(){ openLightbox(it.src, it.poster, it.title, it.desc); }
+      media.addEventListener("click", open);
+      media.addEventListener("keydown", function(e){
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); }
+      });
+    })(item);
+    vg.appendChild(card);
+  });
   try { window.dispatchEvent(new CustomEvent("h2:grids")); } catch (e) {}
 
   /* lab (playground; toys rendered by assets/playful.js) */
@@ -299,6 +340,46 @@ function initLazyVideos() {
     });
   }, { threshold: 0.25 });
   vids.forEach(function(v){ lazyIO.observe(v); });
+}
+
+/* ================= Lightbox (click-to-play with sound) ================= */
+
+var lbOpener = null;
+function openLightbox(src, poster, title, desc) {
+  lbOpener = document.activeElement;
+  el("lightboxTitle").textContent = title;
+  el("lightboxDesc").textContent = desc || "";
+  el("lightboxClose").setAttribute("aria-label", U().lightbox.close);
+  var v = el("lightboxVideo");
+  if (poster) v.poster = poster; else v.removeAttribute("poster");
+  v.src = src;
+  v.load();
+  el("lightbox").hidden = false;
+  document.body.style.overflow = "hidden";
+  el("lightboxClose").focus();
+  /* user gesture -> playback with sound is allowed */
+  var p = v.play();
+  if (p && p.catch) p.catch(function(){});
+}
+function closeLightbox() {
+  var lb = el("lightbox");
+  if (lb.hidden) return;
+  var v = el("lightboxVideo");
+  v.pause();
+  v.removeAttribute("src");
+  v.load();
+  lb.hidden = true;
+  document.body.style.overflow = "";
+  if (lbOpener && lbOpener.focus) lbOpener.focus();
+}
+function initLightbox() {
+  el("lightboxClose").addEventListener("click", closeLightbox);
+  el("lightbox").addEventListener("click", function(e){
+    if (e.target === el("lightbox")) closeLightbox();
+  });
+  document.addEventListener("keydown", function(e){
+    if (e.key === "Escape" && !el("lightbox").hidden) closeLightbox();
+  });
 }
 
 /* ================= Wizard ================= */
@@ -649,6 +730,7 @@ function init() {
   renderPage();
 
   initCallbackForm();
+  initLightbox();
 
   document.querySelectorAll("[data-wizard-open]").forEach(function(b){
     b.addEventListener("click", function(){ openWizard(b); });
@@ -696,7 +778,7 @@ function init() {
       }
     });
   }, { rootMargin: "-40% 0px -55% 0px" });
-  ["services", "portfolio", "lab", "process", "faq", "pricing", "stats", "about", "contact"].forEach(function(id){ io.observe(el(id)); });
+  ["services", "portfolio", "videos", "lab", "process", "faq", "pricing", "stats", "about", "contact"].forEach(function(id){ io.observe(el(id)); });
 }
 
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);

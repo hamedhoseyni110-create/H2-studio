@@ -75,6 +75,12 @@
     <div class="portfolio-grid" id="portfolioGrid"></div>
   </section>
 
+  <section class="section" id="videos">
+    <h2 class="section-title" id="videosTitle"></h2>
+    <p class="section-sub" id="videosSub"></p>
+    <div class="videos-grid" id="videosGrid"></div>
+  </section>
+
   <div class="divider-scene" data-scene aria-hidden="true"><canvas></canvas></div>
 
   <section class="section" id="lab">
@@ -169,6 +175,17 @@
 </div>
 
 <button class="sticky-cta" id="stickyCta" data-wizard-open></button>
+
+<div class="lightbox-overlay" id="lightbox" hidden>
+  <div class="lightbox" role="dialog" aria-modal="true" aria-labelledby="lightboxTitle">
+    <div class="lightbox-head">
+      <h3 id="lightboxTitle"></h3>
+      <button class="lightbox-close" id="lightboxClose">×</button>
+    </div>
+    <video id="lightboxVideo" controls playsinline preload="metadata"></video>
+    <p class="lightbox-desc" id="lightboxDesc"></p>
+  </div>
+</div>
 
 <div class="wizard-overlay" id="wizard" hidden>
   <div class="wizard" role="dialog" aria-modal="true" aria-labelledby="wizardTitle">
