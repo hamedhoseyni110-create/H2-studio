@@ -1,0 +1,209 @@
+/* H2 Studio v2 — playful layer (iter3).
+   Scroll delights: canvas landscape dividers, card parallax, micro-animations,
+   the Lab playground, and the sticky order CTA.
+   ALL styles here; styles.css / narengi.css untouched except the mascot dock
+   block appended at the end of narengi.css. Zero external requests. */
+
+:root {
+  --play-ease: cubic-bezier(0.16, 0.8, 0.24, 1);
+}
+
+/* ============ landscape divider scenes (canvas, decorative) ============ */
+.divider-scene {
+  position: relative;
+  width: 100%;
+  height: 240px;
+  overflow: hidden;
+  margin: 8px 0 -8px;
+  /* soft blend into the page above/below */
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 18%, #000 82%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0, #000 18%, #000 82%, transparent 100%);
+}
+.divider-scene canvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  display: block;
+}
+@media (max-width: 760px) {
+  .divider-scene { height: 170px; }
+}
+
+/* ============ card depth: tilt + scroll parallax via CSS vars ============
+   app.js writes --rx/--ry (tilt) and playful.js writes --par (scroll).
+   Applied only once the reveal settles, so it never fights .reveal-3d. */
+@media (prefers-reduced-motion: no-preference) {
+  #portfolioGrid .portfolio-card.settled,
+  #servicesGrid .service-card.settled {
+    transform:
+      rotateX(var(--rx, 0deg))
+      rotateY(var(--ry, 0deg))
+      translateY(var(--par, 0px));
+    transition: transform 0.14s linear;
+  }
+  /* reveal-3d must fully release the transform after settling */
+  .reveal-3d.settled { transform: none; }
+}
+
+/* ============ scroll micro-animations ============ */
+.section-title { position: relative; display: inline-block; }
+.section-title::after {
+  content: "";
+  position: absolute;
+  inset-inline-start: 2px; bottom: -8px;
+  width: 72px; height: 3px; border-radius: 2px;
+  background: var(--grad);
+  transform: scaleX(0);
+  transform-origin: inline-start;
+  transition: transform 0.7s var(--play-ease) 0.25s;
+}
+.section-title.in::after { transform: scaleX(1); }
+
+/* process step numbers get a little pop when their card lands */
+.process-steps li.in .step-num {
+  animation: step-pop 0.55s var(--play-ease);
+}
+@keyframes step-pop {
+  0%   { transform: scale(0.4); opacity: 0; }
+  60%  { transform: scale(1.18); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+/* ============ sticky order CTA (always one click away) ============ */
+.sticky-cta {
+  position: fixed;
+  bottom: 22px;
+  inset-inline-start: 50%;
+  transform: translateX(50%); /* RTL: inset-inline-start:50% is the right side; recenter */
+  z-index: 110;
+  font-family: var(--font);
+  font-weight: 800;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: #06120d;
+  background: var(--grad);
+  border: 0;
+  border-radius: 999px;
+  padding: 12px 26px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 12px 34px rgba(52, 211, 153, 0.30), 0 4px 14px rgba(0, 0, 0, 0.5);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.3s ease;
+}
+[dir="ltr"] .sticky-cta { transform: translateX(-50%); }
+.sticky-cta:hover {
+  transform: translateX(50%) translateY(-2px);
+  box-shadow: 0 16px 42px rgba(52, 211, 153, 0.42), 0 4px 14px rgba(0, 0, 0, 0.5);
+}
+[dir="ltr"] .sticky-cta:hover { transform: translateX(-50%) translateY(-2px); }
+.sticky-cta:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+/* one-time playful entrance pulse when it first matters (JS adds .pulse once) */
+.sticky-cta.pulse { animation: cta-pulse 0.9s var(--play-ease) 2; }
+@keyframes cta-pulse {
+  0%, 100% { transform: translateX(50%) scale(1); }
+  50%      { transform: translateX(50%) scale(1.07); }
+}
+[dir="ltr"] .sticky-cta.pulse { animation-name: cta-pulse-ltr; }
+@keyframes cta-pulse-ltr {
+  0%, 100% { transform: translateX(-50%) scale(1); }
+  50%      { transform: translateX(-50%) scale(1.07); }
+}
+@media (max-width: 760px) {
+  /* float ABOVE the mascot/music-player bottom row on small screens */
+  .sticky-cta {
+    bottom: 92px;
+    font-size: 0.85rem;
+    padding: 10px 20px;
+    max-width: calc(100vw - 170px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* ============ the Lab ============ */
+.lab-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+.lab-toy {
+  background: var(--surface);
+  border: 1px solid rgba(52, 211, 153, 0.12);
+  border-radius: var(--radius);
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.lab-toy:hover { border-color: rgba(52, 211, 153, 0.32); }
+.lab-toy::before {
+  /* playful corner spark */
+  content: "✦";
+  position: absolute;
+  top: 14px; inset-inline-end: 18px;
+  color: var(--emerald);
+  opacity: 0.5;
+  font-size: 1.1rem;
+  pointer-events: none;
+}
+.lab-toy h3 { margin: 0 0 8px; font-size: 1.15rem; }
+.lab-toy > p { margin: 0 0 16px; color: var(--muted); font-size: 0.92rem; }
+.lab-group { margin-bottom: 14px; }
+.lab-group > span {
+  display: block;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--emerald);
+  margin-bottom: 8px;
+}
+.lab-output-label {
+  display: block;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--emerald);
+  margin: 16px 0 8px;
+}
+.lab-output {
+  background: #05080a;
+  border: 1px dashed rgba(52, 211, 153, 0.35);
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-size: 0.92rem;
+  line-height: 1.9;
+  min-height: 5.4em;
+  color: var(--text);
+}
+.lab-output:empty::before {
+  content: attr(data-placeholder);
+  color: var(--muted);
+  opacity: 0.7;
+}
+.lab-actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; align-items: center; }
+.lab-note { color: var(--muted); font-size: 0.8rem; margin-top: 12px; }
+.lab-copy-ok { color: var(--emerald); font-size: 0.88rem; }
+
+/* palette toy */
+.palette-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.palette-dot {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.palette-dot:hover { transform: scale(1.1); }
+.palette-dot[aria-pressed="true"] {
+  border-color: var(--text);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
+}
+.palette-name { font-size: 0.85rem; color: var(--muted); min-height: 1.6em; margin-bottom: 4px; }
+
+/* ============ reduced motion: everything static ============ */
+@media (prefers-reduced-motion: reduce) {
+  .divider-scene canvas { /* single static frame painted by JS; no animation */ }
+  .section-title::after { transition: none; transform: scaleX(1); }
+  .process-steps li.in .step-num { animation: none; }
+  .sticky-cta.pulse { animation: none; }
+  .sticky-cta { transition: none; }
+  #portfolioGrid .portfolio-card.settled,
+  #servicesGrid .service-card.settled { transform: none; transition: none; }
+}

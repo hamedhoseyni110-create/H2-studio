@@ -1,0 +1,236 @@
+/* نارنگی (Tangerine) — chubby orange cat mascot + ambient sound toggle.
+   ALL mascot styles live here; styles.css is untouched.
+
+   DARK THEME: near-black glassy orb badge, single restrained emerald accent.
+   The clips' white backdrop is intentionally feathered into the dark disc —
+   ffmpeg colorkey was tried and ABANDONED (it ate the cat's white muzzle
+   and ballooned the files 8×), so the badge is a deliberate dark orb instead. */
+
+/* ============ mascot: dark glassy orb badge ============ */
+#narengi {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  width: 168px;
+  height: 168px;
+  z-index: 90;
+  cursor: pointer;
+  border-radius: 50%;
+  /* intentional dark disc: the white frame edges feather into this */
+  background: radial-gradient(circle at 50% 36%, #16241b 0%, #0a120d 48%, #05080a 100%);
+  box-shadow:
+    0 10px 34px rgba(0, 0, 0, 0.62),
+    0 0 0 2px rgba(52, 211, 153, 0.38),
+    0 0 26px rgba(52, 211, 153, 0.10);
+  overflow: hidden;
+  /* NOTE: the happy-wiggle animation runs on #narengi itself; the fixed-position
+     speech bubble child needs this wrapper to keep a stable box. */
+}
+#narengi::after {
+  /* glass sheen */
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 24%, rgba(255, 255, 255, 0.10), transparent 44%);
+  pointer-events: none;
+}
+#narengi video,
+#narengi img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  /* feather the white backdrop edges into the dark disc */
+  -webkit-mask-image: radial-gradient(circle, #000 58%, transparent 70%);
+  mask-image: radial-gradient(circle, #000 58%, transparent 70%);
+  background: transparent;
+}
+@media (max-width: 640px) {
+  #narengi { width: 118px; height: 118px; left: 12px; bottom: 12px; }
+}
+
+/* happy wiggle when hovering any CTA button on the page */
+#narengi.happy { animation: narengi-wiggle 0.6s ease-in-out; }
+@keyframes narengi-wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25%      { transform: rotate(-5deg); }
+  50%      { transform: rotate(4deg); }
+  75%      { transform: rotate(-2deg); }
+}
+
+/* ============ speech bubble (dark) ============ */
+#narengi-bubble {
+  position: fixed;
+  left: 204px;
+  bottom: 72px;
+  max-width: min(300px, calc(100vw - 240px));
+  z-index: 91;
+  background: #0b110d;
+  color: #e9f2ee;
+  border: 1px solid rgba(52, 211, 153, 0.45);
+  border-radius: 16px;
+  padding: 12px 14px;
+  font-family: var(--font, inherit);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(52, 211, 153, 0.08);
+  pointer-events: none;
+  animation: narengi-pop 0.35s ease-out;
+}
+#narengi-bubble[hidden] { display: none; }
+/* bordered tail: emerald outline + dark fill */
+#narengi-bubble::before {
+  content: "";
+  position: absolute;
+  left: -10px;
+  bottom: 14px;
+  border-width: 9px 11px 9px 0;
+  border-style: solid;
+  border-color: transparent rgba(52, 211, 153, 0.55) transparent transparent;
+}
+#narengi-bubble::after {
+  content: "";
+  position: absolute;
+  left: -8px;
+  bottom: 15px;
+  border-width: 8px 10px 8px 0;
+  border-style: solid;
+  border-color: transparent #0b110d transparent transparent;
+}
+#narengi-bubble .narengi-close {
+  pointer-events: auto;
+  position: absolute;
+  top: -12px;
+  inset-inline-end: -10px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid rgba(52, 211, 153, 0.5);
+  background: #0b110d;
+  color: #9fd8bd;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+@keyframes narengi-pop {
+  from { transform: scale(0.85) translateY(6px); opacity: 0; }
+  to   { transform: scale(1) translateY(0);     opacity: 1; }
+}
+
+/* ============ quick-action chips ============ */
+.narengi-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+  pointer-events: auto;
+}
+.narengi-chip {
+  font-family: var(--font, inherit);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: #e9f2ee;
+  background: rgba(52, 211, 153, 0.10);
+  border: 1px solid rgba(52, 211, 153, 0.45);
+  border-radius: 999px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+.narengi-chip:hover,
+.narengi-chip:focus-visible {
+  background: rgba(52, 211, 153, 0.24);
+  outline: none;
+}
+.narengi-talk-text { display: block; }
+
+@media (max-width: 640px) {
+  #narengi-bubble,
+  body.mascot-docked #narengi-bubble {
+    /* above the sticky-CTA + music-player bottom band: never covered */
+    left: 16px;
+    right: 16px;
+    bottom: 152px;
+    max-width: none;
+  }
+  /* tail points down toward the badge */
+  #narengi-bubble::before {
+    left: 44px;
+    bottom: -10px;
+    border-width: 11px 9px 0 9px;
+    border-style: solid;
+    border-color: rgba(52, 211, 153, 0.55) transparent transparent transparent;
+  }
+  #narengi-bubble::after {
+    left: 45px;
+    bottom: -8px;
+    border-width: 10px 8px 0 8px;
+    border-style: solid;
+    border-color: #0b110d transparent transparent transparent;
+  }
+}
+
+/* ============ ambient sound toggle ============ */
+.sound-toggle {
+  background: transparent;
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 7px 12px;
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 1rem;
+  line-height: 1;
+}
+.sound-toggle:hover { background: rgba(52, 211, 153, 0.12); }
+.sound-toggle[aria-pressed="true"] {
+  background: rgba(52, 211, 153, 0.18);
+  border-color: rgba(52, 211, 153, 0.7);
+}
+
+/* ============ reduced motion ============ */
+@media (prefers-reduced-motion: reduce) {
+  #narengi.happy { animation: none; }
+  #narengi-bubble { animation: none; }
+}
+
+/* ============ scroll dock (iter3): shrink out of the way past the hero ====
+   playful.js toggles body.mascot-docked via IntersectionObserver on #top.
+   Docked: 60px corner badge, semi-transparent until hovered; talk + chips
+   keep working — the bubble re-anchors to the small badge. */
+#narengi {
+  transition: width 0.45s ease, height 0.45s ease, left 0.45s ease,
+    bottom 0.45s ease, opacity 0.45s ease;
+}
+body.mascot-docked #narengi {
+  width: 60px;
+  height: 60px;
+  left: 14px;
+  bottom: 14px;
+  opacity: 0.55;
+}
+body.mascot-docked #narengi:hover,
+body.mascot-docked #narengi:focus-visible {
+  opacity: 1;
+}
+body.mascot-docked #narengi-bubble {
+  left: 88px;
+  bottom: 30px;
+  max-width: min(300px, calc(100vw - 118px));
+  z-index: 115; /* above the sticky CTA pill so chips stay tappable */
+}
+@media (max-width: 640px) {
+  body.mascot-docked #narengi {
+    width: 56px;
+    height: 56px;
+    left: 10px;
+    bottom: 10px;
+  }
+  /* bubble position unified below: always above the bottom band on mobile */
+}
+@media (prefers-reduced-motion: reduce) {
+  #narengi { transition: none; }
+}
