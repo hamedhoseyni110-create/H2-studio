@@ -76,6 +76,22 @@
         "title": "Qatre — 56s watercolor film",
         "client": "Qatre brand",
         "case": "A 56-second watercolor short film, made entirely with AI; Persian narration and original music."
+      },
+      {
+        "id": "brochure-ramin",
+        "tag": "Interactive brochure",
+        "title": "Ramin Burger interactive brochure",
+        "client": "Ramin Burger",
+        "desc": "A living catalog for the restaurant: burger layer explorer, photo menu and WhatsApp ordering.",
+        "case": "Sample of the “interactive brochure” product — same experience, white-labeled per business."
+      },
+      {
+        "id": "brochure-nozhe",
+        "tag": "Interactive brochure",
+        "title": "Café Nozhe interactive brochure",
+        "client": "Café Nozhe",
+        "desc": "A cinematic bean-to-cup journey: interactive menu, order tray and visit invitation.",
+        "case": "Sample of the “interactive brochure” product — white-label, single-file, no server needed."
       }
     ],
     "preview": "Animated preview",
