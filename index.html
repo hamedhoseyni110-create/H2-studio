@@ -7,6 +7,8 @@
 <meta name="description" content="H2 Studio — ویدیوهای سینمایی با هوش مصنوعی، سایت‌های سه‌بعدی و اپلیکیشن">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="fa_IR">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale:alternate" content="ar_SA">
 <meta property="og:url" content="https://hamedhoseyni110-create.github.io/H2-studio/">
 <meta property="og:title" content="H2 Studio — ایده‌ات را سینمایی می‌سازم">
 <meta property="og:description" content="ویدیوهای سینمایی با هوش مصنوعی، سایت‌های سه‌بعدی و ایمِرسیو، اپلیکیشن؛ از بریف تا تحویل، یک استودیوی یک‌نفره با استاندارد استودیوهای بزرگ.">
@@ -35,7 +37,14 @@
   <nav class="nav-links" id="navLinks"></nav>
   <div class="nav-actions">
     <button class="sound-toggle" id="soundToggle" aria-pressed="false" aria-label="روشن کردن صدای پس‌زمینه">🔇</button>
-    <button class="lang-toggle" id="langToggle">EN</button>
+    <div class="lang-wrap">
+      <button class="lang-toggle" id="langToggle" aria-haspopup="true" aria-expanded="false">فا</button>
+      <div class="lang-menu" id="langMenu" hidden>
+        <button type="button" data-lang="fa">فارسی</button>
+        <button type="button" data-lang="en">English</button>
+        <button type="button" data-lang="ar">العربية</button>
+      </div>
+    </div>
     <button class="btn btn-primary" id="navCta" data-wizard-open></button>
   </div>
 </header>
