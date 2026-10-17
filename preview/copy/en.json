@@ -35,6 +35,7 @@
     "contact": "Contact",
     "cta": "Consult & order a project",
     "portfolio": "Portfolio",
+    "videos": "Videos",
     "lab": "Lab",
     "process": "Process",
     "services": "Services",
@@ -80,6 +81,37 @@
     "preview": "Animated preview",
     "sub": "Each project is a small world — take a look, then decide.",
     "view_live": "View live"
+  },
+  "videos": {
+    "heading": "Videos",
+    "sub": "Finished advertising videos — watch with sound.",
+    "watch": "Watch with sound",
+    "items": [
+      {
+        "id": "burger-ad",
+        "title": "Burger Assembly — 10s ad",
+        "desc": "Photoreal burger assembly from scratch to serve; AI-made, with music.",
+        "duration": "0:10",
+        "src": "assets/videos/burger-ad.mp4",
+        "poster": "assets/videos/burger-ad.jpg"
+      },
+      {
+        "id": "nozhe-coffee",
+        "title": "Coffee Journey — 30s",
+        "desc": "From bean to cup; cinematic macro shots for Café Nozhe.",
+        "duration": "0:30",
+        "src": "assets/videos/nozhe-coffee.mp4",
+        "poster": "assets/videos/nozhe-coffee.jpg"
+      },
+      {
+        "id": "qatre-film",
+        "title": "Qatre — 56s film",
+        "desc": "Watercolor short film with Persian narration and original music.",
+        "duration": "0:56",
+        "src": "assets/videos/qatre-film.mp4",
+        "poster": "assets/videos/qatre-film.jpg"
+      }
+    ]
   },
   "process": {
     "heading": "How ordering works",
@@ -175,7 +207,11 @@
       "unknown": "Track"
     },
     "wizard_panel_title": "Order wizard",
-    "sticky_order": "Consult & order"
+    "sticky_order": "Consult & order",
+    "lightbox": {
+      "close": "Close",
+      "sound_hint": "Plays with sound"
+    }
   },
   "wizard": {
     "steps": [

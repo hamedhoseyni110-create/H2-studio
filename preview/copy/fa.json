@@ -35,6 +35,7 @@
     "contact": "تماس",
     "cta": "مشاوره و سفارش پروژه",
     "portfolio": "نمونه‌کارها",
+    "videos": "ویدیوها",
     "lab": "لب",
     "process": "روند کار",
     "services": "خدمات",
@@ -80,6 +81,37 @@
     "preview": "پیش‌نمایش متحرک",
     "sub": "هر پروژه یک دنیای کوچک است؛ ببین، بعد تصمیم بگیر.",
     "view_live": "مشاهده زنده"
+  },
+  "videos": {
+    "heading": "ویدیوها",
+    "sub": "ویدیوهای تبلیغاتی آماده‌ی تحویل — با صدا ببین.",
+    "watch": "تماشا با صدا",
+    "items": [
+      {
+        "id": "burger-ad",
+        "title": "مونتاژ برگر — تبلیغ ۱۰ ثانیه‌ای",
+        "desc": "مونتاژ فوتورئال برگر از صفر تا سرو؛ ساخته‌شده با هوش مصنوعی، با موسیقی.",
+        "duration": "۰:۱۰",
+        "src": "assets/videos/burger-ad.mp4",
+        "poster": "assets/videos/burger-ad.jpg"
+      },
+      {
+        "id": "nozhe-coffee",
+        "title": "سفر قهوه — ۳۰ ثانیه",
+        "desc": "از دانه تا فنجان؛ نماهای ماکروی سینمایی برای کافه نوژه.",
+        "duration": "۰:۳۰",
+        "src": "assets/videos/nozhe-coffee.mp4",
+        "poster": "assets/videos/nozhe-coffee.jpg"
+      },
+      {
+        "id": "qatre-film",
+        "title": "قطره — فیلم ۵۶ ثانیه‌ای",
+        "desc": "فیلم کوتاه آبرنگی با نریشن فارسی و موسیقی اختصاصی.",
+        "duration": "۰:۵۶",
+        "src": "assets/videos/qatre-film.mp4",
+        "poster": "assets/videos/qatre-film.jpg"
+      }
+    ]
   },
   "process": {
     "heading": "مسیر سفارش",
@@ -175,7 +207,11 @@
       "unknown": "آهنگ"
     },
     "wizard_panel_title": "ویزارد سفارش",
-    "sticky_order": "مشاوره و سفارش"
+    "sticky_order": "مشاوره و سفارش",
+    "lightbox": {
+      "close": "بستن",
+      "sound_hint": "با صدا پخش می‌شود"
+    }
   },
   "wizard": {
     "steps": [
