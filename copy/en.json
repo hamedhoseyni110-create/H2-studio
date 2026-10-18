@@ -372,7 +372,7 @@
           "About a month",
           "Flexible"
         ],
-        "title": "What's your budget range? (Toman equivalent, fully negotiable)"
+        "title": "What's your budget range? (fully negotiable)"
       },
       {
         "fields": [
@@ -434,6 +434,10 @@
       {
         "q": "What formats do I get on delivery?",
         "a": "Video as high-quality MP4, sized for each platform (Reels, YouTube, web). Websites ship as ready-to-publish files on your own host, with a management guide."
+      },
+      {
+        "q": "Do you work with clients outside Iran?",
+        "a": "Yes — I work with clients in Iran and worldwide. We communicate in English or Arabic over WhatsApp; international projects are quoted in USD, and the whole ordering flow — wizard, coordination, delivery — is in your language."
       }
     ]
   },
@@ -466,7 +470,7 @@
       }
     ],
     "cta": "Get an exact quote",
-    "note": "Prices are negotiable, in Toman; no hidden fees, ever."
+    "note": "Prices are negotiable, in USD for international projects; no hidden fees, ever."
   },
   "stats": {
     "heading": "The studio in numbers",
