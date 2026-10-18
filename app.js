@@ -2,7 +2,15 @@
    Zero external requests: no fetch/XHR, no CDN. "H2 Studio" is always Latin. */
 
 var state = { lang: "fa" };
-try { var saved = localStorage.getItem("h2-lang"); if (saved === "en" || saved === "fa" || saved === "ar") state.lang = saved; } catch (e) {}
+try {
+  var saved = localStorage.getItem("h2-lang");
+  if (saved === "en" || saved === "fa" || saved === "ar") { state.lang = saved; }
+  else {
+    /* first visit: match the visitor's browser language (foreign prospects land in their own language) */
+    var nav = (navigator.language || navigator.userLanguage || "fa").toLowerCase();
+    state.lang = nav.indexOf("ar") === 0 ? "ar" : nav.indexOf("en") === 0 ? "en" : "fa";
+  }
+} catch (e) {}
 
 var FA_DIGITS = ["۱", "۲", "۳", "۴", "۵"];
 var MIN_TEXT = 3;
