@@ -421,7 +421,7 @@ function clearErrors(root) {
 }
 
 function isOptionalText(q) {
-  return q.kind === "text" && /اختیاری|optional/i.test(q.q);
+  return q.kind === "text" && /اختیاری|اختياري|optional/i.test(q.q);
 }
 function briefKey(i) { return "q" + i; }
 
@@ -521,7 +521,7 @@ function renderWizardStep() {
             return chip(o, wiz.brief[key] === oi, ' data-q="' + i + '" data-oi="' + oi + '"');
           }).join("") + "</div>";
       } else {
-        var opt = isOptionalText(q) ? ' <span class="opt-tag">(' + (state.lang === "fa" ? "اختیاری" : "optional") + ")</span>" : "";
+        var opt = !isOptionalText(q) ? ' <span class="opt-tag">(' + (state.lang === "fa" ? "اختیاری" : state.lang === "ar" ? "اختياري" : "optional") + ")</span>" : "";
         html += '<label for="qi' + i + '">' + esc(q.q) + opt + "</label>" +
           '<textarea id="qi' + i + '" data-textq="' + i + '" rows="2">' +
           esc(wiz.brief[key] || "") + "</textarea>";
