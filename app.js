@@ -29,6 +29,7 @@ var LIVE_URLS = {
   "ramin-berger": "https://hamedhoseyni110-create.github.io/ramin-berger/",
   "coffee-nozhe": "https://hamedhoseyni110-create.github.io/coffee-nozhe/",
   "gym-site-demo": "https://hamedhoseyni110-create.github.io/gym-site-demo/",
+  "hala": "https://hamedhoseyni110-create.github.io/hala-football-analytics/",
 };
 function previewSrc(id) {
   if (id === "qatre") return "assets/previews/qatre-preview.mp4";
