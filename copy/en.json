@@ -76,6 +76,14 @@
         "title": "Qatre — 56s watercolor film",
         "client": "Qatre brand",
         "case": "A 56-second watercolor short film, made entirely with AI; Persian narration and original music."
+      },
+      {
+        "id": "hala",
+        "tag": "Web app",
+        "title": "Hala — football analytics",
+        "client": "Personal project",
+        "desc": "Trilingual football stats web app: 5 European leagues + Champions League, side-by-side team comparison, top scorers and transparent predictions — no signup, fully offline.",
+        "case": "From idea to ship: competitor research (FotMob, Sofascore), three languages with full RTL support, deployed on GitHub Pages."
       }
     ],
     "preview": "Animated preview",
