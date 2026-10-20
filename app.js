@@ -30,13 +30,16 @@ var LIVE_URLS = {
   "coffee-nozhe": "https://hamedhoseyni110-create.github.io/coffee-nozhe/",
   "gym-site-demo": "https://hamedhoseyni110-create.github.io/gym-site-demo/",
   "hala": "https://hamedhoseyni110-create.github.io/hala-football-analytics/",
+  "noir": "https://hamedhoseyni110-create.github.io/interactive-brochure-samples/noir/",
 };
 function previewSrc(id) {
   if (id === "qatre") return "assets/previews/qatre-preview.mp4";
+  if (id === "noir") return window.NOIR_PREVIEW_VIDEO || "assets/previews/noir.mp4";
   return "assets/previews/" + id + ".mp4";
 }
 function previewPoster(id) {
   if (id === "qatre") return "assets/previews/qatre-preview.jpg";
+  if (id === "noir") return window.NOIR_PREVIEW_POSTER || "assets/previews/noir.jpg";
   return "assets/previews/" + id + ".jpg";
 }
 
