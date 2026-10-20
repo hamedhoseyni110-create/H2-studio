@@ -6,6 +6,48 @@
       "My standard is simple: what I deliver has to be good enough that you want to show it off. You tell me what you want — I handle the rest."
     ]
   },
+  "callback": {
+    "body": "Leave your number; I’ll call you myself. No complicated forms, no waiting.",
+    "err_name": "Please enter your name (min 3 characters)",
+    "err_phone": "Please enter your phone number",
+    "heading": "Request a callback",
+    "name": "Name",
+    "phone": "Phone number",
+    "submit": "Request callback via WhatsApp",
+    "time": "Good time to call",
+    "time_hint": "e.g. tomorrow evening, or Saturday mornings",
+    "wa_template": "Hi! I’d like a callback.\nName: {name}\nPhone: {phone}\nGood time: {time}"
+  },
+  "faq": {
+    "heading": "FAQ",
+    "items": [
+      {
+        "a": "There’s no fixed price list; every project is quoted on its scope and complexity. The Pricing section shows what drives the price, and the “Get an exact quote” wizard gives you your project’s price in minutes.",
+        "q": "How much does a project cost?"
+      },
+      {
+        "a": "Anywhere from a few days to a few weeks depending on scope; we lock the exact timeline in the brief and stick to it.",
+        "q": "How long does delivery take?"
+      },
+      {
+        "a": "The workflow is built so you see and approve a preview at every stage; revisions until you approve the result are a natural part of the process.",
+        "q": "How many revisions can I request?"
+      },
+      {
+        "a": "Yes — with a precise storyboard, locked references and human editing. Watch “Qatre”: a 56-second film made entirely with AI. AI is the tool; the cinematic eye is human.",
+        "q": "Is AI video quality really professional?"
+      },
+      {
+        "a": "Video as high-quality MP4, sized for each platform (Reels, YouTube, web). Websites ship as ready-to-publish files on your own host, with a management guide.",
+        "q": "What formats do I get on delivery?"
+      },
+      {
+        "a": "Yes — I work with clients in Iran and worldwide. We communicate in English or Arabic over WhatsApp; international projects are quoted in USD, and the whole ordering flow — wizard, coordination, delivery — is in your language.",
+        "q": "Do you work with clients outside Iran?"
+      }
+    ],
+    "sub": "Short, honest answers to the things everyone asks."
+  },
   "footer": {
     "rights": "All rights reserved to H2 Studio. © 2026",
     "tagline": "Making ideas cinematic — H2 Studio"
@@ -17,6 +59,60 @@
     "interact": "Tap it for a burst",
     "subtitle": "AI-crafted cinematic video, 3D immersive websites, and apps — from brief to delivery, a one-person studio with big-studio standards.",
     "title": "I make your idea cinematic."
+  },
+  "lab": {
+    "heading": "The Lab",
+    "palette": {
+      "desc": "Recolor the studio live and find your vibe.",
+      "palettes": [
+        "Emerald (default)",
+        "Sunset",
+        "Ocean",
+        "Neon violet"
+      ],
+      "reset": "Back to default",
+      "title": "Cinematic palette"
+    },
+    "prompt": {
+      "actions": [
+        "soaring above a neon city",
+        "walking through the rain",
+        "dancing under moonlight",
+        "exploring a glowing cave"
+      ],
+      "cameras": [
+        "Slow dolly-in",
+        "180-degree orbit around the subject",
+        "Descending aerial shot",
+        "Gentle push-in zoom"
+      ],
+      "copied": "Copied",
+      "copy": "Copy prompt",
+      "desc": "Pick a subject, an action and a mood; get a copy-ready English production prompt — the same formula we use to make videos (~45 words, one action + one camera move).",
+      "generate": "Build it",
+      "groups": {
+        "action": "Action",
+        "camera": "Camera move",
+        "mood": "Mood & light",
+        "subject": "Subject"
+      },
+      "moods": [
+        "Golden-hour glow",
+        "Cinematic fog",
+        "Night neon",
+        "Soft morning light"
+      ],
+      "note": "Output is in English — video generators work best with English prompts.",
+      "output_label": "Ready prompt",
+      "subjects": [
+        "A chubby orange astronaut cat",
+        "The old bazaar of Isfahan",
+        "A surfer riding the clouds",
+        "A tiny robot chef"
+      ],
+      "title": "Cinematic prompt builder"
+    },
+    "sub": "The studio's playground — small toys that show what AI can do."
   },
   "mascot": {
     "aria": "Tangerine, the studio guide",
@@ -34,115 +130,130 @@
     "about": "About",
     "contact": "Contact",
     "cta": "Consult & order a project",
-    "portfolio": "Portfolio",
-    "videos": "Videos",
+    "faq": "FAQ",
     "lab": "Lab",
+    "portfolio": "Portfolio",
+    "pricing": "Pricing",
     "process": "Process",
     "services": "Services",
-    "faq": "FAQ",
-    "pricing": "Pricing"
+    "videos": "Videos"
   },
   "portfolio": {
     "heading": "Work I've shipped",
     "items": [
       {
+        "case": "A real order for a friend’s restaurant: an interactive menu and WhatsApp ordering wired to his actual products and prices.",
+        "client": "A friend’s restaurant",
         "desc": "Interactive menu, burger builder and WhatsApp ordering; scrolling assembles the burger before your eyes.",
         "id": "ramin-berger",
         "tag": "Cinematic website",
-        "title": "Burger restaurant site",
-        "client": "A friend’s restaurant",
-        "case": "A real order for a friend’s restaurant: an interactive menu and WhatsApp ordering wired to his actual products and prices."
+        "title": "Burger restaurant site"
       },
       {
+        "case": "The official site of Nozhe Café in Isfahan; menu and atmosphere shown cinematically, with an AI-generated video hero.",
+        "client": "Nozhe Café, Isfahan",
         "desc": "Mint-green theme, clickable photo menu and an AI-generated video hero.",
         "id": "coffee-nozhe",
         "tag": "Interactive website",
-        "title": "Nozhe Café site",
-        "client": "Nozhe Café, Isfahan",
-        "case": "The official site of Nozhe Café in Isfahan; menu and atmosphere shown cinematically, with an AI-generated video hero."
+        "title": "Nozhe Café site"
       },
       {
+        "case": "A ready-made demo for gyms; rebranded with each gym’s brand and schedule, sending bookings straight to WhatsApp.",
+        "client": "White-label gym demo",
         "desc": "A cinematic journey from entrance to stations; interactive multi-day booking sent via WhatsApp.",
         "id": "gym-site-demo",
         "tag": "Cinematic website",
-        "title": "Gym site",
-        "client": "White-label gym demo",
-        "case": "A ready-made demo for gyms; rebranded with each gym’s brand and schedule, sending bookings straight to WhatsApp."
+        "title": "Gym site"
       },
       {
+        "case": "A 56-second watercolor short film, made entirely with AI; Persian narration and original music.",
+        "client": "Qatre brand",
         "desc": "56-second AI-made watercolor film; Persian narration and music.",
         "id": "qatre",
         "tag": "Short film",
-        "title": "Qatre — 56s watercolor film",
-        "client": "Qatre brand",
-        "case": "A 56-second watercolor short film, made entirely with AI; Persian narration and original music."
+        "title": "Qatre — 56s watercolor film"
       },
       {
-        "id": "hala",
-        "tag": "Web app",
-        "title": "Hala — football analytics",
+        "case": "From idea to ship: competitor research (FotMob, Sofascore), three languages with full RTL support, deployed on GitHub Pages.",
         "client": "Personal project",
         "desc": "Trilingual football stats web app: 5 European leagues + Champions League, side-by-side team comparison, top scorers and transparent predictions — no signup, fully offline.",
-        "case": "From idea to ship: competitor research (FotMob, Sofascore), three languages with full RTL support, deployed on GitHub Pages."
+        "id": "hala",
+        "tag": "Web app",
+        "title": "Hala — football analytics"
+      },
+      {
+        "case": "From idea to launch: the hero video and style looks were generated with AI, the logo was designed in-house and the site shipped on GitHub Pages; a white-label template ready to rebrand for any clothing store.",
+        "client": "White-label menswear store sample",
+        "desc": "A menswear store with an AI-made video hero, AI styling looks, a showcase with black-and-gold studio backgrounds and a custom logo — bilingual in Persian and English.",
+        "id": "noir",
+        "tag": "Cinematic site",
+        "title": "NOIR fashion store"
       }
     ],
     "preview": "Animated preview",
     "sub": "Each project is a small world — take a look, then decide.",
+    "tabs": {
+      "all": "All work",
+      "sites": "Websites",
+      "videos": "Videos",
+      "webapps": "Web apps"
+    },
+    "tabs_label": "Filter work by type",
     "view_live": "View live"
   },
-  "videos": {
-    "heading": "Videos",
-    "sub": "Finished advertising videos — watch with sound.",
-    "watch": "Watch with sound",
-    "items": [
+  "pricing": {
+    "cta": "Get an exact quote",
+    "factors": [
+      "Project type: AI video, cinematic website, app, or editing",
+      "Scope: video length, number of site pages, number of app features",
+      "Customization level: ready-made template vs. bespoke design",
+      "Ready content: do you have photos, copy and a logo, or must they be created?",
+      "Timeline: rush delivery compresses the production schedule"
+    ],
+    "factors_title": "What drives the price?",
+    "heading": "Pricing",
+    "note": "Prices are negotiable, in USD for international projects; no hidden fees, ever.",
+    "soon": "Coming soon",
+    "sub": "The exact quote comes after the brief — but these are the things that set it.",
+    "tiers": [
       {
-        "id": "burger-ad",
-        "title": "Burger Assembly — 10s ad",
-        "desc": "Photoreal burger assembly from scratch to serve; AI-made, with music.",
-        "duration": "0:10",
-        "src": "assets/videos/burger-ad.mp4",
-        "poster": "assets/videos/burger-ad.jpg"
+        "desc": "For small beginnings; one compact, polished deliverable.",
+        "name": "Starter package"
       },
       {
-        "id": "nozhe-coffee",
-        "title": "Coffee Journey — 30s",
-        "desc": "From bean to cup; cinematic macro shots for Café Nozhe.",
-        "duration": "0:30",
-        "src": "assets/videos/nozhe-coffee.mp4",
-        "poster": "assets/videos/nozhe-coffee.jpg"
+        "desc": "The most popular choice for businesses; a complete, professional deliverable.",
+        "name": "Standard package"
       },
       {
-        "id": "qatre-film",
-        "title": "Qatre — 56s film",
-        "desc": "Watercolor short film with Persian narration and original music.",
-        "duration": "0:56",
-        "src": "assets/videos/qatre-film.mp4",
-        "poster": "assets/videos/qatre-film.jpg"
+        "desc": "Large, fully bespoke projects; special handling from idea to delivery.",
+        "name": "Custom package"
       }
-    ]
+    ],
+    "tiers_soon_note": "Real prices will be filled in here soon; for now, get your exact quote from the wizard.",
+    "tiers_title": "Starter packages"
   },
   "process": {
     "heading": "How ordering works",
     "steps": [
       {
-        "title": "Brief",
-        "desc": "In a few minutes I learn exactly what you want — and what you don’t; the result is a clear brief we both sign off on."
+        "desc": "In a few minutes I learn exactly what you want — and what you don’t; the result is a clear brief we both sign off on.",
+        "title": "Brief"
       },
       {
-        "title": "Concept",
-        "desc": "I propose a few creative directions; you pick one, and that’s the one we build — nothing else."
+        "desc": "I propose a few creative directions; you pick one, and that’s the one we build — nothing else.",
+        "title": "Concept"
       },
       {
-        "title": "Preview",
-        "desc": "Before the final version you see a real preview: a visual storyboard for video, a clickable demo for websites."
+        "desc": "Before the final version you see a real preview: a visual storyboard for video, a clickable demo for websites.",
+        "title": "Preview"
       },
       {
-        "title": "Revisions",
-        "desc": "Your notes come in and get applied exactly; we keep going until you say “that’s it”."
+        "desc": "Your notes come in and get applied exactly; we keep going until you say “that’s it”.",
+        "title": "Revisions"
       },
       {
-        "title": "Delivery",
-        "desc": "Final files, clean and ready to publish — with a usage guide and post-delivery support."
+        "desc": "Final files, clean and ready to publish — with a usage guide and post-delivery support.",
+        "title": "Delivery"
       }
     ]
   },
@@ -191,6 +302,26 @@
       "title": "White-label models"
     }
   ],
+  "stats": {
+    "heading": "The studio in numbers",
+    "items": [
+      {
+        "label": "Projects delivered and live",
+        "value": "4"
+      },
+      {
+        "label": "AI tools in the production stack",
+        "value": "9"
+      },
+      {
+        "label": "Person; you talk to me directly, no middlemen",
+        "value": "1"
+      }
+    ],
+    "quotes_empty": "Coming soon",
+    "quotes_empty_body": "Future clients’ feedback will be published right here.",
+    "quotes_heading": "Client words"
+  },
   "ui": {
     "app_flow_title": "How we build your app",
     "close": "Close",
@@ -198,28 +329,59 @@
     "contact_title": "Contact",
     "external_link": "External link",
     "lang_label": "Switch language",
-    "menu": "Menu",
-    "play_video": "Play video",
-    "skip": "Skip to content",
-    "sound_off": "Turn background sound off",
-    "sound_on": "Turn background sound on",
-    "player": {
-      "title": "Music player",
-      "play": "Play",
-      "pause": "Pause",
-      "list_title": "Track list",
-      "empty": "Soon",
-      "expand": "Show track list",
-      "collapse": "Hide track list",
-      "master_off_note": "Turn the site's master sound on first",
-      "unknown": "Track"
-    },
-    "wizard_panel_title": "Order wizard",
-    "sticky_order": "Consult & order",
     "lightbox": {
       "close": "Close",
       "sound_hint": "Plays with sound"
-    }
+    },
+    "menu": "Menu",
+    "play_video": "Play video",
+    "player": {
+      "collapse": "Hide track list",
+      "empty": "Soon",
+      "expand": "Show track list",
+      "list_title": "Track list",
+      "master_off_note": "Turn the site's master sound on first",
+      "pause": "Pause",
+      "play": "Play",
+      "title": "Music player",
+      "unknown": "Track"
+    },
+    "skip": "Skip to content",
+    "sound_off": "Turn background sound off",
+    "sound_on": "Turn background sound on",
+    "sticky_order": "Consult & order",
+    "wizard_panel_title": "Order wizard"
+  },
+  "videos": {
+    "heading": "Videos",
+    "items": [
+      {
+        "desc": "Photoreal burger assembly from scratch to serve; AI-made, with music.",
+        "duration": "0:10",
+        "id": "burger-ad",
+        "poster": "assets/videos/burger-ad.jpg",
+        "src": "assets/videos/burger-ad.mp4",
+        "title": "Burger Assembly — 10s ad"
+      },
+      {
+        "desc": "From bean to cup; cinematic macro shots for Café Nozhe.",
+        "duration": "0:30",
+        "id": "nozhe-coffee",
+        "poster": "assets/videos/nozhe-coffee.jpg",
+        "src": "assets/videos/nozhe-coffee.mp4",
+        "title": "Coffee Journey — 30s"
+      },
+      {
+        "desc": "Watercolor short film with Persian narration and original music.",
+        "duration": "0:56",
+        "id": "qatre-film",
+        "poster": "assets/videos/qatre-film.jpg",
+        "src": "assets/videos/qatre-film.mp4",
+        "title": "Qatre — 56s film"
+      }
+    ],
+    "sub": "Finished advertising videos — watch with sound.",
+    "watch": "Watch with sound"
   },
   "wizard": {
     "steps": [
@@ -418,152 +580,5 @@
       "whatsapp_number": "989375732165"
     },
     "wa_template": "Hi! I have a new project.\nProject type: {project_type}\n{brief_lines}\nBudget: {budget_range}\nTimeline: {timeline}\nName: {name}\nContact: {contact_handle}"
-  },
-  "faq": {
-    "heading": "FAQ",
-    "sub": "Short, honest answers to the things everyone asks.",
-    "items": [
-      {
-        "q": "How much does a project cost?",
-        "a": "There’s no fixed price list; every project is quoted on its scope and complexity. The Pricing section shows what drives the price, and the “Get an exact quote” wizard gives you your project’s price in minutes."
-      },
-      {
-        "q": "How long does delivery take?",
-        "a": "Anywhere from a few days to a few weeks depending on scope; we lock the exact timeline in the brief and stick to it."
-      },
-      {
-        "q": "How many revisions can I request?",
-        "a": "The workflow is built so you see and approve a preview at every stage; revisions until you approve the result are a natural part of the process."
-      },
-      {
-        "q": "Is AI video quality really professional?",
-        "a": "Yes — with a precise storyboard, locked references and human editing. Watch “Qatre”: a 56-second film made entirely with AI. AI is the tool; the cinematic eye is human."
-      },
-      {
-        "q": "What formats do I get on delivery?",
-        "a": "Video as high-quality MP4, sized for each platform (Reels, YouTube, web). Websites ship as ready-to-publish files on your own host, with a management guide."
-      },
-      {
-        "q": "Do you work with clients outside Iran?",
-        "a": "Yes — I work with clients in Iran and worldwide. We communicate in English or Arabic over WhatsApp; international projects are quoted in USD, and the whole ordering flow — wizard, coordination, delivery — is in your language."
-      }
-    ]
-  },
-  "pricing": {
-    "heading": "Pricing",
-    "sub": "The exact quote comes after the brief — but these are the things that set it.",
-    "factors_title": "What drives the price?",
-    "factors": [
-      "Project type: AI video, cinematic website, app, or editing",
-      "Scope: video length, number of site pages, number of app features",
-      "Customization level: ready-made template vs. bespoke design",
-      "Ready content: do you have photos, copy and a logo, or must they be created?",
-      "Timeline: rush delivery compresses the production schedule"
-    ],
-    "tiers_title": "Starter packages",
-    "soon": "Coming soon",
-    "tiers_soon_note": "Real prices will be filled in here soon; for now, get your exact quote from the wizard.",
-    "tiers": [
-      {
-        "name": "Starter package",
-        "desc": "For small beginnings; one compact, polished deliverable."
-      },
-      {
-        "name": "Standard package",
-        "desc": "The most popular choice for businesses; a complete, professional deliverable."
-      },
-      {
-        "name": "Custom package",
-        "desc": "Large, fully bespoke projects; special handling from idea to delivery."
-      }
-    ],
-    "cta": "Get an exact quote",
-    "note": "Prices are negotiable, in USD for international projects; no hidden fees, ever."
-  },
-  "stats": {
-    "heading": "The studio in numbers",
-    "items": [
-      {
-        "value": "4",
-        "label": "Projects delivered and live"
-      },
-      {
-        "value": "9",
-        "label": "AI tools in the production stack"
-      },
-      {
-        "value": "1",
-        "label": "Person; you talk to me directly, no middlemen"
-      }
-    ],
-    "quotes_heading": "Client words",
-    "quotes_empty": "Coming soon",
-    "quotes_empty_body": "Future clients’ feedback will be published right here."
-  },
-  "callback": {
-    "heading": "Request a callback",
-    "body": "Leave your number; I’ll call you myself. No complicated forms, no waiting.",
-    "name": "Name",
-    "phone": "Phone number",
-    "time": "Good time to call",
-    "time_hint": "e.g. tomorrow evening, or Saturday mornings",
-    "submit": "Request callback via WhatsApp",
-    "err_name": "Please enter your name (min 3 characters)",
-    "err_phone": "Please enter your phone number",
-    "wa_template": "Hi! I’d like a callback.\nName: {name}\nPhone: {phone}\nGood time: {time}"
-  },
-  "lab": {
-    "heading": "The Lab",
-    "sub": "The studio's playground — small toys that show what AI can do.",
-    "prompt": {
-      "title": "Cinematic prompt builder",
-      "desc": "Pick a subject, an action and a mood; get a copy-ready English production prompt — the same formula we use to make videos (~45 words, one action + one camera move).",
-      "groups": {
-        "subject": "Subject",
-        "action": "Action",
-        "camera": "Camera move",
-        "mood": "Mood & light"
-      },
-      "subjects": [
-        "A chubby orange astronaut cat",
-        "The old bazaar of Isfahan",
-        "A surfer riding the clouds",
-        "A tiny robot chef"
-      ],
-      "actions": [
-        "soaring above a neon city",
-        "walking through the rain",
-        "dancing under moonlight",
-        "exploring a glowing cave"
-      ],
-      "cameras": [
-        "Slow dolly-in",
-        "180-degree orbit around the subject",
-        "Descending aerial shot",
-        "Gentle push-in zoom"
-      ],
-      "moods": [
-        "Golden-hour glow",
-        "Cinematic fog",
-        "Night neon",
-        "Soft morning light"
-      ],
-      "generate": "Build it",
-      "output_label": "Ready prompt",
-      "copy": "Copy prompt",
-      "copied": "Copied",
-      "note": "Output is in English — video generators work best with English prompts."
-    },
-    "palette": {
-      "title": "Cinematic palette",
-      "desc": "Recolor the studio live and find your vibe.",
-      "palettes": [
-        "Emerald (default)",
-        "Sunset",
-        "Ocean",
-        "Neon violet"
-      ],
-      "reset": "Back to default"
-    }
   }
 }

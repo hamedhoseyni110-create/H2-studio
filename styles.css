@@ -237,6 +237,23 @@ body {
 .app-flow li b { color: var(--text); }
 
 /* portfolio */
+.works-tabs {
+  display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+  margin: 4px auto 26px;
+}
+.works-tab {
+  font-family: var(--font); background: var(--surface); color: var(--text);
+  border: 1px solid rgba(52, 211, 153, 0.25); border-radius: 999px;
+  padding: 9px 22px; cursor: pointer; font-size: .95rem;
+  transition: border-color .2s, background .2s, color .2s;
+}
+.works-tab:hover { border-color: rgba(34, 211, 238, 0.55); }
+.works-tab.active { background: var(--grad); color: #06120d; border-color: transparent; font-weight: 700; }
+.portfolio-card.works-hidden { display: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .portfolio-grid.filtering .portfolio-card:not(.works-hidden) { animation: works-fade .35s ease both; }
+  @keyframes works-fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+}
 .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; perspective: 1100px; }
 .portfolio-card {
   background: var(--surface); border: 1px solid rgba(52, 211, 153, 0.12);

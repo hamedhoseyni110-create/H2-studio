@@ -44,6 +44,30 @@ function previewPoster(id) {
   return "assets/previews/" + id + ".jpg";
 }
 
+/* Works tabs: portfolio category per item id (site / video / webapp) */
+var ITEM_CAT = {
+  "ramin-berger": "site", "coffee-nozhe": "site", "gym-site-demo": "site",
+  "noir": "site", "pars-gold": "site",
+  "qatre": "video",
+  "hala": "webapp"
+};
+var worksFilter = "all";   /* persists across language re-renders */
+function applyWorksFilter() {
+  document.querySelectorAll("#worksTabs .works-tab").forEach(function(btn){
+    var on = btn.getAttribute("data-filter") === worksFilter;
+    btn.classList.toggle("active", on);
+    btn.setAttribute("aria-selected", on ? "true" : "false");
+  });
+  document.querySelectorAll("#portfolioGrid .portfolio-card").forEach(function(card){
+    var show = worksFilter === "all" || card.getAttribute("data-cat") === worksFilter;
+    card.classList.toggle("works-hidden", !show);
+    if (!show) {
+      var v = card.querySelector("video");
+      if (v && !v.paused) { try { v.pause(); } catch (e) {} }
+    }
+  });
+}
+
 /* ================= Page render ================= */
 
 function renderPage() {
@@ -106,11 +130,27 @@ function renderPage() {
   /* portfolio */
   el("portfolioTitle").textContent = c.portfolio.heading;
   el("portfolioSub").textContent = c.portfolio.sub;
+  var wt = el("worksTabs");
+  if (wt && c.portfolio.tabs) {
+    wt.setAttribute("aria-label", c.portfolio.tabs_label || "");
+    wt.innerHTML = "";
+    [["all", c.portfolio.tabs.all], ["site", c.portfolio.tabs.sites],
+     ["video", c.portfolio.tabs.videos], ["webapp", c.portfolio.tabs.webapps]].forEach(function(pair){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "works-tab";
+      b.setAttribute("role", "tab");
+      b.setAttribute("data-filter", pair[0]);
+      b.textContent = pair[1];
+      wt.appendChild(b);
+    });
+  }
   var pg = el("portfolioGrid");
   pg.innerHTML = "";
   c.portfolio.items.forEach(function(item){
     var card = document.createElement("article");
     card.className = "portfolio-card";
+    card.setAttribute("data-cat", ITEM_CAT[item.id] || "site");
     var live = LIVE_URLS[item.id];
     var cap = '<div class="portfolio-cap">' +
       '<span class="tag">' + esc(item.tag) + "</span>" +
@@ -140,6 +180,7 @@ function renderPage() {
     })(item);
     pg.appendChild(card);
   });
+  applyWorksFilter();
   initTilt();
   initLazyVideos();
   /* playful layer: re-collect scroll-parallax targets after grids re-render */
@@ -802,6 +843,19 @@ function init() {
     var open = links.classList.toggle("open");
     ham.setAttribute("aria-expanded", open ? "true" : "false");
   });
+
+  /* works tabs: one delegated listener (buttons re-render per language) */
+  var wtabs = el("worksTabs");
+  if (wtabs) {
+    wtabs.addEventListener("click", function(e){
+      var btn = e.target.closest(".works-tab");
+      if (!btn) return;
+      worksFilter = btn.getAttribute("data-filter") || "all";
+      var grid = el("portfolioGrid");
+      if (grid) grid.classList.add("filtering");
+      applyWorksFilter();
+    });
+  }
   links.addEventListener("click", function(){ links.classList.remove("open"); ham.setAttribute("aria-expanded", "false"); });
 
   var io = new IntersectionObserver(function(entries){
