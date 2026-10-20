@@ -52,6 +52,25 @@ var ITEM_CAT = {
   "hala": "webapp"
 };
 var worksFilter = "all";   /* persists across language re-renders */
+
+/* Service cards: where a click takes the visitor (proof, not a dead end) */
+var SERVICE_GO = {
+  "video":     { sec: "videos" },
+  "web":       { sec: "portfolio", tab: "site" },
+  "editing":   { sec: "videos" },
+  "app":       { sec: "portfolio", tab: "webapp" },
+  "whitelabel": { sec: "portfolio", tab: "site" }
+};
+function goToWork(sec, tab) {
+  if (tab) {
+    worksFilter = tab;
+    var grid = el("portfolioGrid");
+    if (grid) grid.classList.add("filtering");
+    applyWorksFilter();
+  }
+  var t = document.getElementById(sec);
+  if (t) t.scrollIntoView({ behavior: "smooth", block: "start" });
+}
 function applyWorksFilter() {
   document.querySelectorAll("#worksTabs .works-tab").forEach(function(btn){
     var on = btn.getAttribute("data-filter") === worksFilter;
@@ -123,7 +142,27 @@ function renderPage() {
           return "<li><b>" + esc(f.title) + "</b> — " + esc(f.desc) + "</li>";
         }).join("") + "</ol></details>";
     }
+    var go = SERVICE_GO[s.id];
+    if (go && u.service_go) {
+      html += '<span class="service-go">' + esc(u.service_go) + ' <i aria-hidden="true"></i></span>';
+    }
     card.innerHTML = html;
+    if (go) {
+      card.classList.add("clickable");
+      card.setAttribute("tabindex", "0");
+      card.setAttribute("role", "link");
+      (function(g){
+        card.addEventListener("click", function(e){
+          if (e.target.closest("details")) return;   /* the app flow expander keeps its own job */
+          goToWork(g.sec, g.tab);
+        });
+        card.addEventListener("keydown", function(e){
+          if ((e.key === "Enter" || e.key === " ") && !e.target.closest("details")) {
+            e.preventDefault(); goToWork(g.sec, g.tab);
+          }
+        });
+      })(go);
+    }
     sg.appendChild(card);
   });
 
@@ -135,7 +174,9 @@ function renderPage() {
     wt.setAttribute("aria-label", c.portfolio.tabs_label || "");
     wt.innerHTML = "";
     [["all", c.portfolio.tabs.all], ["site", c.portfolio.tabs.sites],
-     ["video", c.portfolio.tabs.videos], ["webapp", c.portfolio.tabs.webapps]].forEach(function(pair){
+     ["video", c.portfolio.tabs.videos], ["webapp", c.portfolio.tabs.webapps],
+     ["academy", c.portfolio.tabs.academy]].forEach(function(pair){
+      if (!pair[1]) return;
       var b = document.createElement("button");
       b.type = "button";
       b.className = "works-tab";
@@ -173,6 +214,28 @@ function renderPage() {
     (function(it){
       var media = card.querySelector(".portfolio-media");
       function open(){ openLightbox(previewSrc(it.id), previewPoster(it.id), it.title, it.desc); }
+      media.addEventListener("click", open);
+      media.addEventListener("keydown", function(e){
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); }
+      });
+    })(item);
+    pg.appendChild(card);
+  });
+  /* academy lessons also live in the works grid, under their own tab */
+  (c.academy && c.academy.items ? c.academy.items : []).forEach(function(item){
+    var card = document.createElement("article");
+    card.className = "portfolio-card";
+    card.setAttribute("data-cat", "academy");
+    card.innerHTML =
+      '<div class="portfolio-media" tabindex="0" role="button" aria-label="' + esc(c.videos.watch + ": " + item.title) + '">' +
+      '<img src="' + esc(item.poster) + '" alt="" loading="lazy">' +
+      '<span class="media-badge">' + esc(item.duration) + "</span>" +
+      '<span class="play-btn" aria-hidden="true"><i></i></span></div>' +
+      '<div class="portfolio-cap"><span class="tag">' + esc(c.academy.heading) + "</span>" +
+      "<h3>" + esc(item.title) + "</h3><p>" + esc(item.desc) + "</p></div>";
+    (function(it){
+      var media = card.querySelector(".portfolio-media");
+      function open(){ openLightbox(it.src, it.poster, it.title, it.desc); }
       media.addEventListener("click", open);
       media.addEventListener("keydown", function(e){
         if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); }

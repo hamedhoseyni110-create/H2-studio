@@ -6,6 +6,20 @@
       "My standard is simple: what I deliver has to be good enough that you want to show it off. You tell me what you want — I handle the rest."
     ]
   },
+  "academy": {
+    "heading": "Academy",
+    "items": [
+      {
+        "desc": "In 38 seconds: see your bookings and orders, and publish a magazine post — no developer needed.",
+        "duration": "0:38",
+        "id": "wp-admin-walkthrough",
+        "poster": "assets/tutorials/wp-admin-walkthrough.jpg",
+        "src": "assets/tutorials/wp-admin-walkthrough.mp4",
+        "title": "Your WordPress Panel, Explained for Owners"
+      }
+    ],
+    "sub": "Short, practical lessons for site owners — learn to run your own site."
+  },
   "callback": {
     "body": "Leave your number; I’ll call you myself. No complicated forms, no waiting.",
     "err_name": "Please enter your name (min 3 characters)",
@@ -128,6 +142,7 @@
   },
   "nav": {
     "about": "About",
+    "academy": "Academy",
     "contact": "Contact",
     "cta": "Consult & order a project",
     "faq": "FAQ",
@@ -136,8 +151,7 @@
     "pricing": "Pricing",
     "process": "Process",
     "services": "Services",
-    "videos": "Videos",
-    "academy": "Academy"
+    "videos": "Videos"
   },
   "portfolio": {
     "heading": "Work I've shipped",
@@ -189,11 +203,20 @@
         "id": "noir",
         "tag": "Cinematic site",
         "title": "NOIR fashion store"
+      },
+      {
+        "case": "Built end to end on WordPress + Elementor with three custom plugins (store, booking, Vazirmatn fonts) and a dark-gold theme; fully tested on mobile and desktop.",
+        "client": "Gold & jewellery store sample",
+        "desc": "A full WordPress store for a jeweller: cart and order registration, consultation booking, a magazine and an admin panel — the owner edits prices and products himself.",
+        "id": "pars-gold",
+        "tag": "WordPress Website",
+        "title": "Pars Gold — WordPress Jewellery Store"
       }
     ],
     "preview": "Animated preview",
     "sub": "Each project is a small world — take a look, then decide.",
     "tabs": {
+      "academy": "Academy",
       "all": "All work",
       "sites": "Websites",
       "videos": "Videos",
@@ -347,6 +370,7 @@
       "title": "Music player",
       "unknown": "Track"
     },
+    "service_go": "See the work",
     "skip": "Skip to content",
     "sound_off": "Turn background sound off",
     "sound_on": "Turn background sound on",
@@ -581,19 +605,5 @@
       "whatsapp_number": "989375732165"
     },
     "wa_template": "Hi! I have a new project.\nProject type: {project_type}\n{brief_lines}\nBudget: {budget_range}\nTimeline: {timeline}\nName: {name}\nContact: {contact_handle}"
-  },
-  "academy": {
-    "heading": "Academy",
-    "sub": "Short, practical lessons for site owners — learn to run your own site.",
-    "items": [
-      {
-        "id": "wp-admin-walkthrough",
-        "title": "Your WordPress Panel, Explained for Owners",
-        "desc": "In 38 seconds: see your bookings and orders, and publish a magazine post — no developer needed.",
-        "duration": "0:38",
-        "poster": "assets/tutorials/wp-admin-walkthrough.jpg",
-        "src": "assets/tutorials/wp-admin-walkthrough.mp4"
-      }
-    ]
   }
 }
