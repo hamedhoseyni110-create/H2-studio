@@ -136,7 +136,8 @@
     "pricing": "الأسعار",
     "process": "منهجية العمل",
     "services": "الخدمات",
-    "videos": "الفيديوهات"
+    "videos": "الفيديوهات",
+    "academy": "الأكاديمية"
   },
   "portfolio": {
     "heading": "أعمال أنجزتها",
@@ -580,5 +581,19 @@
       "whatsapp_number": "989375732165"
     },
     "wa_template": "مرحباً! لدي مشروع جديد.\nنوع المشروع: {project_type}\n{brief_lines}\nالميزانية: {budget_range}\nالجدول الزمني: {timeline}\nالاسم: {name}\nالتواصل: {contact_handle}"
+  },
+  "academy": {
+    "heading": "الأكاديمية",
+    "sub": "دروس قصيرة وعملية لأصحاب المواقع؛ تعلّم إدارة موقعك بنفسك.",
+    "items": [
+      {
+        "id": "wp-admin-walkthrough",
+        "title": "لوحة تحكم ووردبريس؛ شرح لأصحاب المواقع",
+        "desc": "في ٣٨ ثانية: شاهد الحجوزات والطلبات وانشر مقالاً في مجلتك — دون الحاجة إلى مبرمج.",
+        "duration": "٠:٣٨",
+        "poster": "assets/tutorials/wp-admin-walkthrough.jpg",
+        "src": "assets/tutorials/wp-admin-walkthrough.mp4"
+      }
+    ]
   }
 }

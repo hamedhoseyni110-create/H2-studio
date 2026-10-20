@@ -136,7 +136,8 @@
     "pricing": "Pricing",
     "process": "Process",
     "services": "Services",
-    "videos": "Videos"
+    "videos": "Videos",
+    "academy": "Academy"
   },
   "portfolio": {
     "heading": "Work I've shipped",
@@ -580,5 +581,19 @@
       "whatsapp_number": "989375732165"
     },
     "wa_template": "Hi! I have a new project.\nProject type: {project_type}\n{brief_lines}\nBudget: {budget_range}\nTimeline: {timeline}\nName: {name}\nContact: {contact_handle}"
+  },
+  "academy": {
+    "heading": "Academy",
+    "sub": "Short, practical lessons for site owners — learn to run your own site.",
+    "items": [
+      {
+        "id": "wp-admin-walkthrough",
+        "title": "Your WordPress Panel, Explained for Owners",
+        "desc": "In 38 seconds: see your bookings and orders, and publish a magazine post — no developer needed.",
+        "duration": "0:38",
+        "poster": "assets/tutorials/wp-admin-walkthrough.jpg",
+        "src": "assets/tutorials/wp-admin-walkthrough.mp4"
+      }
+    ]
   }
 }

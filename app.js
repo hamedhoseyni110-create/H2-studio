@@ -81,7 +81,7 @@ function renderPage() {
   /* nav */
   var nav = c.nav;
   var links = [
-    ["services", nav.services], ["portfolio", nav.portfolio], ["videos", nav.videos], ["lab", nav.lab], ["process", nav.process],
+    ["services", nav.services], ["portfolio", nav.portfolio], ["videos", nav.videos], ["academy", nav.academy], ["lab", nav.lab], ["process", nav.process],
     ["faq", nav.faq], ["pricing", nav.pricing],
     ["about", nav.about], ["contact", nav.contact]
   ];
@@ -211,6 +211,34 @@ function renderPage() {
       });
     })(item);
     vg.appendChild(card);
+  });
+  try { window.dispatchEvent(new CustomEvent("h2:grids")); } catch (e) {}
+
+  /* academy (owner tutorials; same card + lightbox machinery as videos) */
+  el("academyTitle").textContent = c.academy.heading;
+  el("academySub").textContent = c.academy.sub;
+  var ag = el("academyGrid");
+  ag.innerHTML = "";
+  c.academy.items.forEach(function(item){
+    var card = document.createElement("article");
+    card.className = "video-card";
+    card.innerHTML =
+      '<div class="video-media" tabindex="0" role="button" aria-label="' + esc(c.videos.watch + ": " + item.title) + '">' +
+      '<img src="' + esc(item.poster) + '" alt="" loading="lazy">' +
+      '<span class="play-btn" aria-hidden="true"><i></i></span>' +
+      '<span class="duration-badge">' + esc(item.duration) + "</span>" +
+      '<span class="sound-badge">' + esc(u.lightbox.sound_hint) + "</span>" +
+      "</div>" +
+      '<div class="video-cap"><h3>' + esc(item.title) + "</h3><p>" + esc(item.desc) + "</p></div>";
+    (function(it){
+      var media = card.querySelector(".video-media");
+      function open(){ openLightbox(it.src, it.poster, it.title, it.desc); }
+      media.addEventListener("click", open);
+      media.addEventListener("keydown", function(e){
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); }
+      });
+    })(item);
+    ag.appendChild(card);
   });
   try { window.dispatchEvent(new CustomEvent("h2:grids")); } catch (e) {}
 
@@ -867,7 +895,7 @@ function init() {
       }
     });
   }, { rootMargin: "-40% 0px -55% 0px" });
-  ["services", "portfolio", "videos", "lab", "process", "faq", "pricing", "stats", "about", "contact"].forEach(function(id){ io.observe(el(id)); });
+  ["services", "portfolio", "videos", "academy", "lab", "process", "faq", "pricing", "stats", "about", "contact"].forEach(function(id){ io.observe(el(id)); });
 }
 
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);

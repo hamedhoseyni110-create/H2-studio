@@ -136,7 +136,8 @@
     "pricing": "تعرفه",
     "process": "روند کار",
     "services": "خدمات",
-    "videos": "ویدیوها"
+    "videos": "ویدیوها",
+    "academy": "آکادمی"
   },
   "portfolio": {
     "heading": "کارهایی که ساخته‌ام",
@@ -580,5 +581,19 @@
       "whatsapp_number": "989375732165"
     },
     "wa_template": "سلام! یه پروژه جدید دارم.\nنوع پروژه: {project_type}\n{brief_lines}\nبودجه: {budget_range}\nزمان‌بندی: {timeline}\nاسم: {name}\nراه ارتباطی: {contact_handle}"
+  },
+  "academy": {
+    "heading": "آکادمی",
+    "sub": "آموزش‌های کوتاه و کاربردی برای صاحب سایت؛ یاد بگیر خودت سایتت را بچرخانی.",
+    "items": [
+      {
+        "id": "wp-admin-walkthrough",
+        "title": "کار با پنل وردپرس؛ برای صاحب سایت",
+        "desc": "در ۳۸ ثانیه ببین چطور رزروها و سفارش‌هایت را می‌بینی و برای مجله‌ات مقاله می‌گذاری؛ بدون نیاز به کدنویس.",
+        "duration": "۰:۳۸",
+        "poster": "assets/tutorials/wp-admin-walkthrough.jpg",
+        "src": "assets/tutorials/wp-admin-walkthrough.mp4"
+      }
+    ]
   }
 }
