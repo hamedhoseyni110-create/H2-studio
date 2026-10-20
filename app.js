@@ -31,6 +31,7 @@ var LIVE_URLS = {
   "gym-site-demo": "https://hamedhoseyni110-create.github.io/gym-site-demo/",
   "hala": "https://hamedhoseyni110-create.github.io/hala-football-analytics/",
   "noir": "https://hamedhoseyni110-create.github.io/interactive-brochure-samples/noir/",
+  "pars-gold": "https://parsgold.ct.ws/",
 };
 function previewSrc(id) {
   if (id === "qatre") return "assets/previews/qatre-preview.mp4";
