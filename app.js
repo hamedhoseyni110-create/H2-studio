@@ -387,6 +387,8 @@ function renderPage() {
 
   /* about */
   el("aboutTitle").textContent = c.about.heading;
+  var aboutPhotoEl = el("aboutPhoto");
+  if (aboutPhotoEl) aboutPhotoEl.alt = c.about.photo_alt || "";
   el("aboutBody").innerHTML = c.about.paragraphs.map(function(p){
     return "<p>" + esc(p) + "</p>";
   }).join("");
