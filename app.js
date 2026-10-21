@@ -30,6 +30,7 @@ var LIVE_URLS = {
   "coffee-nozhe": "https://hamedhoseyni110-create.github.io/coffee-nozhe/",
   "gym-site-demo": "https://hamedhoseyni110-create.github.io/gym-site-demo/",
   "hala": "https://hamedhoseyni110-create.github.io/hala-football-analytics/",
+  "loyalty": "https://hamedhoseyni110-create.github.io/interactive-brochure-samples/loyalty-club/",
   "noir": "https://hamedhoseyni110-create.github.io/interactive-brochure-samples/noir/",
   "pars-gold": "https://parsgold.ct.ws/",
 };
@@ -49,7 +50,7 @@ var ITEM_CAT = {
   "ramin-berger": "site", "coffee-nozhe": "site", "gym-site-demo": "site",
   "noir": "site", "pars-gold": "site",
   "qatre": "video",
-  "hala": "webapp"
+  "hala": "webapp", "loyalty": "webapp"
 };
 var worksFilter = "all";   /* persists across language re-renders */
 

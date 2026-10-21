@@ -197,6 +197,14 @@
         "title": "Hala — football analytics"
       },
       {
+        "case": "White-label demo driven by one config file: brand name, colors and the reward rule change per shop; fully trilingual with true RTL support.",
+        "client": "Café Nozhe sample — white-label for any shop",
+        "desc": "A digital stamp card for cafés and shops: customers open their card from a single link — no app to install — and the seller stamps it from a simple PIN panel; 8 stamps earn a free coffee. To try it: sign in with 09123456789; seller sign-in uses the demo PIN 1234.",
+        "id": "loyalty",
+        "tag": "Web app",
+        "title": "Digital Loyalty Club"
+      },
+      {
         "case": "From idea to launch: the hero video and style looks were generated with AI, the logo was designed in-house and the site shipped on GitHub Pages; a white-label template ready to rebrand for any clothing store.",
         "client": "White-label menswear store sample",
         "desc": "A menswear store with an AI-made video hero, AI styling looks, a showcase with black-and-gold studio backgrounds and a custom logo — bilingual in Persian and English.",
