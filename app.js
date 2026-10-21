@@ -45,6 +45,18 @@ function previewPoster(id) {
   return "assets/previews/" + id + ".jpg";
 }
 
+/* Social profiles (footer) */
+var SOCIAL_URLS = {
+  "instagram": "https://www.instagram.com/hamed_hoseyni110/",
+  "linkedin": "https://www.linkedin.com/in/hamed-hoseyni-b00678444/",
+  "whatsapp": "https://wa.me/989375732165"
+};
+var SOCIAL_ICONS = {
+  "instagram": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>',
+  "linkedin": '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.55V9h3.57v11.45z"/></svg>',
+  "whatsapp": '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>'
+};
+
 /* Works tabs: portfolio category per item id (site / video / webapp) */
 var ITEM_CAT = {
   "ramin-berger": "site", "coffee-nozhe": "site", "gym-site-demo": "site",
@@ -101,11 +113,15 @@ function renderPage() {
   /* nav */
   var nav = c.nav;
   var links = [
-    ["services", nav.services], ["portfolio", nav.portfolio], ["videos", nav.videos], ["academy", nav.academy], ["lab", nav.lab], ["process", nav.process],
+    ["services", nav.services], ["portfolio", nav.portfolio], ["webapps", nav.webapps], ["videos", nav.videos], ["academy", nav.academy], ["lab", nav.lab], ["process", nav.process],
     ["faq", nav.faq], ["pricing", nav.pricing],
     ["about", nav.about], ["contact", nav.contact]
   ];
   el("navLinks").innerHTML = links.map(function(p){
+    if (p[0] === "webapps") {
+      /* no section of its own: lands on the portfolio with the Web apps tab active */
+      return '<a href="#portfolio" data-anchor="portfolio" data-goto-tab="webapp">' + esc(p[1]) + "</a>";
+    }
     return '<a href="#' + p[0] + '" data-anchor="' + p[0] + '">' + esc(p[1]) + "</a>";
   }).join("");
   el("navLinks").setAttribute("aria-label", u.menu);
@@ -344,6 +360,11 @@ function renderPage() {
       "<h4>" + esc(t.name) + "</h4><p>" + esc(t.desc) + "</p></div>";
   }).join("");
   el("pricingSoonNote").textContent = pr.tiers_soon_note;
+  /* tier cards stay hidden until real prices exist (no «به‌زودی» shelf) */
+  var hasPricedTier = pr.tiers.some(function(t){ return !!t.price; });
+  ["pricingTiersTitle", "pricingTiers", "pricingSoonNote"].forEach(function(id){
+    el(id).hidden = !hasPricedTier;
+  });
   el("pricingCta").textContent = pr.cta;
   el("pricingNote").textContent = pr.note;
 
@@ -353,10 +374,16 @@ function renderPage() {
     return '<div class="stat-card"><div class="stat-value" dir="auto">' + esc(s.value) + "</div>" +
       '<div class="stat-label">' + esc(s.label) + "</div></div>";
   }).join("");
-  el("quotesTitle").textContent = c.stats.quotes_heading;
-  el("quotesEmpty").innerHTML =
-    '<div class="soon-badge">' + esc(c.stats.quotes_empty) + "</div>" +
-    "<p>" + esc(c.stats.quotes_empty_body) + "</p>";
+  /* testimonials: hidden until a real quote exists (no empty «به‌زودی» block) */
+  var hasQuotes = !!(c.stats.quotes && c.stats.quotes.length);
+  el("quotesTitle").hidden = !hasQuotes;
+  el("quotesEmpty").hidden = !hasQuotes;
+  if (hasQuotes) {
+    el("quotesTitle").textContent = c.stats.quotes_heading;
+    el("quotesEmpty").innerHTML =
+      '<div class="soon-badge">' + esc(c.stats.quotes_empty) + "</div>" +
+      "<p>" + esc(c.stats.quotes_empty_body) + "</p>";
+  }
 
   /* about */
   el("aboutTitle").textContent = c.about.heading;
@@ -384,6 +411,19 @@ function renderPage() {
   /* footer */
   el("footerTagline").textContent = c.footer.tagline;
   el("footerRights").textContent = c.footer.rights;
+  var fsEl = el("footerSocial");
+  if (fsEl && c.footer.social) {
+    fsEl.innerHTML = ["instagram", "linkedin", "whatsapp"].map(function(k){
+      return '<a href="' + SOCIAL_URLS[k] + '" target="_blank" rel="noopener" aria-label="' + esc(c.footer.social[k]) + '">' + SOCIAL_ICONS[k] + "</a>";
+    }).join("");
+  }
+  var flEl = el("footerLinks");
+  if (flEl) {
+    flEl.setAttribute("aria-label", c.footer.links_label || "");
+    flEl.innerHTML = [["services", nav.services], ["portfolio", nav.portfolio], ["videos", nav.videos], ["academy", nav.academy], ["pricing", nav.pricing], ["contact", nav.contact]].map(function(p){
+      return '<a href="#' + p[0] + '">' + esc(p[1]) + "</a>";
+    }).join("");
+  }
   el("wizardClose").setAttribute("aria-label", u.close);
 
   /* scroll reveals last — everything must exist first */
@@ -949,6 +989,13 @@ function init() {
     });
   }
   links.addEventListener("click", function(){ links.classList.remove("open"); ham.setAttribute("aria-expanded", "false"); });
+  /* nav «webapps» item: land on the portfolio with the Web apps tab active */
+  links.addEventListener("click", function(e){
+    var a = e.target.closest ? e.target.closest("a[data-goto-tab]") : null;
+    if (!a) return;
+    e.preventDefault();
+    goToWork("portfolio", a.getAttribute("data-goto-tab"));
+  });
 
   var io = new IntersectionObserver(function(entries){
     entries.forEach(function(en){

@@ -63,7 +63,13 @@
     "sub": "Short, honest answers to the things everyone asks."
   },
   "footer": {
+    "links_label": "Quick links",
     "rights": "All rights reserved to H2 Studio. © 2026",
+    "social": {
+      "instagram": "Instagram",
+      "linkedin": "LinkedIn",
+      "whatsapp": "WhatsApp"
+    },
     "tagline": "Making ideas cinematic — H2 Studio"
   },
   "hero": {
@@ -151,7 +157,8 @@
     "pricing": "Pricing",
     "process": "Process",
     "services": "Services",
-    "videos": "Videos"
+    "videos": "Videos",
+    "webapps": "Web apps"
   },
   "portfolio": {
     "heading": "Work I've shipped",
@@ -339,7 +346,7 @@
     "items": [
       {
         "label": "Projects delivered and live",
-        "value": "4"
+        "value": "8"
       },
       {
         "label": "AI tools in the production stack",

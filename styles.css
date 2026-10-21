@@ -314,6 +314,18 @@ html[dir="ltr"] .service-go i::after { content: "→"; }
   padding: 36px 22px 44px; text-align: center; color: var(--muted); font-size: .9rem;
 }
 .footer img { border-radius: 8px; margin-bottom: 10px; }
+.footer-social { display: flex; gap: 12px; justify-content: center; margin: 8px 0 14px; }
+.footer-social a {
+  width: 42px; height: 42px; border-radius: 50%;
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--text); transition: border-color .25s, color .25s, transform .25s;
+}
+.footer-social a:hover { border-color: rgba(34, 211, 238, 0.65); color: var(--cyan); transform: translateY(-2px); }
+.footer-social svg { width: 20px; height: 20px; }
+.footer-links { display: flex; flex-wrap: wrap; gap: 8px 22px; justify-content: center; margin: 0 0 16px; }
+.footer-links a { color: var(--muted); text-decoration: none; font-size: .92rem; transition: color .25s; }
+.footer-links a:hover { color: var(--emerald); }
 .footer-tagline { margin: 0 0 6px; color: var(--text); font-weight: 700; }
 .footer-rights { margin: 0; }
 

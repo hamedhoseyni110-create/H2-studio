@@ -275,6 +275,10 @@ var MUSIC_TRACKS = [
   }
 
   function refresh() {
+    if (!MUSIC_TRACKS.length) { /* no tracks yet: stay invisible until music arrives */
+      if (host) host.hidden = true;
+      return;
+    }
     if (!built) build();
     P = copy();
     host.setAttribute("aria-label", P.title);
