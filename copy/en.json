@@ -197,6 +197,14 @@
         "title": "Qatre — 56s watercolor film"
       },
       {
+        "case": "Luxury perfume ad for the studio portfolio; the real bottle is locked in every frame, with original music.",
+        "client": "H2 PARFUM brand (studio portfolio)",
+        "desc": "38-second AI-made luxury perfume ad; a bottle born from a vortex of light to a golden mist explosion.",
+        "id": "h2-parfum",
+        "tag": "Advertising clip",
+        "title": "H2 PARFUM — 38s perfume ad"
+      },
+      {
         "case": "From idea to ship: competitor research (FotMob, Sofascore), three languages with full RTL support, deployed on GitHub Pages.",
         "client": "Personal project",
         "desc": "Trilingual football stats web app: 5 European leagues + Champions League, side-by-side team comparison, top scorers and transparent predictions — no signup, fully offline.",
@@ -419,6 +427,14 @@
         "poster": "assets/videos/qatre-film.jpg",
         "src": "assets/videos/qatre-film.mp4",
         "title": "Qatre — 56s film"
+      },
+      {
+        "desc": "A bottle born from a vortex of light; golden mist explosion and the final hero frame.",
+        "duration": "0:38",
+        "id": "h2-parfum",
+        "poster": "assets/videos/h2-parfum.jpg",
+        "src": "assets/videos/h2-parfum-film.mp4",
+        "title": "H2 PARFUM — 38s ad"
       }
     ],
     "sub": "Finished advertising videos — watch with sound.",

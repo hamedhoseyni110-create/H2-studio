@@ -62,6 +62,7 @@ var ITEM_CAT = {
   "ramin-berger": "site", "coffee-nozhe": "site", "gym-site-demo": "site",
   "noir": "site", "pars-gold": "site",
   "qatre": "video",
+  "h2-parfum": "video",
   "hala": "webapp", "loyalty": "webapp"
 };
 var worksFilter = "all";   /* persists across language re-renders */
