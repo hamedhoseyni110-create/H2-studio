@@ -138,22 +138,77 @@
     }
   }
 
-  /* ---------- aurora mouse parallax + gentle scroll depth (desktop only) ---------- */
+  /* ---------- scroll-driven background: aurora parallax + hue journey ----------
+     Mouse parallax needs a mouse; the scroll parts (depth + hue shift from
+     emerald toward cyan) run on every device, including phones. */
   var aurora = document.querySelector(".aurora");
-  if (aurora && finePointer && !reducedMotion) {
-    var mx = 0, my = 0, ticking = false;
-    function render() {
-      ticking = false;
+  if (aurora && !reducedMotion) {
+    var mx = 0, my = 0, aurTicking = false;
+    function renderAurora() {
+      aurTicking = false;
       var sy = window.scrollY || 0;
-      aurora.style.transform = "translate3d(" + (mx * 12).toFixed(1) + "px, " + (sy * 0.03 + my * 10).toFixed(1) + "px, 0)";
+      var max = Math.max((document.documentElement.scrollHeight || 0) - window.innerHeight, 1);
+      var progress = Math.min(Math.max(sy / max, 0), 1);
+      aurora.style.transform = "translate3d(" + (mx * 12).toFixed(1) + "px, " + (sy * 0.06 + my * 10).toFixed(1) + "px, 0)";
+      aurora.style.filter = "hue-rotate(" + (progress * 45).toFixed(1) + "deg)";
     }
-    window.addEventListener("mousemove", function (e) {
-      mx = e.clientX / window.innerWidth - 0.5;
-      my = e.clientY / window.innerHeight - 0.5;
-      if (!ticking) { ticking = true; requestAnimationFrame(render); }
-    }, { passive: true });
+    function queueAurora() {
+      if (!aurTicking) { aurTicking = true; requestAnimationFrame(renderAurora); }
+    }
+    if (finePointer) {
+      window.addEventListener("mousemove", function (e) {
+        mx = e.clientX / window.innerWidth - 0.5;
+        my = e.clientY / window.innerHeight - 0.5;
+        queueAurora();
+      }, { passive: true });
+    }
+    window.addEventListener("scroll", queueAurora, { passive: true });
+    renderAurora();
+  }
+
+  /* ---------- hero parallax: video sinks back, title comes forward ---------- */
+  var heroEl = $("#top"), heroVideo = $("#heroVideo"), heroInner = document.querySelector(".hero-inner");
+  if (heroEl && heroVideo && heroInner && !reducedMotion) {
+    var heroTicking = false;
+    function renderHero() {
+      heroTicking = false;
+      var sy = window.scrollY || 0;
+      var hh = heroEl.offsetHeight || window.innerHeight;
+      var p = Math.min(Math.max(sy / hh, 0), 1);
+      heroVideo.style.transform = "translateY(" + (sy * 0.3).toFixed(1) + "px) scale(" + (1 + p * 0.08).toFixed(3) + ")";
+      heroInner.style.transform = "translateY(" + (sy * 0.12).toFixed(1) + "px)";
+    }
     window.addEventListener("scroll", function () {
-      if (!ticking) { ticking = true; requestAnimationFrame(render); }
+      if (!heroTicking) { heroTicking = true; requestAnimationFrame(renderHero); }
     }, { passive: true });
+  }
+
+  /* ---------- scroll-linked 3D tilt on portfolio cards (no mouse needed) ----------
+     Runs only after a card finished its reveal entrance (.in) and never fights
+     the mouse tilt (.up-tilting wins while hovering). */
+  if (pg && !reducedMotion) {
+    var tiltTicking = false;
+    function renderScrollTilt() {
+      tiltTicking = false;
+      var vh = window.innerHeight;
+      var gridRect = pg.getBoundingClientRect();
+      if (gridRect.bottom < 0 || gridRect.top > vh) return;
+      $$(".portfolio-card", pg).forEach(function (card) {
+        if (!card.classList.contains("in") || card.classList.contains("up-tilting") ||
+            card.classList.contains("works-hidden")) return;
+        var r = card.getBoundingClientRect();
+        if (r.bottom < 0 || r.top > vh) return;
+        var center = r.top + r.height / 2;
+        var offset = (center - vh / 2) / (vh / 2);
+        var rotX = Math.max(Math.min(-offset * 6, 7), -7);
+        card.style.transform = "rotateX(" + rotX.toFixed(2) + "deg)";
+      });
+    }
+    window.addEventListener("scroll", function () {
+      if (!tiltTicking) { tiltTicking = true; requestAnimationFrame(renderScrollTilt); }
+    }, { passive: true });
+    window.addEventListener("resize", function () {
+      if (!tiltTicking) { tiltTicking = true; requestAnimationFrame(renderScrollTilt); }
+    });
   }
 })();

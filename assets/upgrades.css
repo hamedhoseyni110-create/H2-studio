@@ -127,3 +127,29 @@
 @media (prefers-reduced-motion: reduce) {
   .portfolio-card.up-beam::after { animation: none; }
 }
+
+/* ---- 7. Stronger aurora (brand presence from the first frame) ---- */
+.aurora .b1 { background: radial-gradient(circle, rgba(52, 211, 153, 0.44), transparent 68%); }
+.aurora .b2 { background: radial-gradient(circle, rgba(34, 211, 238, 0.4), transparent 68%); }
+.aurora .b3 { background: radial-gradient(circle, rgba(16, 122, 106, 0.44), transparent 68%); }
+
+/* ---- 8. Cool brand tint over the hero video (warm burger frame -> brand-cold first frame) ---- */
+.up-hero-tint {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(160deg, rgba(52, 211, 153, 0.14), rgba(34, 211, 238, 0.1) 50%, rgba(52, 211, 153, 0.05));
+}
+
+/* ---- 9. Hero subtitle readability: the muted gray vanished over bright video
+   frames, so the sub, scroll hint and interact hint go near-white + shadow ---- */
+.hero-sub {
+  color: #e6f4ec;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.65), 0 1px 4px rgba(0, 0, 0, 0.8);
+}
+.scroll-hint,
+.interact-hint {
+  color: #d3e8de;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.7);
+}
