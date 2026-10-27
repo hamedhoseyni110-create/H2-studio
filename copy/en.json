@@ -205,6 +205,14 @@
         "title": "H2 PARFUM — 38s perfume ad"
       },
       {
+        "case": "Prismatic-light perfume ad for the studio portfolio; the red bottle rises out of a pink, gold and teal vortex of light and lands on the hero frame.",
+        "client": "H2 PRISM brand (studio portfolio)",
+        "desc": "23-second AI-made perfume ad; a prismatic light vortex to the red bottle hero frame.",
+        "id": "h2-prism",
+        "tag": "Advertising clip",
+        "title": "H2 PRISM — 23s perfume ad"
+      },
+      {
         "case": "From idea to ship: competitor research (FotMob, Sofascore), three languages with full RTL support, deployed on GitHub Pages.",
         "client": "Personal project",
         "desc": "Trilingual football stats web app: 5 European leagues + Champions League, side-by-side team comparison, top scorers and transparent predictions — no signup, fully offline.",
@@ -435,6 +443,14 @@
         "poster": "assets/videos/h2-parfum.jpg",
         "src": "assets/videos/h2-parfum-film.mp4",
         "title": "H2 PARFUM — 38s ad"
+      },
+      {
+        "desc": "A pink, gold and teal prismatic light vortex; the red bottle lands on the hero frame.",
+        "duration": "0:23",
+        "id": "h2-prism",
+        "poster": "assets/videos/h2-prism.jpg",
+        "src": "assets/videos/h2-prism-film.mp4",
+        "title": "H2 PRISM — 23s ad"
       }
     ],
     "sub": "Finished advertising videos — watch with sound.",

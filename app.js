@@ -63,6 +63,7 @@ var ITEM_CAT = {
   "noir": "site", "pars-gold": "site",
   "qatre": "video",
   "h2-parfum": "video",
+  "h2-prism": "video",
   "hala": "webapp", "loyalty": "webapp"
 };
 var worksFilter = "all";   /* persists across language re-renders */
