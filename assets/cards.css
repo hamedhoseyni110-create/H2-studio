@@ -1,0 +1,115 @@
+/* ============ Cards pilot layer v4 — STACK+RING (2026-10-30): the v2 reference
+   SYSTEM adapted to OUR design. Hamed confirmed with his own screenshots and
+   ordered: this very system, clean, glassy cards, our own model.
+   REFERENCE SYSTEM (figmaformotion.com/v2, verified + Hamed's screenshots):
+   - STACK phase: deck pinned in view; scroll-driven tilt-and-discard — the
+     top card rotates clockwise (~12-16deg) and slides up-right off the stack;
+     the card underneath straightens and scales up to front. NO page-flip
+     (no card back ever shown), no fade, no crossfade.
+   - RING phase: thumbnails disperse into a ring around a central pill; the
+     big center word changes as scrolling continues; then the ring scrolls
+     away normally. Everything scroll-driven, never autoplay/buttons.
+   OUR ADAPTATION (no copying of v2's visuals):
+   - the site's own fixed aurora layer stays the scene (sections transparent);
+   - GLASS cards/tiles (dark translucent + blur, emerald-tinted border);
+   - emerald #34d399 / cyan #22d3ee accents, our typography, our content.
+   Implementation: vanilla JS scroll driver + one sticky frame (sticky
+   pattern from local-web-3d-master/scroll-driven-3d.md, no GSAP) + the
+   media-weight rule (zero new media; existing light previews only, lazy,
+   front-card-only playback).
+   LESSONS: NEVER put overflow:hidden on any ancestor of a sticky element
+   (chapters-pilot F1) — only the sticky frame itself clips. ============ */
+
+.sr-section { position: relative; height: 1200vh; height: 1200svh; }
+.sr-sticky {
+  position: sticky; top: 0;
+  height: 100vh; height: 100svh;
+  overflow: hidden;
+}
+.sr-stack { position: absolute; inset: 0; }
+
+/* ---- stack cards: glass sheets, centered, JS-driven transforms ---- */
+.sr-card {
+  position: absolute; left: 50%; top: 50%;
+  width: min(720px, 86vw);
+  padding: 16px 16px 14px;
+  border-radius: 24px;
+  background: rgba(6, 10, 9, 0.78);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid rgba(52, 211, 153, 0.28);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  will-change: transform;
+}
+.sr-card-media {
+  position: relative; aspect-ratio: 16 / 9;
+  background: #000; border-radius: 16px; overflow: hidden;
+  border: 1px solid rgba(52, 211, 153, 0.25);
+}
+.sr-card-media video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sr-card-title {
+  color: #fff; font-weight: 800;
+  font-size: clamp(1.15rem, 2.6vw, 1.5rem);
+  padding: 14px 8px 2px; text-align: start; line-height: 1.4;
+}
+
+/* ---- ring phase: pill + big word + glass tiles (JS positions tiles) ---- */
+.sr-ring { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
+.sr-pill {
+  position: absolute; left: 50%; top: 39%;
+  transform: translate(-50%, -50%);
+  padding: 10px 26px; border-radius: 999px;
+  border: 1px solid rgba(233, 242, 238, 0.55);
+  background: rgba(6, 10, 9, 0.55);
+  color: #e9f2ee; font-size: clamp(0.95rem, 2.2vw, 1.25rem);
+  font-weight: 700; letter-spacing: 0.04em; white-space: nowrap;
+}
+.sr-word {
+  position: absolute; left: 50%; top: 56%;
+  transform: translate(-50%, -50%);
+  color: #fff; font-weight: 900; line-height: 1.05; white-space: nowrap;
+  font-size: clamp(2.6rem, 9vw, 6.5rem);
+  text-shadow: 0 6px 30px rgba(0, 0, 0, 0.45);
+}
+.sr-tiles { position: absolute; inset: 0; }
+.sr-tile {
+  position: absolute; left: 50%; top: 50%;
+  width: clamp(96px, 13vw, 160px); aspect-ratio: 16 / 10;
+  border-radius: 14px; overflow: hidden;
+  background: rgba(6, 10, 9, 0.72);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  backdrop-filter: blur(10px) saturate(140%);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
+  will-change: transform;
+}
+.sr-tile video { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* ---- enriched lightbox actions (injected by cards.js, unchanged) ---- */
+.cs-lb-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.cs-lb-actions:empty { display: none; }
+
+/* ---- mobile ---- */
+@media (max-width: 760px) {
+  .sr-card { width: 88vw; padding: 12px 12px 10px; }
+  .sr-tile { width: clamp(84px, 26vw, 120px); }
+  .sr-pill { top: 38%; }
+  .sr-word { top: 54%; }
+}
+
+/* ---- reduced motion: static stack + static ring, no autoplay ---- */
+.sr-reduced.sr-section { height: auto; }
+.sr-reduced .sr-sticky { position: static; height: auto; overflow: visible; }
+.sr-reduced .sr-stack {
+  position: static; display: flex; flex-direction: column;
+  gap: 24px; align-items: center; padding: 24px 16px;
+}
+.sr-reduced .sr-card { position: static; transform: none !important; }
+.sr-reduced .sr-ring { position: static; opacity: 1; }
+.sr-reduced .sr-pill { position: static; transform: none; margin: 8px auto; width: max-content; }
+.sr-reduced .sr-word { position: static; transform: none; text-align: center; margin: 8px 0 20px; }
+.sr-reduced .sr-tiles {
+  position: static; display: flex; flex-wrap: wrap;
+  justify-content: center; gap: 12px; padding-bottom: 32px;
+}
+.sr-reduced .sr-tile { position: static; transform: none !important; }
