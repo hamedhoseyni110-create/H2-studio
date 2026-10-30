@@ -1,26 +1,16 @@
-/* ============ Cards pilot layer v4 — STACK+RING (2026-10-30): the v2 reference
-   SYSTEM adapted to OUR design. Hamed confirmed with his own screenshots and
-   ordered: this very system, clean, glassy cards, our own model.
-   REFERENCE SYSTEM (figmaformotion.com/v2, verified + Hamed's screenshots):
-   - STACK phase: deck pinned in view; scroll-driven tilt-and-discard — the
-     top card rotates clockwise (~12-16deg) and slides up-right off the stack;
-     the card underneath straightens and scales up to front. NO page-flip
-     (no card back ever shown), no fade, no crossfade.
-   - RING phase: thumbnails disperse into a ring around a central pill; the
-     big center word changes as scrolling continues; then the ring scrolls
-     away normally. Everything scroll-driven, never autoplay/buttons.
-   OUR ADAPTATION (no copying of v2's visuals):
-   - the site's own fixed aurora layer stays the scene (sections transparent);
-   - GLASS cards/tiles (dark translucent + blur, emerald-tinted border);
-   - emerald #34d399 / cyan #22d3ee accents, our typography, our content.
-   Implementation: vanilla JS scroll driver + one sticky frame (sticky
-   pattern from local-web-3d-master/scroll-driven-3d.md, no GSAP) + the
-   media-weight rule (zero new media; existing light previews only, lazy,
-   front-card-only playback).
-   LESSONS: NEVER put overflow:hidden on any ancestor of a sticky element
-   (chapters-pilot F1) — only the sticky frame itself clips. ============ */
+/* ============ Cards pilot layer v5 — STACK+RING (2026-10-30): v4 + approved fixes.
+   v5: disperse 0.5 seg, each word 0.5 seg (SEGMENTS 8.5, section 950vh);
+   9 ring tiles (all portfolio video items); ad words (what we BUILD);
+   NOIR local files verified, live 404 fixed at publish.
+   v5fix: mobile word size vw-driven without the 2.6rem floor (was clipping
+   12–18-char EN words at 390px) + mobile tiles 28vw → 24vw so side tiles
+   clear the word line. Ring radii NOT reduced: that would pull side tiles
+   inward and worsen the seg-7.25 overlap (measured in the fix report).
+   Sticky pattern + media-weight rule from local-web-3d-master/scroll-driven-3d.md.
+   LESSON: never put overflow:hidden on any ancestor of a sticky element (F1)
+   — only the sticky frame itself clips. ============ */
 
-.sr-section { position: relative; height: 1200vh; height: 1200svh; }
+.sr-section { position: relative; height: 950vh; height: 950svh; }
 .sr-sticky {
   position: sticky; top: 0;
   height: 100vh; height: 100svh;
@@ -74,7 +64,7 @@
 .sr-tiles { position: absolute; inset: 0; }
 .sr-tile {
   position: absolute; left: 50%; top: 50%;
-  width: clamp(96px, 13vw, 160px); aspect-ratio: 16 / 10;
+  width: clamp(110px, 15vw, 180px); aspect-ratio: 16 / 10;
   border-radius: 14px; overflow: hidden;
   background: rgba(6, 10, 9, 0.72);
   -webkit-backdrop-filter: blur(10px) saturate(140%);
@@ -92,9 +82,9 @@
 /* ---- mobile ---- */
 @media (max-width: 760px) {
   .sr-card { width: 88vw; padding: 12px 12px 10px; }
-  .sr-tile { width: clamp(84px, 26vw, 120px); }
+  .sr-tile { width: clamp(88px, 24vw, 132px); }
   .sr-pill { top: 38%; }
-  .sr-word { top: 54%; }
+  .sr-word { top: 54%; font-size: clamp(1.4rem, 7.5vw, 2.2rem); }
 }
 
 /* ---- reduced motion: static stack + static ring, no autoplay ---- */

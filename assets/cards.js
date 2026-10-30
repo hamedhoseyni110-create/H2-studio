@@ -1,17 +1,13 @@
-/* Cards pilot layer v4 — STACK+RING (2026-10-30): the v2 reference SYSTEM
-   adapted to OUR design. Hamed confirmed with his own screenshots: "go ahead
-   with this very system, just build it clean so it matches our site, glassy
-   cards, our own model." New layer only, zero edits to app.js/copy-data.js.
-   REFERENCE SYSTEM (figmaformotion.com/v2 + Hamed's mobile screenshots):
-   - STACK: deck pinned in view; scroll-driven tilt-and-discard — top card
-     rotates clockwise (~12-16deg) and slides up-right off the stack; the
-     card underneath straightens and scales up to front. NO page-flip (no
-     card back ever shown), no fade, no crossfade.
-   - RING: thumbnails disperse into a ring around a central pill; the big
-     center word changes as scrolling continues; then the ring scrolls away.
-   - Everything scroll-driven, never autoplay/buttons.
-   OUR ADAPTATION: site aurora stays the scene; GLASS cards/tiles; emerald /
-   cyan accents; our portfolio content; our client-type words. */
+/* Cards pilot layer v5 — STACK+RING (2026-10-30): v4 + Hamed's approved fixes.
+   CHANGE 1 (ring speed): phases remapped — stack 6 @1.0, disperse 0.5, each
+   word 0.5 → SEGMENTS 8.5; section height 950vh keeps 100vh/segment for the
+   stack, so each word now takes 50vh (twice as fast). Stack transforms,
+   tilt angles, no-fade/no-flip rules UNCHANGED.
+   CHANGE 2 (fuller ring): 9 tiles (all portfolio video items) — stack stays 6.
+   CHANGE 3 (ad words): pill + words now say what we BUILD, not client types.
+   CHANGE 4 (NOIR black panel): local files verified intact; the live 404 for
+   noir.mp4/noir.jpg is fixed at publish by uploading those two files.
+   New layer only, zero edits to app.js/copy-data.js. */
 
 (function () {
   var section = document.getElementById("services-swap");
@@ -28,16 +24,18 @@
     { id: "loyalty",       video: "assets/previews/loyalty.mp4",       poster: "assets/previews/loyalty.jpg" },
     { id: "noir",          video: "assets/previews/noir.mp4",          poster: "assets/previews/noir.jpg" }
   ];
-  /* ---- center words: our adaptation of v2's audience words. NOT in COPY —
-         small hardcoded dict, re-rendered on the <html lang> observer. ---- */
+  /* ---- center words: what we BUILD (v5, advertising words — replaced the
+         v4 client-type words). NOT in COPY — small hardcoded dict,
+         re-rendered on the <html lang> observer. ---- */
   var WORDS = {
-    fa: { pill: "برای", words: ["رستوران‌ها", "کافه‌ها", "فروشگاه‌ها", "باشگاه‌ها"] },
-    en: { pill: "FOR",  words: ["Restaurants", "Cafés", "Shops", "Gyms"] },
-    ar: { pill: "لـ",   words: ["مطاعم", "مقاهي", "متاجر", "صالات رياضية"] }
+    fa: { pill: "می‌سازیم", words: ["سایت سینمایی", "ویدیوی تبلیغاتی", "فروشگاه آنلاین", "اپلیکیشن موبایل"] },
+    en: { pill: "WE BUILD",  words: ["Cinematic websites", "Promo videos", "Online stores", "Mobile apps"] },
+    ar: { pill: "نبني",   words: ["مواقع سينمائية", "فيديوهات ترويجية", "متاجر إلكترونية", "تطبيقات جوال"] }
   };
   var N_STACK = ITEMS.length;          // 6 discards
   var N_WORDS = 4;
-  var SEGMENTS = N_STACK + 1 + N_WORDS; // 6 stack + 1 disperse + 4 words = 11
+  var DISPERSE_SEG = 0.5, WORD_SEG = 0.5;
+  var SEGMENTS = N_STACK + DISPERSE_SEG + N_WORDS * WORD_SEG; // 6 + 0.5 + 2 = 8.5
 
   function lang() { return (window.state && window.state.lang) || "fa"; }
 
@@ -59,7 +57,14 @@
     stackEl.appendChild(card);
     return { id: it.id, el: card, title: card.querySelector(".sr-card-title"), video: card.querySelector("video") };
   });
-  var ringTiles = ITEMS.map(function (it) {
+  /* ---- ring tiles: ALL 9 portfolio video items (v5 fuller ring).
+         Stack stays the 6 ITEMS above; tiles add gym/hala/pars-gold. ---- */
+  var RING_ITEMS = ITEMS.concat([
+    { id: "gym-site-demo", video: "assets/previews/gym-site-demo.mp4", poster: "assets/previews/gym-site-demo.jpg" },
+    { id: "hala",          video: "assets/previews/hala.mp4",          poster: "assets/previews/hala.jpg" },
+    { id: "pars-gold",     video: "assets/previews/pars-gold.mp4",     poster: "assets/previews/pars-gold.jpg" }
+  ]);
+  var ringTiles = RING_ITEMS.map(function (it) {
     var tile = document.createElement("div");
     tile.className = "sr-tile";
     tile.innerHTML = '<video muted loop playsinline preload="metadata" ' +
@@ -96,7 +101,7 @@
     var r = sticky.getBoundingClientRect();
     return { rx: Math.min(r.width * 0.42, 560), ry: Math.min(r.height * 0.34, 330) };
   }
-  var TILE_ANGLES = [-90, -30, 30, 90, 150, 210];
+  var TILE_ANGLES = [-90, -50, -10, 30, 70, 110, 150, 190, 230];
 
   function cardTransform(tx, ty, rot, sc) {
     return "translate(-50%, -50%) translate(" + tx + "%, " + ty + "%) rotate(" + rot + "deg) scale(" + sc + ")";
@@ -122,13 +127,13 @@
       }
     });
 
-    /* ---- ring: opacity + disperse + words ---- */
+    /* ---- ring: opacity + disperse + words (v5: disperse 0.5 seg, each word 0.5 seg) ---- */
     var ringOpacity = 0, wordIndex = 0, wordFrac = 0, orbit = 0, disperse = -1;
-    if (seg >= N_STACK && seg < N_STACK + 1) {
-      disperse = seg - N_STACK;
+    if (seg >= N_STACK && seg < N_STACK + DISPERSE_SEG) {
+      disperse = (seg - N_STACK) / DISPERSE_SEG;
       ringOpacity = disperse;
-    } else if (seg >= N_STACK + 1) {
-      var wf = Math.min(N_WORDS, seg - (N_STACK + 1));
+    } else if (seg >= N_STACK + DISPERSE_SEG) {
+      var wf = Math.min(N_WORDS, (seg - (N_STACK + DISPERSE_SEG)) / WORD_SEG);
       wordIndex = Math.min(N_WORDS - 1, Math.floor(wf));
       wordFrac = wf - Math.floor(wf);
       if (wf >= N_WORDS) wordFrac = 1;
@@ -151,7 +156,7 @@
     /* ---- center word ---- */
     var w = WORDS[lang()] || WORDS.en;
     if (wordIndex !== lastWordIndex) { wordEl.textContent = w.words[wordIndex]; lastWordIndex = wordIndex; }
-    var intro = seg >= N_STACK + 1 ? Math.min(1, wordFrac / 0.3) : 1;
+    var intro = seg >= N_STACK + DISPERSE_SEG ? Math.min(1, wordFrac / 0.3) : 1;
     wordEl.style.opacity = String(ringOpacity * intro);
     wordEl.style.transform = "translate(-50%, -50%) translateY(" + ((1 - intro) * 18).toFixed(1) + "px)";
     pillEl.style.opacity = String(ringOpacity);
