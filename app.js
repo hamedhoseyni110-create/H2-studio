@@ -1001,16 +1001,19 @@ function init() {
     goToWork("portfolio", a.getAttribute("data-goto-tab"));
   });
 
+  var MAPPED = ["services", "portfolio", "videos", "academy", "lab", "process", "faq", "pricing", "stats", "about", "contact"];
   var io = new IntersectionObserver(function(entries){
     entries.forEach(function(en){
-      if (en.isIntersecting) {
-        links.querySelectorAll("a").forEach(function(a){
-          a.classList.toggle("active", a.getAttribute("data-anchor") === en.target.id);
-        });
-      }
+      if (!en.isIntersecting) return;
+      var mapped = MAPPED.indexOf(en.target.id) !== -1;
+      links.querySelectorAll("a").forEach(function(a){
+        if (a.hasAttribute("data-goto-tab")) { a.classList.remove("active"); return; }
+        a.classList.toggle("active", mapped && a.getAttribute("data-anchor") === en.target.id);
+      });
     });
   }, { rootMargin: "-40% 0px -55% 0px" });
-  ["services", "portfolio", "videos", "academy", "lab", "process", "faq", "pricing", "stats", "about", "contact"].forEach(function(id){ io.observe(el(id)); });
+  ["services-swap"].concat(MAPPED).forEach(function(id){ var t = el(id); if (t) io.observe(t); });
+  window.H2NavSpy = io; /* lion.js observes its injected sections (return, panels) */
 }
 
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);

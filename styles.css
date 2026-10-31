@@ -103,7 +103,11 @@ body {
 .nav-links { display: flex; gap: 4px; margin-inline-start: auto; }
 .nav-links a {
   color: var(--muted); text-decoration: none; padding: 8px 14px;
-  border-radius: 10px; font-size: .95rem;
+  border-radius: 10px; font-size: .95rem; white-space: nowrap;
+}
+@media (max-width: 1280px) {
+  .nav-links { gap: 2px; }
+  .nav-links a { padding: 8px 10px; font-size: .9rem; }
 }
 .nav-links a:hover, .nav-links a.active { color: var(--text); background: rgba(52, 211, 153, 0.1); }
 .nav-actions { display: flex; align-items: center; gap: 10px; }
@@ -322,7 +326,7 @@ html[dir="ltr"] .service-go i::after { content: "→"; }
 .contact .section-sub { max-width: 560px; margin-inline: auto; }
 .footer {
   border-top: 1px solid rgba(52, 211, 153, 0.12);
-  padding: 36px 22px 44px; text-align: center; color: var(--muted); font-size: .9rem;
+  padding: 36px 22px 130px; text-align: center; color: var(--muted); font-size: .9rem;
 }
 .footer img { border-radius: 8px; margin-bottom: 10px; }
 .footer-social { display: flex; gap: 12px; justify-content: center; margin: 8px 0 14px; }
@@ -763,3 +767,14 @@ html[dir="ltr"] .service-go i::after { content: "→"; }
 @media (prefers-reduced-motion: reduce) {
   .play-btn { transition: none; }
 }
+
+/* ---------- cleanup pass (2026-10-31): tighter mobile cards, no copy removed ---------- */
+@media (max-width: 700px) {
+  .services-grid { gap: 14px; }
+  .service-card { padding: 18px 16px; }
+  .process-steps { gap: 14px; }
+  .process-steps li { padding: 18px 16px; }
+}
+/* anchor jumps (nav links, scrollIntoView) land below the fixed nav instead
+   of hiding section titles underneath it */
+main section[id] { scroll-margin-top: 90px; }

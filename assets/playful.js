@@ -1,10 +1,9 @@
 /* H2 Studio v2 — playful layer (iter3).
  *
- *  - Canvas night-landscape divider scenes (2D only, no WebGL): layered
- *    ridges + twinkling stars + horizon glow + fireflies, parallaxed by
- *    scroll. DPR-capped, paused offscreen / when tab hidden.
  *  - Scroll parallax on settled portfolio/service cards (CSS var --par).
- *  - Sticky order CTA: one-time playful pulse when it first matters.
+ *  - Sticky order CTA: one-time playful pulse when it first matters;
+ *    otherwise visible only when useful (hides on scroll-down, over the
+ *    footer/final CTA, and while the narengi bubble is open).
  *  - Mascot dock: body.mascot-docked when scrolled past the hero
  *    (styling lives in assets/narengi.css).
  *  - window.H2Lab.render(): the Lab playground — cinematic prompt builder
@@ -33,189 +32,6 @@
   }
 
   /* ================= divider scenes ================= */
-  function DividerScene(container, seed) {
-    this.c = container;
-    this.canvas = container.querySelector('canvas');
-    this.ctx = this.canvas.getContext('2d');
-    this.seed = seed;
-    this.visible = false;
-    this.raf = 0;
-    this.t0 = 0;
-    this.stars = [];
-    this.flies = [];
-    this.layers = []; /* {img, factor, y, speed} */
-    this.W = 0; this.H = 0;
-    this.resizeT = 0;
-    var self = this;
-    this.onResize = function () {
-      if (self.resizeT) clearTimeout(self.resizeT);
-      self.resizeT = setTimeout(function () { self.build(); self.paint(0); }, 180);
-    };
-    window.addEventListener('resize', this.onResize);
-    if ('IntersectionObserver' in window) {
-      this.io = new IntersectionObserver(function (es) {
-        es.forEach(function (en) {
-          self.visible = en.isIntersecting;
-          self.kick();
-        });
-      }, { threshold: 0.02 });
-      this.io.observe(container);
-    } else {
-      this.visible = true;
-    }
-    document.addEventListener('visibilitychange', function () { self.kick(); });
-    this.build();
-    this.paint(0);
-    this.kick();
-  }
-
-  DividerScene.prototype.build = function () {
-    var r = this.c.getBoundingClientRect();
-    var dpr = clamp(window.devicePixelRatio || 1, 1, 2);
-    this.W = Math.max(2, Math.round(r.width * dpr));
-    this.H = Math.max(2, Math.round(r.height * dpr));
-    this.dpr = dpr;
-    this.canvas.width = this.W;
-    this.canvas.height = this.H;
-    var rnd = mulberry32(this.seed);
-    var W = this.W, H = this.H, i;
-
-    /* stars */
-    this.stars = [];
-    var nStars = W > 900 * dpr ? 110 : 60;
-    for (i = 0; i < nStars; i++) {
-      this.stars.push({
-        x: rnd() * W, y: rnd() * H * 0.55,
-        r: (0.5 + rnd() * 1.4) * dpr,
-        ph: rnd() * 6.283, sp: 0.6 + rnd() * 1.8,
-        cyan: rnd() > 0.72
-      });
-    }
-
-    /* ridge silhouettes (pre-rendered offscreen, wider than canvas for shift) */
-    function ridge(baseY, amp, color, jag) {
-      var pad = Math.round(W * 0.22);
-      var cw = W + pad * 2;
-      var cv = document.createElement('canvas');
-      cv.width = cw; cv.height = H;
-      var g = cv.getContext('2d');
-      var step = Math.max(18 * dpr, W / 46);
-      var pts = [];
-      var x, y = baseY;
-      for (x = 0; x <= cw + step; x += step) {
-        y += (rnd() - 0.5) * amp * jag;
-        y = clamp(y, baseY - amp, baseY + amp * 0.7);
-        pts.push([x, y]);
-      }
-      g.beginPath();
-      g.moveTo(0, H);
-      for (var k = 0; k < pts.length; k++) {
-        var p0 = pts[Math.max(0, k - 1)], p1 = pts[k], p2 = pts[Math.min(pts.length - 1, k + 1)];
-        g.quadraticCurveTo(p1[0], p1[1], (p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2);
-        void p0;
-      }
-      g.lineTo(cw, H);
-      g.closePath();
-      g.fillStyle = color;
-      g.fill();
-      return { img: cv, pad: pad };
-    }
-
-    this.layers = [
-      { r: ridge(H * 0.46, H * 0.16, 'rgba(23,48,40,0.85)', 1.0), factor: 0.14, bob: 6 },
-      { r: ridge(H * 0.62, H * 0.15, 'rgba(13,26,21,0.95)', 1.2), factor: 0.32, bob: 10 },
-      { r: ridge(H * 0.80, H * 0.14, 'rgba(6,11,10,1)', 1.4), factor: 0.58, bob: 14 }
-    ];
-
-    /* fireflies */
-    this.flies = [];
-    for (i = 0; i < 14; i++) {
-      this.flies.push({
-        x: rnd() * W, y: H * 0.45 + rnd() * H * 0.5,
-        ph: rnd() * 6.283, sp: 0.25 + rnd() * 0.5,
-        rise: 6 + rnd() * 14, sway: 20 + rnd() * 30,
-        cyan: rnd() > 0.5, s: (1.2 + rnd() * 1.8) * dpr
-      });
-    }
-  };
-
-  DividerScene.prototype.paint = function (t) {
-    var ctx = this.ctx, W = this.W, H = this.H;
-    if (!W || !H) return;
-    ctx.clearRect(0, 0, W, H);
-
-    /* sky wash */
-    var sky = ctx.createLinearGradient(0, 0, 0, H);
-    sky.addColorStop(0, 'rgba(4,8,7,0)');
-    sky.addColorStop(0.55, 'rgba(6,12,10,0.55)');
-    sky.addColorStop(1, 'rgba(4,7,6,0.9)');
-    ctx.fillStyle = sky;
-    ctx.fillRect(0, 0, W, H);
-
-    /* scroll parallax: how far the scene's center is from viewport center */
-    var rect = this.c.getBoundingClientRect();
-    var vh = window.innerHeight || 1;
-    var p = clamp(((rect.top + rect.height / 2) - vh / 2) / vh, -1, 1);
-
-    /* stars */
-    var s, a, i;
-    for (i = 0; i < this.stars.length; i++) {
-      s = this.stars[i];
-      a = 0.25 + 0.65 * Math.abs(Math.sin(t * s.sp + s.ph));
-      ctx.beginPath();
-      ctx.arc(s.x - p * 18 * this.dpr, s.y, s.r, 0, 6.283);
-      ctx.fillStyle = s.cyan
-        ? 'rgba(150,235,245,' + a.toFixed(3) + ')'
-        : 'rgba(235,255,245,' + a.toFixed(3) + ')';
-      ctx.fill();
-    }
-
-    /* horizon glow (breathes a little) */
-    var glowY = H * 0.52;
-    var breathe = 0.75 + 0.25 * Math.sin(t * 0.5);
-    var gl = ctx.createRadialGradient(W / 2, glowY, 0, W / 2, glowY, W * 0.42);
-    gl.addColorStop(0, 'rgba(52,211,153,' + (0.16 * breathe).toFixed(3) + ')');
-    gl.addColorStop(0.55, 'rgba(34,211,238,' + (0.08 * breathe).toFixed(3) + ')');
-    gl.addColorStop(1, 'rgba(34,211,238,0)');
-    ctx.fillStyle = gl;
-    ctx.fillRect(0, 0, W, H);
-
-    /* ridge layers, back → front */
-    for (i = 0; i < this.layers.length; i++) {
-      var L = this.layers[i];
-      var shift = -p * L.factor * W * 0.24;
-      var bobY = Math.sin(t * 0.4 + i * 2.1) * L.bob * this.dpr * 0.4;
-      ctx.drawImage(L.r.img, -L.r.pad + shift, bobY);
-    }
-
-    /* fireflies */
-    for (i = 0; i < this.flies.length; i++) {
-      var f = this.flies[i];
-      var fy = f.y - ((t * f.rise) % (H * 0.5));
-      var fx = f.x + Math.sin(t * f.sp + f.ph) * f.sway * this.dpr;
-      a = 0.25 + 0.55 * Math.abs(Math.sin(t * f.sp * 1.7 + f.ph));
-      ctx.beginPath();
-      ctx.arc(fx, fy, f.s, 0, 6.283);
-      ctx.fillStyle = f.cyan
-        ? 'rgba(120,225,240,' + a.toFixed(3) + ')'
-        : 'rgba(120,240,180,' + a.toFixed(3) + ')';
-      ctx.fill();
-    }
-  };
-
-  DividerScene.prototype.kick = function () {
-    var self = this;
-    if (this.raf) { cancelAnimationFrame(this.raf); this.raf = 0; }
-    if (REDUCED) { this.paint(0); return; }
-    if (!this.visible || document.hidden) return;
-    this.t0 = this.t0 || performance.now();
-    var loop = function (now) {
-      self.paint((now - self.t0) / 1000);
-      self.raf = requestAnimationFrame(loop);
-    };
-    this.raf = requestAnimationFrame(loop);
-  };
-
   /* ================= scroll parallax on cards ================= */
   var parEls = [];
   var parQueued = false;
@@ -264,6 +80,51 @@
     io.observe(heroEl);
   }
 
+  /* ================= sticky CTA: visible only when useful =================
+     Hides while scrolling down (reading), returns on scroll-up, and stays
+     hidden while the hero is on screen (its own CTA serves), over the
+     footer/final CTA (they have their own order button), and while the
+     narengi bubble is open (no triple order path). */
+  function armCtaBehavior(heroEl, ctaEl) {
+    if (!ctaEl) return;
+    var lastY = window.scrollY || 0, down = false, heroVis = false, foot = false, bub = false;
+    function apply() {
+      var hide = heroVis || (down && (window.scrollY || 0) > 320) || foot || bub;
+      ctaEl.classList.toggle('cta-hidden', hide);
+    }
+    var ticking = false;
+    window.addEventListener('scroll', function () {
+      if (ticking) return; ticking = true;
+      requestAnimationFrame(function () {
+        var y = window.scrollY || 0;
+        if (y > lastY + 6) down = true; else if (y < lastY - 6) down = false;
+        lastY = y; ticking = false; apply();
+      });
+    }, { passive: true });
+    if ('IntersectionObserver' in window) {
+      if (heroEl) {
+        var hio = new IntersectionObserver(function (es) {
+          heroVis = es.some(function (en) { return en.isIntersecting; }); apply();
+        }, { threshold: 0 });
+        hio.observe(heroEl);
+      }
+      var fio = new IntersectionObserver(function (es) {
+        foot = es.some(function (en) { return en.isIntersecting; }); apply();
+      }, { threshold: 0.02 });
+      var footEl = document.querySelector('footer');
+      var finalEl = document.getElementById('lionFinalCta');
+      if (footEl) fio.observe(footEl);
+      if (finalEl) fio.observe(finalEl);
+    }
+    var bubble = document.getElementById('narengi-bubble');
+    if (bubble && 'MutationObserver' in window) {
+      var mo = new MutationObserver(function () { bub = !bubble.hidden; apply(); });
+      mo.observe(bubble, { attributes: true, attributeFilter: ['hidden'] });
+      bub = !bubble.hidden;
+    }
+    apply();
+  }
+
   /* ================= mascot dock ================= */
   function armMascotDock(heroEl) {
     if (!heroEl || !('IntersectionObserver' in window)) return;
@@ -287,11 +148,9 @@
     { e: '#a78bfa', c: '#f472b6' }
   ];
   var PAL_KEY = 'h2-palette';
-  var palIdx = 0;
-  try {
-    var sp = parseInt(localStorage.getItem(PAL_KEY), 10);
-    if (sp >= 0 && sp < PALETTES.length) palIdx = sp;
-  } catch (e) { /* private mode */ }
+  var palIdx = 0; /* the site itself always starts on the lion default (0);
+    a saved sunset from the old global behaviour is overwritten by the
+    init applyPalette(0) below, so the lion theme can no longer break. */
 
   function applyPalette(idx) {
     palIdx = idx;
@@ -303,6 +162,31 @@
       'linear-gradient(135deg,' + p.e + ',' + p.c + ',' + p.m + ')' :
       'linear-gradient(135deg,' + p.e + ',' + p.c + ')');
     try { localStorage.setItem(PAL_KEY, String(idx)); } catch (e) { /* noop */ }
+  }
+
+  /* Lab-only palette preview: recolours #lab subtree (its primary button
+     and pressed chips use var(--grad)) without touching :root or saving
+     anything, so the rest of the site keeps the lion theme. */
+  var previewIdx = -1;
+  function previewPalette(idx) {
+    var lab = document.getElementById('lab');
+    if (!lab) return;
+    var p = PALETTES[idx];
+    lab.style.setProperty('--emerald', p.e);
+    lab.style.setProperty('--cyan', p.c);
+    lab.style.setProperty('--grad', p.m ?
+      'linear-gradient(135deg,' + p.e + ',' + p.c + ',' + p.m + ')' :
+      'linear-gradient(135deg,' + p.e + ',' + p.c + ')');
+    previewIdx = idx;
+  }
+  function clearPreview() {
+    var lab = document.getElementById('lab');
+    if (lab) {
+      lab.style.removeProperty('--emerald');
+      lab.style.removeProperty('--cyan');
+      lab.style.removeProperty('--grad');
+    }
+    previewIdx = -1;
   }
 
   function esc(s) {
@@ -449,7 +333,7 @@
     grid.querySelectorAll('[data-pal]').forEach(function (b) {
       b.addEventListener('click', function () {
         var i = +b.getAttribute('data-pal');
-        applyPalette(i);
+        previewPalette(i);
         grid.querySelectorAll('[data-pal]').forEach(function (x) {
           x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
         });
@@ -457,12 +341,18 @@
       });
     });
     grid.querySelector('#palReset').addEventListener('click', function () {
-      applyPalette(0);
+      clearPreview();
       grid.querySelectorAll('[data-pal]').forEach(function (x) {
         x.setAttribute('aria-pressed', x.getAttribute('data-pal') === '0' ? 'true' : 'false');
       });
       palName.textContent = PL.palettes[0];
     });
+    if (previewIdx >= 0) {
+      grid.querySelectorAll('[data-pal]').forEach(function (x) {
+        x.setAttribute('aria-pressed', +x.getAttribute('data-pal') === previewIdx ? 'true' : 'false');
+      });
+      palName.textContent = PL.palettes[previewIdx];
+    }
   }
 
   window.H2Lab = { render: renderLab };
@@ -470,8 +360,6 @@
   /* ================= init ================= */
   function init() {
     applyPalette(palIdx); /* before first paint where possible */
-    var scenes = Array.prototype.slice.call(document.querySelectorAll('[data-scene]'));
-    scenes.forEach(function (c, i) { new DividerScene(c, 1234 + i * 777); });
 
     if (!REDUCED) {
       window.addEventListener('scroll', queueParallax, { passive: true });
@@ -488,6 +376,7 @@
     var hero = document.getElementById('top');
     var cta = document.getElementById('stickyCta');
     armCtaPulse(hero, cta);
+    armCtaBehavior(hero, cta);
     armMascotDock(hero);
   }
 

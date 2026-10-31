@@ -1,5 +1,5 @@
 /* Lion phase layer (step 5) — hero shrink-to-aura, progress, tilt titles,
-   aura strip, showreel section, depth-clip return section.
+   aura strip, depth-clip return section.
    Runs last (after cards.js). app.js and copy-data.js are untouched.
    Single rAF loop, time-based lerp (0.09 @60fps) — one motion system for the whole page. */
 (function () {
@@ -44,13 +44,14 @@
   strip.innerHTML = '<div class="lion-aura-bg"></div><div class="lion-aura-veil"></div>';
   wrap.parentNode.insertBefore(strip, wrap.nextSibling);
 
-  /* ---- showreel: the old hero video as its own section ---- */
-  var show = document.createElement('section');
-  show.className = 'lion-showreel';
-  show.innerHTML = '<video controls playsinline preload="metadata" poster="assets/hero-poster.jpg">' +
-    '<source src="assets/hero.mp4" type="video/mp4"></video>';
-  strip.parentNode.insertBefore(show, strip.nextSibling);
-
+  /* nav-spy hookup: lion.js runs at parse time, app.js creates H2NavSpy
+     on DOMContentLoaded, so observe now if present, else after DOM ready. */
+  function spyObserve(elm) {
+    if (window.H2NavSpy) { window.H2NavSpy.observe(elm); return; }
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.H2NavSpy) window.H2NavSpy.observe(elm);
+    });
+  }
   /* ---- return section: depth clip, plays on scroll entry ---- */
   var swap = document.getElementById('services-swap');
   var ret = document.createElement('section');
@@ -65,6 +66,7 @@
       '<source src="assets/lion-depth-v1.mp4" type="video/mp4"></video>';
   }
   if (swap && swap.parentNode) swap.parentNode.insertBefore(ret, swap.nextSibling);
+  spyObserve(ret);
 
   /* ---- why-us panels: stacked colour panels after the portfolio ----
      Content comes from COPY (trilingual, like everything else); the
@@ -82,6 +84,7 @@
   }
   panelsSec.innerHTML = panelsHTML;
   if (portfolioSec && portfolioSec.parentNode) portfolioSec.parentNode.insertBefore(panelsSec, portfolioSec.nextSibling);
+  spyObserve(panelsSec);
   function renderPanels() {
     var lang = document.documentElement.lang || 'fa';
     var data = (typeof COPY !== 'undefined' && COPY[lang] && COPY[lang].panels) ||

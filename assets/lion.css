@@ -97,19 +97,6 @@
   .lion-aura-strip { height: 100px; }
 }
 
-/* ---------- showreel (own section after hero) ---------- */
-.lion-showreel {
-  max-width: var(--maxw);
-  margin: 0 auto;
-  padding: 40px 22px 10px;
-}
-.lion-showreel video {
-  width: 100%;
-  border-radius: 20px;
-  display: block;
-  background: #000;
-}
-
 /* ---------- return section (depth clip) ---------- */
 .lion-return {
   position: relative;
@@ -202,21 +189,27 @@
 .lion-panels-sub { color: rgba(255,255,255,.75); text-align: center; margin: 10px 0 36px; }
 .lion-panel {
   position: sticky;
-  min-height: 82vh;
+  min-height: 64vh;
   border-radius: 28px;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  text-align: center; padding: 48px 24px;
-  color: #0b0b0b;
-  box-shadow: 0 -12px 40px rgba(0,0,0,.45);
+  text-align: center; padding: 40px 24px;
+  color: #f2f7f4;
+  background: linear-gradient(180deg, rgba(13,18,16,.94), rgba(5,8,7,.97));
+  border: 1px solid rgba(52,211,153,.4);
+  box-shadow: 0 -12px 40px rgba(0,0,0,.45), 0 0 70px rgba(52,211,153,.16);
 }
-.lion-panel.p-em { background: #34d399; }
-.lion-panel.p-mg { background: #ec4899; }
-.lion-panel.p-vi { background: #8b5cf6; }
-.lion-panel.p-or { background: #fb923c; }
+.lion-panel.p-em { border-color: rgba(52,211,153,.45); box-shadow: 0 -12px 40px rgba(0,0,0,.45), 0 0 70px rgba(52,211,153,.18); }
+.lion-panel.p-mg { border-color: rgba(236,72,153,.45); box-shadow: 0 -12px 40px rgba(0,0,0,.45), 0 0 70px rgba(236,72,153,.18); }
+.lion-panel.p-vi { border-color: rgba(139,92,246,.45); box-shadow: 0 -12px 40px rgba(0,0,0,.45), 0 0 70px rgba(139,92,246,.18); }
+.lion-panel.p-or { border-color: rgba(251,146,60,.45); box-shadow: 0 -12px 40px rgba(0,0,0,.45), 0 0 70px rgba(251,146,60,.18); }
 .lion-panel-giant { font-size: clamp(2.6rem, 9vw, 5.5rem); font-weight: 800; line-height: 1.2; }
-.lion-panel-desc { font-size: clamp(1rem, 2.6vw, 1.25rem); color: rgba(0,0,0,.72); margin-top: 16px; max-width: 560px; line-height: 1.9; }
+.lion-panel.p-em .lion-panel-giant { color: #34d399; }
+.lion-panel.p-mg .lion-panel-giant { color: #ec4899; }
+.lion-panel.p-vi .lion-panel-giant { color: #8b5cf6; }
+.lion-panel.p-or .lion-panel-giant { color: #fb923c; }
+.lion-panel-desc { font-size: clamp(1rem, 2.6vw, 1.25rem); color: rgba(255,255,255,.78); margin-top: 16px; max-width: 560px; line-height: 1.9; }
 @media (max-width: 640px) {
-  .lion-panel { min-height: 78vh; border-radius: 22px; }
+  .lion-panel { min-height: 62vh; border-radius: 22px; }
 }
 
 /* ---------- templates-style portfolio cards (approved 2026-10-31) ----------

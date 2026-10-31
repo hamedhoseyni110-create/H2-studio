@@ -8,26 +8,6 @@
   --play-ease: cubic-bezier(0.16, 0.8, 0.24, 1);
 }
 
-/* ============ landscape divider scenes (canvas, decorative) ============ */
-.divider-scene {
-  position: relative;
-  width: 100%;
-  height: 240px;
-  overflow: hidden;
-  margin: 8px 0 -8px;
-  /* soft blend into the page above/below */
-  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 18%, #000 82%, transparent 100%);
-  mask-image: linear-gradient(180deg, transparent 0, #000 18%, #000 82%, transparent 100%);
-}
-.divider-scene canvas {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-  display: block;
-}
-@media (max-width: 760px) {
-  .divider-scene { height: 170px; }
-}
-
 /* ============ card depth: tilt + scroll parallax via CSS vars ============
    app.js writes --rx/--ry (tilt) and playful.js writes --par (scroll).
    Applied only once the reveal settles, so it never fights .reveal-3d. */
@@ -96,6 +76,10 @@
 }
 [dir="ltr"] .sticky-cta:hover { transform: translateX(-50%) translateY(-2px); }
 .sticky-cta:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+/* hidden when not useful (JS toggles .cta-hidden): slides down + fades;
+   pointer-events off so it never covers content while hidden */
+.sticky-cta.cta-hidden { opacity: 0; pointer-events: none; transform: translateX(50%) translateY(14px); }
+[dir="ltr"] .sticky-cta.cta-hidden { transform: translateX(-50%) translateY(14px); }
 /* one-time playful entrance pulse when it first matters (JS adds .pulse once) */
 .sticky-cta.pulse { animation: cta-pulse 0.9s var(--play-ease) 2; }
 @keyframes cta-pulse {
@@ -199,7 +183,6 @@
 
 /* ============ reduced motion: everything static ============ */
 @media (prefers-reduced-motion: reduce) {
-  .divider-scene canvas { /* single static frame painted by JS; no animation */ }
   .section-title::after { transition: none; transform: scaleX(1); }
   .process-steps li.in .step-num { animation: none; }
   .sticky-cta.pulse { animation: none; }
