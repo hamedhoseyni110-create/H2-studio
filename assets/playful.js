@@ -281,7 +281,7 @@
   var typeTimer = 0;
 
   var PALETTES = [
-    { e: '#34d399', c: '#22d3ee' },
+    { e: '#34d399', c: '#22d3ee', m: '#ec4899' },
     { e: '#fbbf24', c: '#fb7185' },
     { e: '#38bdf8', c: '#2dd4bf' },
     { e: '#a78bfa', c: '#f472b6' }
@@ -299,7 +299,9 @@
     var root = document.documentElement;
     root.style.setProperty('--emerald', p.e);
     root.style.setProperty('--cyan', p.c);
-    root.style.setProperty('--grad', 'linear-gradient(135deg,' + p.e + ',' + p.c + ')');
+    root.style.setProperty('--grad', p.m ?
+      'linear-gradient(135deg,' + p.e + ',' + p.c + ',' + p.m + ')' :
+      'linear-gradient(135deg,' + p.e + ',' + p.c + ')');
     try { localStorage.setItem(PAL_KEY, String(idx)); } catch (e) { /* noop */ }
   }
 

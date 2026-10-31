@@ -176,7 +176,10 @@
       var hh = heroEl.offsetHeight || window.innerHeight;
       var p = Math.min(Math.max(sy / hh, 0), 1);
       heroVideo.style.transform = "translateY(" + (sy * 0.3).toFixed(1) + "px) scale(" + (1 + p * 0.08).toFixed(3) + ")";
-      heroInner.style.transform = "translateY(" + (sy * 0.12).toFixed(1) + "px)";
+      /* .hero-inner is owned by lion.js (shrink + fade); the old line that
+         wrote it here with the opposite sign fought lion.js on every
+         scroll and flashed a wrong value after instant jumps. Removed
+         2026-10-31; the video sink above stays. */
     }
     window.addEventListener("scroll", function () {
       if (!heroTicking) { heroTicking = true; requestAnimationFrame(renderHero); }

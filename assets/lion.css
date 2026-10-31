@@ -1,0 +1,329 @@
+/* Lion phase layer (step 5) — loaded LAST, overrides only.
+   Hero living-lion, colorful theme, scroll motion, return clip, mascot tweaks.
+   app.js and copy-data.js are untouched. */
+
+:root {
+  --magenta: #ec4899;
+  --violet: #8b5cf6;
+  --narangi: #fb923c;
+  /* lion-theme unification: the old two-colour --grad (emerald->cyan)
+     still drove primary buttons incl. the nav CTA, tabs and chips.
+     Overriding it here (last-loaded sheet) makes them all lion gradient. */
+  --grad: linear-gradient(135deg, #34d399, #22d3ee, #ec4899);
+}
+
+/* ---------- colorful theme ---------- */
+.aurora .b3 {
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.34), transparent 68%);
+}
+.aurora .b4 {
+  top: 8%;
+  inset-inline-start: 32%;
+  width: 44vmax;
+  height: 44vmax;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.32), transparent 68%);
+  animation: aurora-drift-1 68s ease-in-out infinite alternate-reverse;
+}
+/* hero title gradient: emerald -> cyan -> magenta.
+   NOTE: the background shorthand resets background-clip, so the text clipping
+   from upgrades.css must be re-asserted here, or the title renders as a solid bar. */
+#heroTitle {
+  background: linear-gradient(110deg, #34d399 0%, #22d3ee 50%, #ec4899 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+/* lion slightly lower so the title clears its eyes (wide viewports only;
+   on portrait phones the video height matches and this is a no-op) */
+#heroVideo { object-position: center 25%; }
+/* card glows, cycling emerald / magenta / orange — static, no animation (mobile-safe) */
+.services-grid > *:nth-child(3n+1),
+.portfolio-grid > *:nth-child(3n+1) {
+  box-shadow: 0 0 32px rgba(52, 211, 153, 0.22);
+}
+.services-grid > *:nth-child(3n+2),
+.portfolio-grid > *:nth-child(3n+2) {
+  box-shadow: 0 0 32px rgba(236, 72, 153, 0.22);
+}
+.services-grid > *:nth-child(3n+3),
+.portfolio-grid > *:nth-child(3n+3) {
+  box-shadow: 0 0 32px rgba(251, 146, 60, 0.22);
+}
+
+/* ---------- hero: sticky shrink-to-aura ---------- */
+.lion-hero-wrap { height: 260vh; }
+.hero.lion-sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  min-height: 100svh;
+}
+.lion-hero-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  will-change: transform, opacity;
+}
+#lionProgress {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 4px;
+  width: 0%;
+  background: linear-gradient(90deg, #34d399, #ec4899);
+  z-index: 200;
+}
+
+/* ---------- aura strip (visual band, no text) ---------- */
+.lion-aura-strip {
+  position: relative;
+  height: 150px;
+  overflow: hidden;
+}
+.lion-aura-bg {
+  position: absolute;
+  inset: 0;
+  background: url("lion-v1.webp") center 30% / cover no-repeat;
+  opacity: 0.28;
+  filter: blur(1px) saturate(1.1);
+}
+.lion-aura-veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #040706 0%, transparent 30%, transparent 70%, #040706 100%);
+}
+@media (max-width: 640px) {
+  .lion-aura-strip { height: 100px; }
+}
+
+/* ---------- showreel (own section after hero) ---------- */
+.lion-showreel {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 40px 22px 10px;
+}
+.lion-showreel video {
+  width: 100%;
+  border-radius: 20px;
+  display: block;
+  background: #000;
+}
+
+/* ---------- return section (depth clip) ---------- */
+.lion-return {
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lion-return video,
+.lion-return img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---------- tilt headings ---------- */
+.section-title { will-change: transform; }
+/* Clip the few pixels of perspective-projected tilt corners at the screen edge
+   (pre-existing upgrades tilt on portfolio cards projects ~4px past the viewport
+   on mobile). overflow-x: clip — unlike hidden — does not break sticky. */
+.section { overflow-x: clip; }
+
+/* ---------- mascot tweaks (step 4 resolution) ---------- */
+@media (max-width: 640px) {
+  #narengi { width: 88px; height: 88px; }
+}
+#narengi {
+  opacity: 0.55;
+  transition: opacity 0.4s ease;
+  box-shadow:
+    0 10px 34px rgba(0, 0, 0, 0.62),
+    0 0 0 2px rgba(52, 211, 153, 0.38),
+    0 0 26px rgba(52, 211, 153, 0.10),
+    0 0 34px rgba(236, 72, 153, 0.14);
+}
+#narengi:hover,
+#narengi:active,
+#narengi:focus-visible,
+#narengi:has(#narengi-bubble:not([hidden])) {
+  opacity: 1;
+}
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .hero {
+    background:
+      linear-gradient(180deg, rgba(7, 10, 9, 0.55) 0%, rgba(7, 10, 9, 0.25) 50%, rgba(7, 10, 9, 0.65) 100%),
+      url("lion-v1.webp") center 30% / cover no-repeat,
+      linear-gradient(180deg, #070a09 0%, #040706 100%);
+  }
+  .lion-hero-media,
+  .hero-inner {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+
+/* ---------- services pour (approved 2026-10-31) ----------
+   Pour replaces the generic reveal for services cards only; portfolio
+   keeps its reveal. Pre-settle, the reveal's 0.8s transition is neutralized
+   so the scroll scrub stays tight (otherwise every frame's inline transform
+   would lag behind an ease). Once lion.js adds .settled at rest, this rule
+   stops applying and the mouse-tilt transition resumes. */
+@media (prefers-reduced-motion: no-preference) {
+  #servicesGrid .service-card.reveal-3d:not(.settled),
+  #servicesGrid .service-card.reveal-3d.in:not(.settled) {
+    transition: none;
+  }
+  #portfolioGrid .portfolio-card.reveal-3d:not(.settled),
+  #portfolioGrid .portfolio-card.reveal-3d.in:not(.settled) {
+    transition: none;
+  }
+  #processSteps li.reveal-3d:not(.settled),
+  #processSteps li.reveal-3d.in:not(.settled) {
+    transition: none;
+  }
+}
+
+/* ---------- why-us panels (approved 2026-10-31) ----------
+   Stacked colour panels after the portfolio, mirroring the reference's
+   Collection-features behaviour with our dark theme and our own claims.
+   Pure CSS sticky — no JS motion, no media weight. Sticky tops are set
+   from JS (nav height + 26px steps) so the stack edges stay visible
+   below the fixed nav. */
+.lion-panels { position: relative; padding: 40px 16px 60px; }
+.lion-panels-title { text-align: center; }
+.lion-panels-sub { color: rgba(255,255,255,.75); text-align: center; margin: 10px 0 36px; }
+.lion-panel {
+  position: sticky;
+  min-height: 82vh;
+  border-radius: 28px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 48px 24px;
+  color: #0b0b0b;
+  box-shadow: 0 -12px 40px rgba(0,0,0,.45);
+}
+.lion-panel.p-em { background: #34d399; }
+.lion-panel.p-mg { background: #ec4899; }
+.lion-panel.p-vi { background: #8b5cf6; }
+.lion-panel.p-or { background: #fb923c; }
+.lion-panel-giant { font-size: clamp(2.6rem, 9vw, 5.5rem); font-weight: 800; line-height: 1.2; }
+.lion-panel-desc { font-size: clamp(1rem, 2.6vw, 1.25rem); color: rgba(0,0,0,.72); margin-top: 16px; max-width: 560px; line-height: 1.9; }
+@media (max-width: 640px) {
+  .lion-panel { min-height: 78vh; border-radius: 22px; }
+}
+
+/* ---------- templates-style portfolio cards (approved 2026-10-31) ----------
+   Reference card frame, dark-adapted: radius 20, 10px inset, media radius 15,
+   footer row (title + pill), palette accents cycling, first card spans 2
+   columns (featured, like the reference). Cap lines beyond title + pill are
+   hidden (the lightbox still carries title + desc). Posters are set from JS. */
+#portfolioGrid .portfolio-card.lion-tcard { border-radius: 20px; padding: 10px; box-shadow: 0 10px 34px rgba(0,0,0,.4); }
+#portfolioGrid .portfolio-card.lion-tcard .portfolio-media { border-radius: 15px; }
+#portfolioGrid .portfolio-card.lion-tcard .portfolio-cap { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; padding: 14px 8px 6px; }
+#portfolioGrid .portfolio-card.lion-tcard .portfolio-cap h3 { grid-column: 1; grid-row: 1; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#portfolioGrid .portfolio-card.lion-tcard .portfolio-cap .live-link,
+#portfolioGrid .portfolio-card.lion-tcard .portfolio-cap .lion-watch-pill { grid-column: 2; grid-row: 1; border-radius: 999px; white-space: nowrap; }
+#portfolioGrid .portfolio-card.lion-tcard .portfolio-cap > :not(h3):not(.live-link):not(.lion-watch-pill) { display: none; }
+#portfolioGrid .portfolio-card.lion-tcard .lion-watch-pill { background: transparent; font: inherit; cursor: pointer; color: var(--emerald); border: 1px solid rgba(52,211,153,.4); padding: 8px 16px; font-weight: 700; font-size: .95rem; }
+#portfolioGrid .portfolio-card.lion-tcard:first-child { grid-column: span 2; box-shadow: 0 10px 34px rgba(0,0,0,.4), 0 0 44px rgba(52,211,153,.18); }
+#portfolioGrid .portfolio-card.lion-tcard:nth-of-type(5n+1) { border-color: rgba(52,211,153,.45); }
+#portfolioGrid .portfolio-card.lion-tcard:nth-of-type(5n+1) .live-link,
+#portfolioGrid .portfolio-card.lion-tcard:nth-of-type(5n+1) .lion-watch-pill { border-color: rgba(52,211,153,.6); color: #6ee7b7; }
+#portfolioGrid .portfolio-card.lion-tcard:nth-of-type(5n+1):hover { border-color: rgba(52,211,153,.7); }
+#portfolioGrid .portfolio-card.lion-tcard:nth-of-type(5n+2) { border-color: rgba(236,72,153,.45); }
+#portfolioGrid .portfolio-card.lion-tcard:nth-of-type(5n+2) .live-link,
+#portfolioGrid .portfolio-card.lion-tcard:nth-of-type(5n+2) .lion-watch-pill { border-color: rgba(236,72,153,.6); color: #f9a8d4; }
+#portfolioGrid .portfolio-card.lion-tcard:nth-of-type(5n+2):hover { border-color: rgba(236,72,153,.7); }
+#portfolioGrid .portfolio-card.lion-tcard:nth-of-type(5n+3) { border-color: rgba(139,92,246,.45); }
+#portfolioGrid .portfolio-card.lion-tcard:nth-of-type(5n+3) .live-link,
+#portfolioGrid .portfolio-card.lion-tcard:nth-of-type(5n+3) .lion-watch-pill { border-color: rgba(139,92,246,.6); color: #c4b5fd; }
+#portfolioGrid .portfolio-card.lion-tcard:nth-of-type(5n+3):hover { border-color: rgba(139,92,246,.7); }
+#portfolioGrid .portfolio-card.lion-tcard:nth-of-type(5n+4) { border-color: rgba(251,146,60,.45); }
+#portfolioGrid .portfolio-card.lion-tcard:nth-of-type(5n+4) .live-link,
+#portfolioGrid .portfolio-card.lion-tcard:nth-of-type(5n+4) .lion-watch-pill { border-color: rgba(251,146,60,.6); color: #fdba74; }
+#portfolioGrid .portfolio-card.lion-tcard:nth-of-type(5n+4):hover { border-color: rgba(251,146,60,.7); }
+#portfolioGrid .portfolio-card.lion-tcard:nth-of-type(5n+5) { border-color: rgba(34,211,238,.45); }
+#portfolioGrid .portfolio-card.lion-tcard:nth-of-type(5n+5) .live-link,
+#portfolioGrid .portfolio-card.lion-tcard:nth-of-type(5n+5) .lion-watch-pill { border-color: rgba(34,211,238,.6); color: #a5f3fc; }
+#portfolioGrid .portfolio-card.lion-tcard:nth-of-type(5n+5):hover { border-color: rgba(34,211,238,.7); }
+
+/* ---------- process line-draw (approved 2026-10-31) ----------
+   The line is injected by lion.js (absolute, so it never becomes a grid
+   item); its height is measured from the first step number. Steps light
+   up (.lit) as the line reaches them. */
+#processSteps { position: relative; }
+/* 5 real steps need 5 columns on desktop, otherwise the grid wraps and
+   the line (which crosses the first row's numbers) would hide. */
+@media (min-width: 1024px) {
+  #processSteps { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+}
+.lion-process-line { position: absolute; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #ec4899, #22d3ee, #34d399); transform-origin: right; }
+#processSteps li.lit { border-color: rgba(52,211,153,.6); box-shadow: 0 0 24px rgba(52,211,153,.25); }
+
+/* ---------- manifesto (approved 2026-10-31; home: right before About) ----------
+   Huge lines brighten per-line on scroll over a dim lion aura. Lines come
+   from COPY; *...* marks the accent word. */
+.lion-manifesto { position: relative; padding: 90px 20px; overflow: hidden; }
+.lion-manifesto-aura { position: absolute; inset: 0; background: url('lion-v1.webp') center / cover no-repeat; opacity: .12; filter: blur(1px); pointer-events: none; }
+.lion-manifesto-lines { position: relative; max-width: 1000px; margin: 0 auto; text-align: center; }
+.lion-manifesto-line { font-size: clamp(2rem, 6vw, 4rem); font-weight: 800; line-height: 1.4; margin: 0 0 12px; }
+.lion-manifesto-line:nth-child(1) .lion-manifesto-accent { color: #34d399; }
+.lion-manifesto-line:nth-child(2) .lion-manifesto-accent { color: #ec4899; }
+.lion-manifesto-line:nth-child(3) .lion-manifesto-accent { color: #22d3ee; }
+
+/* ---------- videos mosaic (approved 2026-10-31; #videosGrid only) ----------
+   Featured tile (qatre, 3rd) is pulled first and spans 2x2; the last tile
+   (prism) spans 2 columns — together they fill a 3x3 wall with no holes.
+   Academy keeps its own grid. */
+#videosGrid { grid-template-columns: repeat(3, 1fr); grid-auto-rows: 240px; }
+#videosGrid .video-card { height: 100%; display: flex; flex-direction: column; }
+#videosGrid .video-media { flex: 1 1 auto; min-height: 0; aspect-ratio: auto; }
+#videosGrid .video-card:nth-child(3) { order: -1; grid-column: span 2; grid-row: span 2; }
+#videosGrid .video-card:nth-child(5) { grid-column: span 2; }
+@media (max-width: 700px) {
+  #videosGrid { grid-template-columns: 1fr 1fr; grid-auto-rows: 170px; }
+  #videosGrid .video-card:nth-child(3) { grid-row: auto; }
+}
+
+/* ---------- pricing two-card shape (approved 2026-10-31) ---------- */
+/* Latent-bug fix (caught 2026-10-31 on the real page): #pricingTiers has
+   hidden=true but .tiers-grid { display: grid } beats the UA [hidden]
+   rule, so the «به‌زودی» tier cards showed anyway. The ID+attribute
+   selector below outranks the class rule without !important; when real
+   prices exist, hidden=false and the grid shows normally. */
+#pricingTiers[hidden] { display: none; }
+.lion-pricing-two { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+.lion-pricing-card { background: var(--surface); border: 1px solid rgba(255,255,255,.12); border-radius: 24px; padding: 32px 28px; }
+.lion-pricing-factors { border-top: 3px solid #34d399; }
+.lion-pricing-start { border-top: 3px solid #ec4899; }
+.lion-pricing-start h3 { margin: 0 0 14px; font-size: 1.3rem; }
+@media (max-width: 700px) { .lion-pricing-two { grid-template-columns: 1fr; } }
+
+/* ---------- FAQ numbered (approved 2026-10-31) ----------
+   Pure CSS counters, so re-renders keep working; digit script follows the
+   page language. The existing + indicator stays as ::after. */
+#faqList { counter-reset: lionFaq; }
+#faqList .faq-item summary { justify-content: flex-start; }
+#faqList .faq-item summary::before { counter-increment: lionFaq; content: counter(lionFaq, persian); font-size: 1.6rem; font-weight: 800; line-height: 1; flex: 0 0 auto; }
+#faqList .faq-item summary::after { margin-inline-start: auto; }
+#faqList .faq-item:nth-of-type(4n+1) summary::before { color: #34d399; }
+#faqList .faq-item:nth-of-type(4n+2) summary::before { color: #22d3ee; }
+#faqList .faq-item:nth-of-type(4n+3) summary::before { color: #ec4899; }
+#faqList .faq-item:nth-of-type(4n+4) summary::before { color: #8b5cf6; }
+html[lang="en"] #faqList .faq-item summary::before { content: counter(lionFaq); }
+html[lang="ar"] #faqList .faq-item summary::before { content: counter(lionFaq, arabic-indic); }
+
+/* ---------- final CTA band (approved 2026-10-31; last in <main>) ---------- */
+.lion-final-cta { text-align: center; padding: 110px 20px; position: relative; overflow: hidden; }
+.lion-final-cta::before { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 0%, rgba(52,211,153,.22), transparent 60%), radial-gradient(ellipse at 80% 100%, rgba(236,72,153,.18), transparent 55%); pointer-events: none; }
+.lion-final-cta h2 { position: relative; font-size: clamp(2.4rem, 7vw, 4.6rem); font-weight: 800; line-height: 1.3; margin: 0; }
+.lion-final-cta .lion-final-accent { color: #34d399; }
+.lion-final-cta p { position: relative; color: var(--muted); font-size: 1.15rem; margin: 16px 0 0; }
+.lion-final-cta .lion-final-btn { position: relative; margin-top: 34px; }
