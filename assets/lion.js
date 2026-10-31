@@ -315,11 +315,13 @@
   function apply(y) {
     var doc = document.documentElement.scrollHeight - vh;
     prog.style.width = (doc > 0 ? (y / doc) * 100 : 0) + '%';
-    /* hero shrink completes over 1.2 viewports, then holds shrunken as aura */
+    /* hero fades over 1.2 viewports, then holds invisible */
     var hp = clamp(y / (vh * 1.2), 0, 1);
-    media.style.transform = 'translate3d(' + (-hp * 12) + 'vw,' + (-hp * 16) +
-      'vh,0) scale(' + (1 - hp * 0.6) + ')';
-    media.style.opacity = (1 - hp * 0.65).toFixed(2);
+    /* hero fade-in-place (2026-10-31, Hamed's correction: the corner drift
+       looked wrong — the whole frame must fade as one, no drifting to a
+       corner, no shrinking. Opacity 1 -> 0 over the same range. */
+    media.style.transform = '';
+    media.style.opacity = (1 - hp).toFixed(2);
     if (inner) {
       inner.style.transform = 'translate3d(0,' + (-y * 0.12) + 'px,0)';
       inner.style.opacity = Math.max(0, 1 - hp * 1.5).toFixed(2);

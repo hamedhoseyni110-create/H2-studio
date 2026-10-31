@@ -288,8 +288,14 @@
 #videosGrid .video-card:nth-child(3) { order: -1; grid-column: span 2; grid-row: span 2; }
 #videosGrid .video-card:nth-child(5) { grid-column: span 2; }
 @media (max-width: 700px) {
-  #videosGrid { grid-template-columns: 1fr 1fr; grid-auto-rows: 170px; }
-  #videosGrid .video-card:nth-child(3) { grid-row: auto; }
+  /* Single column on phones (approved 2026-10-31): the 2-col/170px rule
+     starved posters to 0px (single-col cards) / 41px (wide cards) because
+     the tall caps ate the whole fixed row. With auto rows + restored
+     16/9 media, every poster is ~200px tall and tappable. */
+  #videosGrid { grid-template-columns: 1fr; grid-auto-rows: auto; }
+  #videosGrid .video-card:nth-child(3) { grid-column: auto; grid-row: auto; }
+  #videosGrid .video-card:nth-child(5) { grid-column: auto; }
+  #videosGrid .video-media { flex: none; aspect-ratio: 16 / 9; }
 }
 
 /* ---------- pricing two-card shape (approved 2026-10-31) ---------- */
