@@ -29,6 +29,15 @@
   if (fx) media.appendChild(fx);
   var inner = hero.querySelector('.hero-inner');
 
+  /* ---- mid-runway echo (2026-11-02, option A): the hero title re-appears
+     lower in the scroll runway so no viewport of the runway is empty.
+     Text is copied live from #heroTitle, so it follows the active language
+     with no new copy keys. CSS default opacity is 0; apply() drives it. */
+  var mid = document.createElement('div');
+  mid.className = 'lion-hero-mid';
+  mid.setAttribute('aria-hidden', 'true');
+  hero.appendChild(mid);
+
   /* ---- aurora: 4th blob (violet) ---- */
   var aurora = document.querySelector('.aurora');
   if (aurora && !aurora.querySelector('.b4')) {
@@ -105,7 +114,15 @@
   renderPanels();
   if ('MutationObserver' in window) {
     new MutationObserver(function (muts) {
-      muts.forEach(function (m) { if (m.attributeName === 'lang') renderPanels(); });
+      muts.forEach(function (m) {
+        if (m.attributeName !== 'lang') return;
+        renderPanels();
+        /* Mid echo follows the language at once, even with no scroll
+           (apply() only runs on scroll ticks). Observer callbacks run
+           after setLang's synchronous render, so the title is already new. */
+        var ht = document.getElementById('heroTitle');
+        if (ht && mid) mid.textContent = ht.textContent;
+      });
     }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
   }
   var navEl = document.getElementById('nav');
@@ -318,16 +335,28 @@
   function apply(y) {
     var doc = document.documentElement.scrollHeight - vh;
     prog.style.width = (doc > 0 ? (y / doc) * 100 : 0) + '%';
-    /* hero fades over 1.2 viewports, then holds invisible */
-    var hp = clamp(y / (vh * 1.2), 0, 1);
-    /* hero fade-in-place (2026-10-31, Hamed's correction: the corner drift
-       looked wrong — the whole frame must fade as one, no drifting to a
-       corner, no shrinking. Opacity 1 -> 0 over the same range. */
+    /* hero runway (2026-11-02, option A): the media fades over 2.4 viewports
+       instead of 1.2, so the lion lingers; the title leaves by 1.0 viewport;
+       the mid-runway echo fades in 1.0 -> 1.4 and out 2.0 -> 2.4, so no
+       viewport of the 2.6-viewport runway is ever empty. Fade-in-place
+       (2026-10-31, Hamed's correction) is kept: no drift, no shrink. */
+    var hp = clamp(y / (vh * 2.4), 0, 1);
     media.style.transform = '';
     media.style.opacity = (1 - hp).toFixed(2);
     if (inner) {
       inner.style.transform = 'translate3d(0,' + (-y * 0.12) + 'px,0)';
-      inner.style.opacity = Math.max(0, 1 - hp * 1.5).toFixed(2);
+      inner.style.opacity = Math.max(0, 1 - hp * 2.4).toFixed(2);
+    }
+    if (mid) {
+      /* Copy live every tick (not once per language): the first apply()
+         tick can run before app.js fills #heroTitle, and a once-only copy
+         would lock in that empty read forever. Compare-and-copy self-heals
+         after render and on every language switch. */
+      var ht = document.getElementById('heroTitle');
+      if (ht && mid.textContent !== ht.textContent) mid.textContent = ht.textContent;
+      var midIn = clamp((y - vh * 1.0) / (vh * 0.4), 0, 1);
+      var midOut = clamp((vh * 2.4 - y) / (vh * 0.4), 0, 1);
+      mid.style.opacity = Math.min(midIn, midOut).toFixed(2);
     }
     /* tilt titles — skip titles still below the viewport so reveals keep working */
     titles.forEach(function (el, i) {

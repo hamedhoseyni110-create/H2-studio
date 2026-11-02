@@ -65,6 +65,29 @@
   z-index: 0;
   will-change: transform, opacity;
 }
+/* mid-runway title echo (2026-11-02, option A): gradient text like
+   #heroTitle; opacity driven by lion.js, default 0 so reduced-motion
+   (where apply() never runs) never shows a duplicate title. */
+.lion-hero-mid {
+  position: absolute;
+  left: 50%;
+  top: 56%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 90vw;
+  text-align: center;
+  font-size: clamp(26px, 7vw, 44px);
+  font-weight: 800;
+  line-height: 1.4;
+  background: linear-gradient(110deg, #34d399 0%, #22d3ee 50%, #ec4899 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2;
+  padding: 0 20px;
+}
 #lionProgress {
   position: fixed;
   top: 0;
