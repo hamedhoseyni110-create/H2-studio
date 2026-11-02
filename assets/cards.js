@@ -73,6 +73,30 @@
     return { id: it.id, el: tile, video: tile.querySelector("video") };
   });
 
+  /* ---- tap → lightbox preview (2026-11-02, Hamed's bug report): the
+       stack+ring layer shipped as pure scroll animation with no tap wiring.
+       Same pattern as portfolio media (app.js): click + Enter/Space open the
+       enriched lightbox (live-link + full-film actions attach via the wrapper
+       below, keyed on previewSrc). Titles/descs come from COPY by id. */
+  function openPreview(id) {
+    var items = (window.COPY && window.COPY[lang()] && window.COPY[lang()].portfolio.items) || [];
+    var found = null;
+    items.forEach(function (it) { if (it.id === id) found = it; });
+    if (typeof window.openLightbox !== "function") return;
+    window.openLightbox(window.previewSrc(id), window.previewPoster(id),
+      found ? found.title : id, found ? (found.desc || "") : "");
+  }
+  function bindPreview(el, id) {
+    el.setAttribute("tabindex", "0");
+    el.setAttribute("role", "button");
+    el.addEventListener("click", function () { openPreview(id); });
+    el.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openPreview(id); }
+    });
+  }
+  stackCards.forEach(function (c) { bindPreview(c.el, c.id); });
+  ringTiles.forEach(function (t) { bindPreview(t.el, t.id); });
+
   /* ---- language render (titles from COPY, pill + words from WORDS) ---- */
   var lastWordIndex = -1;
   function renderLang() {
@@ -108,6 +132,11 @@
   }
 
   function renderFrame(seg) {
+    /* tap gating (2026-11-02): stack cards are tappable only during the
+       stack phase; once discarded they must not intercept ring-tile taps. */
+    var stackLive = seg < N_STACK;
+    stackCards.forEach(function (card) { card.el.style.pointerEvents = stackLive ? "auto" : "none"; });
+
     /* ---- stack phase: seg in [0, 6) ---- */
     stackCards.forEach(function (card, i) {
       var x = i - seg, t, rot, sc, ty, z;
@@ -141,6 +170,10 @@
       ringOpacity = 1;
     }
     ringEl.style.opacity = String(ringOpacity);
+    /* tap gating (2026-11-02): the ring stays inert during the stack phase
+       (it covers the whole sticky area and must not block stack taps) and
+       becomes tappable only once dispersed. */
+    ringEl.style.pointerEvents = ringOpacity > 0 ? "auto" : "none";
     var radii = ringRadii();
     ringTiles.forEach(function (tile, i) {
       var a = (TILE_ANGLES[i] + orbit) * Math.PI / 180;
