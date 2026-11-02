@@ -92,14 +92,150 @@ function applyWorksFilter() {
     btn.classList.toggle("active", on);
     btn.setAttribute("aria-selected", on ? "true" : "false");
   });
-  document.querySelectorAll("#portfolioGrid .portfolio-card").forEach(function(card){
-    var show = worksFilter === "all" || card.getAttribute("data-cat") === worksFilter;
-    card.classList.toggle("works-hidden", !show);
-    if (!show) {
-      var v = card.querySelector("video");
-      if (v && !v.paused) { try { v.pause(); } catch (e) {} }
-    }
+  /* coverflow rail: re-render for the active tab, re-centered on first item */
+  if (railAll) renderRail();
+}
+
+/* ================= Portfolio coverflow rail =================
+   Port of the approved isolated demo (same transform math, easing,
+   controls, swipe, caption/live-button behavior). Class names are
+   pf-* only, so lion.js fan + upgrades.js tilt (both target
+   .portfolio-card) never touch the rail. */
+
+var railAll = null;      /* all items, all tabs */
+var railView = [];       /* items visible under worksFilter */
+var railActive = 0;
+
+function renderRail() {
+  var pg = el("portfolioGrid");
+  if (!pg || !railAll) return;
+  railView = railAll.filter(function(it){
+    return worksFilter === "all" || it.cat === worksFilter;
   });
+  railActive = 0;
+  pg.innerHTML = "";
+  var stage = document.createElement("div");
+  stage.className = "pf-stage";
+  var track = document.createElement("div");
+  track.className = "pf-track";
+  stage.appendChild(track);
+  var controls = document.createElement("div");
+  controls.className = "pf-controls";
+  var nav = { fa: { prev: "قبلی", next: "بعدی" },
+              en: { prev: "Previous", next: "Next" },
+              ar: { prev: "السابق", next: "التالي" } }[state.lang] || { prev: "قبلی", next: "بعدی" };
+  var prevBtn = document.createElement("button");
+  prevBtn.type = "button"; prevBtn.className = "pf-btn";
+  prevBtn.setAttribute("aria-label", nav.prev); prevBtn.textContent = "›";
+  var nextBtn = document.createElement("button");
+  nextBtn.type = "button"; nextBtn.className = "pf-btn";
+  nextBtn.setAttribute("aria-label", nav.next); nextBtn.textContent = "‹";
+  controls.appendChild(prevBtn); controls.appendChild(nextBtn);
+  var caption = document.createElement("div");
+  caption.className = "pf-caption"; caption.setAttribute("aria-live", "polite");
+  var liveWrap = document.createElement("div");
+  liveWrap.className = "pf-live-wrap";
+  pg.appendChild(stage); pg.appendChild(controls); pg.appendChild(caption); pg.appendChild(liveWrap);
+  railView.forEach(function(it, i){
+    var card = document.createElement("div");
+    card.className = "pf-card";
+    card.setAttribute("tabindex", "0");
+    card.setAttribute("role", "button");
+    card.setAttribute("aria-label", it.title);
+    if (it.poster) {
+      var img = document.createElement("img");
+      img.src = it.poster; img.alt = ""; img.loading = "lazy";
+      card.appendChild(img);
+    } else {
+      card.classList.add("pf-noimg");
+    }
+    var t = document.createElement("div");
+    t.className = "pf-card-title"; t.textContent = it.title;
+    card.appendChild(t);
+    card.addEventListener("click", function(){
+      if (i === railActive) railOpen(it); else railSetActive(i);
+    });
+    card.addEventListener("keydown", function(e){
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        if (i === railActive) railOpen(it); else railSetActive(i);
+      }
+    });
+    track.appendChild(card);
+  });
+  prevBtn.addEventListener("click", function(){ railSetActive(railActive - 1); });
+  nextBtn.addEventListener("click", function(){ railSetActive(railActive + 1); });
+  /* Swipe listens on the STAGE (not the track): with the track
+     pointer-events:none (tap fix), card touches bubble up to the
+     stage and empty-area touches hit the stage directly, so swipe
+     works from anywhere in the stage, exactly once. */
+  var tx = null;
+  stage.addEventListener("touchstart", function(e){ tx = e.touches[0].clientX; }, { passive: true });
+  stage.addEventListener("touchend", function(e){
+    if (tx === null) return;
+    var dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 40) railSetActive(railActive + (dx < 0 ? 1 : -1));
+    tx = null;
+  }, { passive: true });
+  railPaint();
+}
+
+function railOpen(it) {
+  if (it.kind === "academy") { openLightbox(it.src, it.poster, it.title, it.desc); }
+  else { openLightbox(previewSrc(it.id), previewPoster(it.id), it.title, it.desc); }
+}
+
+function railSetActive(i) {
+  if (!railView.length) return;
+  railActive = ((i % railView.length) + railView.length) % railView.length;
+  railPaint();
+}
+
+function railPaint() {
+  var pg = el("portfolioGrid");
+  if (!pg) return;
+  var track = pg.querySelector(".pf-track");
+  var caption = pg.querySelector(".pf-caption");
+  var liveWrap = pg.querySelector(".pf-live-wrap");
+  if (!track) return;
+  var narrow = window.matchMedia("(max-width:520px)").matches;
+  var SP1 = narrow ? 150 : 235, SP2 = narrow ? 170 : 260, ANG = narrow ? -25 : -38;
+  var maxOff = narrow ? 1 : 2;
+  var N = railView.length;
+  var cards = track.children;
+  for (var i = 0; i < N; i++) {
+    var d = (i - railActive) % N; if (d > 5) d -= N; if (d < -5) d += N;
+    /* short rails (a tab's subset): wrap offsets to the near side */
+    if (N <= 5) { if (d > N / 2) d -= N; if (d < -N / 2) d += N; }
+    var card = cards[i];
+    var ad = Math.abs(d);
+    if (ad > maxOff) {
+      card.style.opacity = "0"; card.style.pointerEvents = "none"; card.style.zIndex = "1";
+      continue;
+    }
+    card.style.opacity = "1"; card.style.pointerEvents = "auto";
+    var z = d === 0 ? 80 : (ad === 1 ? -120 : -220);
+    var s = d === 0 ? 1 : (ad === 1 ? 0.88 : 0.76);
+    var sp = ad === 1 ? SP1 : SP2;
+    var bright = d === 0 ? 1 : (ad === 1 ? 0.65 : 0.45);
+    card.style.transform = "translate(-50%, -50%) translateX(" + (d * sp) + "px) translateZ(" + z + "px) rotateY(" + (d * ANG) + "deg) scale(" + s + ")";
+    card.style.filter = "brightness(" + bright + ")";
+    card.style.zIndex = String(5 - ad);
+    if (d === 0) card.classList.add("active"); else card.classList.remove("active");
+  }
+  var cur = railView[railActive];
+  if (caption) caption.textContent = cur ? cur.title : "";
+  if (liveWrap) {
+    liveWrap.innerHTML = "";
+    var live = cur && cur.kind === "work" ? LIVE_URLS[cur.id] : null;
+    if (live) {
+      var a = document.createElement("a");
+      a.className = "pf-live"; a.href = live; a.target = "_blank"; a.rel = "noopener";
+      a.innerHTML = esc(C().portfolio.view_live) + ' <span aria-hidden="true">↗</span>' +
+        '<span class="sr-only">' + esc(U().external_link) + "</span>";
+      liveWrap.appendChild(a);
+    }
+  }
 }
 
 /* ================= Page render ================= */
@@ -205,62 +341,26 @@ function renderPage() {
       wt.appendChild(b);
     });
   }
-  var pg = el("portfolioGrid");
-  pg.innerHTML = "";
+  /* portfolio coverflow rail (approved demo, ported): posters only in the
+     rail; videos stay click-to-load via the lightbox. railAll is rebuilt on
+     every renderPage, so tabs + language re-render flow through one path;
+     the existing applyWorksFilter() call below re-renders the rail. */
+  railAll = [];
   c.portfolio.items.forEach(function(item){
-    var card = document.createElement("article");
-    card.className = "portfolio-card";
-    card.setAttribute("data-cat", ITEM_CAT[item.id] || "site");
-    var live = LIVE_URLS[item.id];
-    var cap = '<div class="portfolio-cap">' +
-      '<span class="tag">' + esc(item.tag) + "</span>" +
-      "<h3>" + esc(item.title) + "</h3>" +
-      '<p class="client-line">' + esc(item.client) + "</p>" +
-      "<p>" + esc(item.desc) + "</p>" +
-      '<p class="case-line">' + esc(item.case) + "</p>";
-    if (live) {
-      cap += '<a class="live-link" href="' + live + '" target="_blank" rel="noopener">' +
-        esc(c.portfolio.view_live) + ' <span aria-hidden="true">↗</span>' +
-        '<span class="sr-only">' + esc(u.external_link) + "</span></a>";
-    }
-    cap += "</div>";
-    var badge = '<span class="media-badge">' + esc(c.portfolio.preview) + "</span>";
-    var playBtn = '<span class="play-btn" aria-hidden="true"><i></i></span>';
-    card.innerHTML =
-      '<div class="portfolio-media" tabindex="0" role="button" aria-label="' + esc(c.videos.watch + ": " + item.title) + '">' +
-      '<video data-src="' + esc(previewSrc(item.id)) + '" muted loop playsinline preload="none" aria-hidden="true"></video>' +
-      badge + playBtn + "</div>" + cap;
-    (function(it){
-      var media = card.querySelector(".portfolio-media");
-      function open(){ openLightbox(previewSrc(it.id), previewPoster(it.id), it.title, it.desc); }
-      media.addEventListener("click", open);
-      media.addEventListener("keydown", function(e){
-        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); }
-      });
-    })(item);
-    pg.appendChild(card);
+    railAll.push({
+      id: item.id, title: item.title, desc: item.desc,
+      cat: ITEM_CAT[item.id] || "site", kind: "work",
+      poster: item.id === "qatre" ? "assets/previews/qatre-preview-480.webp"
+                                  : "assets/previews/" + item.id + "-480.webp"
+    });
   });
-  /* academy lessons also live in the works grid, under their own tab */
+  /* academy lessons also live in the rail, under their own tab */
   (c.academy && c.academy.items ? c.academy.items : []).forEach(function(item){
-    var card = document.createElement("article");
-    card.className = "portfolio-card";
-    card.setAttribute("data-cat", "academy");
-    card.innerHTML =
-      '<div class="portfolio-media" tabindex="0" role="button" aria-label="' + esc(c.videos.watch + ": " + item.title) + '">' +
-      '<img src="' + esc(item.poster) + '" alt="" loading="lazy">' +
-      '<span class="media-badge">' + esc(item.duration) + "</span>" +
-      '<span class="play-btn" aria-hidden="true"><i></i></span></div>' +
-      '<div class="portfolio-cap"><span class="tag">' + esc(c.academy.heading) + "</span>" +
-      "<h3>" + esc(item.title) + "</h3><p>" + esc(item.desc) + "</p></div>";
-    (function(it){
-      var media = card.querySelector(".portfolio-media");
-      function open(){ openLightbox(it.src, it.poster, it.title, it.desc); }
-      media.addEventListener("click", open);
-      media.addEventListener("keydown", function(e){
-        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); }
-      });
-    })(item);
-    pg.appendChild(card);
+    railAll.push({
+      id: item.id, title: item.title, desc: item.desc,
+      cat: "academy", kind: "academy",
+      poster: item.poster || "", src: item.src || ""
+    });
   });
   applyWorksFilter();
   initTilt();
