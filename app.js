@@ -113,6 +113,9 @@ function renderRail() {
     return worksFilter === "all" || it.cat === worksFilter;
   });
   railActive = 0;
+  /* stop any playing loop before the old cards are destroyed */
+  var oldTrack = pg.querySelector(".pf-track");
+  if (oldTrack) oldTrack.querySelectorAll("video.pf-loop").forEach(function(v){ v.pause(); });
   pg.innerHTML = "";
   var stage = document.createElement("div");
   stage.className = "pf-stage";
@@ -149,6 +152,21 @@ function renderRail() {
     } else {
       card.classList.add("pf-noimg");
     }
+    /* center-only loop preview: the element exists from build time but
+       gets no src (and downloads nothing) until its card becomes center;
+       academy items stay poster-only (no preview mp4 exists for them) */
+    if (it.kind === "work" && it.poster && it.poster.slice(-9) === "-480.webp") {
+      var vid = document.createElement("video");
+      vid.className = "pf-loop";
+      vid.muted = true; vid.setAttribute("muted", "");
+      vid.loop = true; vid.playsInline = true; vid.setAttribute("playsinline", "");
+      vid.preload = "none";
+      vid.dataset.loopSrc = it.poster.replace("-480.webp", ".mp4");
+      vid.addEventListener("playing", function(){ vid.classList.add("pf-on"); });
+      vid.addEventListener("pause", function(){ vid.classList.remove("pf-on"); });
+      vid.addEventListener("error", function(){ vid.classList.add("pf-loop-failed"); });
+      card.appendChild(vid);
+    }
     var t = document.createElement("div");
     t.className = "pf-card-title"; t.textContent = it.title;
     card.appendChild(t);
@@ -181,6 +199,7 @@ function renderRail() {
 }
 
 function railOpen(it) {
+  railPauseCenter();
   if (it.kind === "academy") { openLightbox(it.src, it.poster, it.title, it.desc); }
   else { openLightbox(previewSrc(it.id), previewPoster(it.id), it.title, it.desc); }
 }
@@ -235,6 +254,45 @@ function railPaint() {
         '<span class="sr-only">' + esc(U().external_link) + "</span>";
       liveWrap.appendChild(a);
     }
+  }
+  railLoopState();
+}
+
+/* Center-only loop previews: only the center card's video ever gets a src
+   (so side cards download zero video bytes); reduced-motion never plays. */
+function railLoopState() {
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var pg = el("portfolioGrid");
+  var track = pg && pg.querySelector(".pf-track");
+  if (!track) return;
+  var cards = track.children;
+  for (var i = 0; i < cards.length; i++) {
+    var vid = cards[i].querySelector("video.pf-loop");
+    if (!vid) continue;
+    if (i === railActive && !reduced) {
+      if (!vid.getAttribute("src")) vid.src = vid.dataset.loopSrc;
+      if (vid.paused) { var p = vid.play(); if (p && p.catch) p.catch(function(){}); }
+    } else if (!vid.paused) {
+      vid.pause();
+    }
+  }
+}
+function railCenterVideo() {
+  var pg = el("portfolioGrid");
+  var track = pg && pg.querySelector(".pf-track");
+  var card = track && track.children[railActive];
+  return card ? card.querySelector("video.pf-loop") : null;
+}
+function railPauseCenter() {
+  var vid = railCenterVideo();
+  if (vid && !vid.paused) vid.pause();
+}
+function railResumeCenter() {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  var vid = railCenterVideo();
+  if (vid) {
+    if (!vid.getAttribute("src")) vid.src = vid.dataset.loopSrc;
+    if (vid.paused) { var p = vid.play(); if (p && p.catch) p.catch(function(){}); }
   }
 }
 
@@ -660,6 +718,7 @@ function closeLightbox() {
   v.load();
   lb.hidden = true;
   document.body.style.overflow = "";
+  railResumeCenter();
   if (lbOpener && lbOpener.focus) lbOpener.focus();
 }
 function initLightbox() {
