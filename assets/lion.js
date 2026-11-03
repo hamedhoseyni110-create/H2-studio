@@ -66,6 +66,33 @@
   strip.innerHTML = '<div class="lion-aura-bg"></div><div class="lion-aura-veil"></div>';
   wrap.parentNode.insertBefore(strip, wrap.nextSibling);
 
+  /* ---- velocity strip (Argon #1, 2026-11-03): thin band in normal flow
+     right AFTER the aura strip, so it never touches the hero's 260vh sticky
+     geometry (it sits below the wrap). Content is the hero title repeated,
+     live-copied like the mid echo — approved copy only, no invented
+     slogans. Skew/tint are driven by apply() from scroll velocity; the CSS
+     default is static, so reduced-motion (where apply() never runs) stays
+     neutral with no JS needed. */
+  var velStrip = document.createElement('section');
+  velStrip.className = 'lion-vel-strip';
+  velStrip.setAttribute('aria-hidden', 'true');
+  velStrip.innerHTML = '<div class="lion-vel-glow lion-vel-glow-down"></div>' +
+    '<div class="lion-vel-glow lion-vel-glow-up"></div>' +
+    '<div class="lion-vel-inner"></div>';
+  strip.parentNode.insertBefore(velStrip, strip.nextSibling);
+  var velInner = velStrip.querySelector('.lion-vel-inner');
+  var velGlowDown = velStrip.querySelector('.lion-vel-glow-down');
+  var velGlowUp = velStrip.querySelector('.lion-vel-glow-up');
+  function syncVelText() {
+    var ht = document.getElementById('heroTitle');
+    if (!ht || !velInner) return;
+    var t = ht.textContent || '';
+    if (!t) return;
+    var rep = t + ' ✦ ' + t + ' ✦ ' + t;
+    if (velInner.textContent !== rep) velInner.textContent = rep;
+  }
+  document.addEventListener('DOMContentLoaded', syncVelText);
+
   /* nav-spy hookup: lion.js runs at parse time, app.js creates H2NavSpy
      on DOMContentLoaded, so observe now if present, else after DOM ready. */
   function spyObserve(elm) {
@@ -181,6 +208,7 @@
            after setLang's synchronous render, so the title is already new. */
         var ht = document.getElementById('heroTitle');
         if (ht && mid) mid.textContent = ht.textContent;
+        syncVelText();
       });
     }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
   }
@@ -490,6 +518,22 @@
   finalSec.innerHTML = '<h2 class="lion-final-title"></h2><p class="lion-final-sub"></p>' +
     '<a class="btn btn-primary btn-lg lion-final-btn" href="https://wa.me/989375732165" target="_blank" rel="noopener"></a>';
   if (mainEl) mainEl.appendChild(finalSec);
+  /* ---- final curtain (Argon #1, 2026-11-03): the EXISTING #lionFinalCta
+     becomes the curtain — no new section, no duplicate CTA, no copy change
+     (renderFinalCta still owns the exact finalCta copy). The wrapper is
+     200svh with the section sticky top:0, so the curtain rises to cover the
+     viewport and holds for 100vh of scroll, then releases and the footer
+     follows. Reduced-motion CSS collapses the wrapper (height auto, section
+     static) so the curtain is a plain full section there. The sticky-CTA
+     observer in playful.js watches the element itself, so the wrapper does
+     not affect it. */
+  if (mainEl && finalSec.parentNode === mainEl) {
+    finalSec.classList.add('lion-curtain');
+    var curtainWrap = document.createElement('div');
+    curtainWrap.className = 'lion-curtain-wrap';
+    mainEl.insertBefore(curtainWrap, finalSec);
+    curtainWrap.appendChild(finalSec);
+  }
   function renderFinalCta() {
     var lang = document.documentElement.lang || 'fa';
     var data = (typeof COPY !== 'undefined' && COPY[lang] && COPY[lang].finalCta) ||
@@ -539,6 +583,16 @@
   /* ---- scroll motion (skipped under reduced motion) ---- */
   if (reduced) return;
   var titles = Array.prototype.slice.call(document.querySelectorAll('.section-title'));
+  /* velocity strip state: velS is the smoothed velocity (px per 60fps
+     frame), derived from the smoothed scroll value itself, so it decays
+     naturally as the lerp settles — no second loop, no jitter. */
+  var velPrev = 0, velS = 0, velLastDt = 16.7;
+  function velNeutral() {
+    velS = 0;
+    if (velInner) velInner.style.transform = '';
+    if (velGlowDown) velGlowDown.style.opacity = '0';
+    if (velGlowUp) velGlowUp.style.opacity = '0';
+  }
   var target = 0, current = 0, vh = window.innerHeight;
   function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
   function apply(y) {
@@ -567,19 +621,70 @@
       var midOut = clamp((vh * 2.4 - y) / (vh * 0.4), 0, 1);
       mid.style.opacity = Math.min(midIn, midOut).toFixed(2);
     }
-    /* tilt titles — skip titles still below the viewport so reveals keep working */
+    /* velocity strip — velocity from the smoothed scroll delta, normalized
+       by frame time and exponentially smoothed (0.8/0.2) so direction
+       changes never flicker. Down = positive skew + Narangi glow; up =
+       negative skew + cyan glow; rest = neutral (velNeutral at settle).
+       Mobile caps the skew so the line stays readable. */
+    if (velInner) {
+      syncVelText();
+      var rawVel = (y - velPrev) * (16.7 / (velLastDt || 16.7));
+      velPrev = y;
+      velS = velS * 0.8 + rawVel * 0.2;
+      if (velS > 60) velS = 60; else if (velS < -60) velS = -60;
+      var skewCap = (window.innerWidth <= 700) ? 4 : 8;
+      var sk = velS * 0.12;
+      if (sk > skewCap) sk = skewCap; else if (sk < -skewCap) sk = -skewCap;
+      var scX = 1 + Math.min(Math.abs(velS), 60) * 0.0015;
+      velInner.style.transform = 'skewX(' + sk.toFixed(2) + 'deg) scaleX(' + scX.toFixed(3) + ')';
+      var mag = Math.min(Math.abs(velS) / 60, 1) * 0.85;
+      if (velGlowDown) velGlowDown.style.opacity = (velS > 0 ? mag : 0).toFixed(2);
+      if (velGlowUp) velGlowUp.style.opacity = (velS < 0 ? mag : 0).toFixed(2);
+    }
+    /* tilt titles — skip titles still below the viewport so reveals keep working.
+       Cinematic entrance (Argon #1): the tilt rotation still resolves on the
+       raw progress p, but the rise + fade ride an easeOutCubic curve and the
+       whole title settles from scale .94 — composed in the SAME inline
+       transform string by the SAME owner (this block), so tilt and entrance
+       can never fight. The reveal system is untouched: it still owns the
+       pre-entry hidden state and the playful ::after underline via .in.
+       Whole-title units only — no per-character/word splitting, so FA/AR
+       joining and shaping are never touched. At p=1 the transform is
+       identity, exactly as before, so tilt is intact after settle. */
     titles.forEach(function (el, i) {
       var r = el.getBoundingClientRect();
       if (r.top > vh) return;
       var p = clamp((vh - r.top) / (vh + r.height), 0, 1);
-      var inv = 1 - p;
+      var pe = 1 - Math.pow(1 - p, 3);
+      var inv = 1 - p, invE = 1 - pe;
+      var scT = (0.94 + 0.06 * pe).toFixed(3);
       if (i % 2 === 0) {
-        el.style.transform = 'rotateX(' + (inv * 28) + 'deg) translateY(' + (inv * 60) + 'px)';
+        el.style.transform = 'rotateX(' + (inv * 28) + 'deg) translateY(' + (invE * 60) + 'px) scale(' + scT + ')';
       } else {
-        el.style.transform = 'rotateY(' + (inv * -30) + 'deg) translateY(' + (inv * 60) + 'px)';
+        el.style.transform = 'rotateY(' + (inv * -30) + 'deg) translateY(' + (invE * 60) + 'px) scale(' + scT + ')';
       }
-      el.style.opacity = (0.25 + 0.75 * p).toFixed(2);
+      el.style.opacity = (0.25 + 0.75 * pe).toFixed(2);
     });
+    /* final curtain entrance — the curtain's own children rise + fade as the
+       section enters; pinned (rect.top 0) or passed, pC = 1 and the inline
+       styles CLEAR, so the button's :active press scale (stylesheet) works
+       instead of being overridden by a leftover identity transform. CSS
+       default is fully visible, so reduced-motion (no apply()) shows the
+       plain full section. */
+    if (finalSec) {
+      var cr = finalSec.getBoundingClientRect();
+      var pC = clamp((vh - cr.top) / vh, 0, 1);
+      var curtainKids = finalSec.querySelectorAll('.lion-final-title, .lion-final-sub, .lion-final-btn');
+      curtainKids.forEach(function (c) {
+        if (pC >= 1) {
+          c.style.transform = '';
+          c.style.opacity = '';
+        } else {
+          c.style.transform = 'translateY(' + ((1 - pC) * 40).toFixed(1) + 'px)';
+          c.style.opacity = (0.2 + 0.8 * pC).toFixed(2);
+        }
+      });
+    }
     /* services pour — approved 2026-10-31. Replaces the generic reveal for
        services cards only (their reveal transition is neutralized in
        lion.css until .settled, so the scrub stays tight). Runs on every
@@ -724,11 +829,13 @@
        now settles in ~3 ticks instead of ~110. */
     var dt = (lastTick && now) ? (now - lastTick) : 16.7;
     lastTick = now;
+    velLastDt = dt;
     var f = 1 - Math.pow(1 - 0.09, dt / 16.7);
     current += (target - current) * f;
     if (Math.abs(target - current) < 0.5) {
       current = target;
       apply(current);
+      velNeutral();
       raf = 0;
       lastTick = 0;
       return;
