@@ -472,3 +472,38 @@ html[lang="ar"] #faqList .faq-item summary::before { content: counter(lionFaq, a
 @media (max-width: 520px) {
   .stats-grid .stat-value { font-size: 44px; }
 }
+
+/* ---- Hero atmosphere glow (approved demo v2, stronger) ----
+   Lives INSIDE .lion-hero-media (injected by lion.js), so it renders above
+   the lion video/shade/tint/particles and fades with the media on scroll.
+   Demo-exact values: emerald+cyan radial, blur 80px, opacity .4 desktop. */
+.lion-hero-glow {
+  position: absolute; top: -180px; left: 50%; transform: translateX(-50%);
+  width: 900px; height: 600px; pointer-events: none; z-index: 3;
+  background: radial-gradient(closest-side, rgba(52,211,153,.55), rgba(34,211,238,.28) 55%, transparent 75%);
+  filter: blur(80px); opacity: .4;
+}
+@media (max-width: 700px) {
+  .lion-hero-glow { width: 620px; height: 420px; top: -140px; opacity: .28; }
+}
+
+/* ---- Hero primary CTA beam (approved demo v2) ----
+   Applied to the LIVE primary button (#heroCtaPrimary, opens the wizard).
+   Only position/overflow/pseudos are added here — the button's own
+   background, padding, text and wizard action are untouched. Streak:
+   3px x 160px, solid white core, strong drop-shadow, 2s loop, minimal gaps. */
+#heroCtaPrimary {
+  position: relative; overflow: hidden; isolation: isolate;
+}
+#heroCtaPrimary::before, #heroCtaPrimary::after {
+  content: ""; position: absolute; height: 3px; width: 160px; z-index: 1; pointer-events: none;
+  background: linear-gradient(90deg, transparent, #ffffff 35%, #ffffff 65%, transparent);
+  filter: drop-shadow(0 0 10px rgba(255,255,255,.95));
+}
+#heroCtaPrimary::before { top: 0; left: -40px; animation: hero-beam-right 2s linear infinite; }
+#heroCtaPrimary::after { top: auto; bottom: 0; right: -40px; animation: hero-beam-left 2s linear infinite; }
+@keyframes hero-beam-right { from { transform: translateX(0); } to { transform: translateX(calc(100% + 80px)); } }
+@keyframes hero-beam-left { from { transform: translateX(0); } to { transform: translateX(calc(-100% - 80px)); } }
+@media (prefers-reduced-motion: reduce) {
+  #heroCtaPrimary::before, #heroCtaPrimary::after { animation: none; opacity: 0; }
+}

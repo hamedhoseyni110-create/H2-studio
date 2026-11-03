@@ -29,6 +29,19 @@
   if (fx) media.appendChild(fx);
   var inner = hero.querySelector('.hero-inner');
 
+  /* ---- hero atmosphere glow (approved demo v2, stronger): appended INSIDE
+     .lion-hero-media so it sits above the video/shade/tint/particles AND
+     inherits the media scroll fade (apply() drives media opacity every
+     tick) — it can never linger as an orphan blob after the video fades.
+     Media is created once at parse time and never re-rendered by app.js
+     (language switches only change text), so this one-time append is
+     permanent across languages. Stacking: media (z 0) < mid echo (z 2) <
+     hero-inner (z 3), so the wash tints the video but never covers text. */
+  var heroGlow = document.createElement('div');
+  heroGlow.className = 'lion-hero-glow';
+  heroGlow.setAttribute('aria-hidden', 'true');
+  media.appendChild(heroGlow);
+
   /* ---- mid-runway echo (2026-11-02, option A): the hero title re-appears
      lower in the scroll runway so no viewport of the runway is empty.
      Text is copied live from #heroTitle, so it follows the active language
