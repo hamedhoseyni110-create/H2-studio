@@ -359,3 +359,117 @@
     try { hero.removeEventListener('pointerdown', onHeroPointerDown); } catch (_) { /* noop */ }
   });
 })();
+
+/* ============================================================================
+ * H2 Studio — site-wide ambient dust (dust stage, Argon priority).
+ *
+ * Separate from the hero particle system above (hero-scoped, cursor-reactive):
+ * this is a dumb ambient layer — ~50 slow-drifting motes, very low opacity,
+ * fixed behind all content (z-index -1, pointer-events none), so it reads as
+ * dust in the air over the dark background without fighting text or media.
+ *
+ * Hard off: mobile (<768px, matchMedia + CSS guard in lion.css),
+ * prefers-reduced-motion (returns before creating the canvas), tab hidden
+ * (visibilitychange pauses the rAF loop; resize across the breakpoint stops
+ * or restarts it). Zero external requests. No WebGL — 2D canvas, DPR-capped.
+ * ========================================================================== */
+(function () {
+  'use strict';
+  var MQ = window.matchMedia ? window.matchMedia('(max-width: 767px)') : null;
+  var RM = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+  if ((MQ && MQ.matches) || (RM && RM.matches)) return;
+
+  var COUNT = 50;
+  function makeDot(r, g, b) {
+    var S = 32, c = document.createElement('canvas');
+    c.width = c.height = S;
+    var x = c.getContext('2d');
+    var grad = x.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2);
+    grad.addColorStop(0, 'rgba(' + r + ',' + g + ',' + b + ',1)');
+    grad.addColorStop(0.4, 'rgba(' + r + ',' + g + ',' + b + ',0.5)');
+    grad.addColorStop(1, 'rgba(' + r + ',' + g + ',' + b + ',0)');
+    x.fillStyle = grad; x.fillRect(0, 0, S, S);
+    return c;
+  }
+  var SPR = [makeDot(52, 211, 153), makeDot(34, 211, 238), makeDot(236, 72, 153)];
+
+  var canvas = document.createElement('canvas');
+  canvas.id = 'h2Dust';
+  canvas.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;z-index:-1;pointer-events:none;';
+  document.body.appendChild(canvas);
+  var ctx = canvas.getContext('2d');
+
+  var W = 0, H = 0, dpr = 1;
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = Math.round(window.innerWidth * dpr); H = Math.round(window.innerHeight * dpr);
+    canvas.width = W; canvas.height = H;
+  }
+  resize();
+
+  var px = new Float32Array(COUNT), py = new Float32Array(COUNT),
+      ps = new Float32Array(COUNT), ph = new Float32Array(COUNT),
+      pa = new Float32Array(COUNT), pr = new Float32Array(COUNT),
+      pc = new Uint8Array(COUNT), palpha = new Float32Array(COUNT);
+  function seed(i, anywhere) {
+    px[i] = Math.random() * (W / dpr || 1);
+    py[i] = anywhere ? Math.random() * (H / dpr || 1) : (H / dpr || 1) + 10;
+    ps[i] = 4 + Math.random() * 8;        // upward drift px/s (slow)
+    ph[i] = Math.random() * Math.PI * 2;  // wobble phase
+    pa[i] = 3 + Math.random() * 8;        // wobble amplitude px
+    pr[i] = 1 + Math.random() * 1.5;      // radius px (tiny)
+    pc[i] = (Math.random() * 3) | 0;      // sprite pick
+  }
+  for (var i = 0; i < COUNT; i++) { seed(i, true); palpha[i] = 0.08 + Math.random() * 0.14; }
+
+  var rafId = 0, lastT = performance.now(), running = false;
+  function frame(now) {
+    if (!running) { rafId = 0; return; }
+    var dt = Math.min((now - lastT) / 1000, 0.1);
+    lastT = now;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W / dpr, H / dpr);
+    var t = now * 0.001;
+    for (var i = 0; i < COUNT; i++) {
+      py[i] -= ps[i] * dt;
+      if (py[i] < -20) seed(i, false);
+      var wx = px[i] + Math.sin(t * 0.4 + ph[i]) * pa[i];
+      var s = pr[i] * 3;
+      ctx.globalAlpha = palpha[i];
+      ctx.drawImage(SPR[pc[i]], wx - s / 2, py[i] - s / 2, s, s);
+    }
+    ctx.globalAlpha = 1;
+    rafId = requestAnimationFrame(frame);
+  }
+  function start() {
+    if (running) return;
+    running = true; lastT = performance.now();
+    rafId = requestAnimationFrame(frame);
+  }
+  function stop() {
+    running = false;
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = 0;
+  }
+  function isMobile() { return !!(MQ && MQ.matches); }
+  function onVis() {
+    if (document.hidden) stop();
+    else if (!isMobile()) start();
+  }
+  function onResize() {
+    resize();
+    // Clamp x into the new viewport (particles never move horizontally).
+    var vw = W / dpr;
+    for (var i = 0; i < COUNT; i++) if (px[i] > vw) px[i] = Math.random() * vw;
+    if (isMobile()) stop();
+    else if (!document.hidden) start();
+  }
+  document.addEventListener('visibilitychange', onVis);
+  window.addEventListener('resize', onResize);
+  window.addEventListener('pagehide', function () {
+    stop();
+    document.removeEventListener('visibilitychange', onVis);
+    window.removeEventListener('resize', onResize);
+  });
+  start();
+})();
