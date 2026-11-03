@@ -201,38 +201,41 @@
   }
 }
 
-/* ---------- why-us panels (approved 2026-10-31) ----------
-   Stacked colour panels after the portfolio, mirroring the reference's
-   Collection-features behaviour with our dark theme and our own claims.
-   Pure CSS sticky — no JS motion, no media weight. Sticky tops are set
-   from JS (nav height + 26px steps) so the stack edges stay visible
-   below the fixed nav. */
-.lion-panels { position: relative; padding: 40px 16px 60px; }
+/* ---------- why-us panels: Kage chapters (approved 2026-11-03) ----------
+   Port of the approved image-backed demo: scroll-driven sticky chapters
+   over the valley backdrop, per-chapter accent tint shift. Section keeps
+   its header (title + sub from COPY) above the sticky stage; the stage
+   is full-bleed (section side padding removed, header keeps its own
+   margins). Progress bar sits at the stage bottom so it never clashes
+   with the fixed nav; number top offsets clear the nav height. */
+.lion-panels { position: relative; padding: 40px 0 0; }
 .lion-panels-title { text-align: center; }
-.lion-panels-sub { color: rgba(255,255,255,.75); text-align: center; margin: 10px 0 36px; }
-.lion-panel {
-  position: sticky;
-  min-height: 64vh;
-  border-radius: 28px;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  text-align: center; padding: 40px 24px;
-  color: #f2f7f4;
-  background: linear-gradient(180deg, rgba(13,18,16,.94), rgba(5,8,7,.97));
-  border: 1px solid rgba(52,211,153,.4);
-  box-shadow: 0 -12px 40px rgba(0,0,0,.45), 0 0 70px rgba(52,211,153,.16);
+.lion-panels-sub { color: rgba(255,255,255,.75); text-align: center; margin: 10px 16px 36px; }
+#kgChapters { position: relative; height: 480vh; }
+.kg-sticky { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; background: #040706; }
+.kg-bg { position: absolute; left: 0; top: 0; width: 100%; height: 115%; object-fit: cover; will-change: transform; }
+.kg-scrim { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(4,7,6,.55) 0%, rgba(4,7,6,.25) 40%, rgba(4,7,6,.55) 100%); }
+.kg-tint { position: absolute; inset: 0; opacity: 0; transition: opacity .6s cubic-bezier(.22,1,.36,1); pointer-events: none; }
+.kg-progress { position: absolute; bottom: 0; left: 0; height: 3px; background: var(--acc, #34d399); z-index: 7; }
+.kg-num { position: absolute; top: 112px; left: 32px; z-index: 2; font-size: clamp(9rem, 22vw, 18rem); font-weight: 900; line-height: 1; color: transparent; -webkit-text-stroke: 2px var(--acc, #34d399); text-shadow: 0 0 90px var(--acc, #34d399); will-change: transform, opacity; }
+.kg-giant { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 2; font-size: clamp(2.5rem, 7vw, 6rem); font-weight: 900; white-space: nowrap; color: rgba(240,255,248,.95); text-shadow: 0 12px 44px rgba(0,0,0,.7); will-change: transform, opacity; }
+.kg-card { position: absolute; right: 88px; top: 50%; width: min(360px, 38vw); z-index: 3; background: rgba(6,18,13,.82); border: 1px solid var(--acc, #34d399); border-radius: 18px; padding: 22px 20px; box-shadow: 0 0 0 1px var(--acc, #34d399), 0 24px 60px rgba(0,0,0,.6); will-change: transform, opacity; }
+.kg-eyebrow { font-size: 12px; font-weight: 700; color: var(--acc, #34d399); }
+.kg-heading { font-size: 24px; font-weight: 900; color: var(--acc, #34d399); margin-top: 8px; line-height: 1.5; }
+.kg-desc { font-size: 14px; line-height: 2; color: #d7e3db; margin-top: 8px; }
+.kg-rail { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); z-index: 5; display: flex; flex-direction: column; gap: 12px; }
+.kg-rail button { width: 52px; height: 44px; border-radius: 12px; border: 1px solid rgba(255,255,255,.3); background: rgba(10,20,16,.7); color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; transition: background .6s cubic-bezier(.22,1,.36,1), color .6s cubic-bezier(.22,1,.36,1), border-color .6s cubic-bezier(.22,1,.36,1); }
+.kg-rail button.on { background: var(--acc, #34d399); color: #04120c; border-color: transparent; }
+@media (max-width: 700px) {
+  .kg-num { top: 84px; left: 12px; font-size: 5.5rem; }
+  .kg-giant { top: 27%; bottom: auto; font-size: 2.4rem; }
+  .kg-card { right: 50%; top: auto; bottom: 96px; width: 86%; transform: translateX(50%); padding: 16px; }
+  .kg-heading { font-size: 20px; }
+  .kg-desc { font-size: 13px; }
+  .kg-rail { right: auto; left: 50%; top: auto; bottom: 22px; transform: translateX(-50%); flex-direction: row; }
 }
-.lion-panel.p-em { border-color: rgba(52,211,153,.45); box-shadow: 0 -12px 40px rgba(0,0,0,.45), 0 0 70px rgba(52,211,153,.18); }
-.lion-panel.p-mg { border-color: rgba(236,72,153,.45); box-shadow: 0 -12px 40px rgba(0,0,0,.45), 0 0 70px rgba(236,72,153,.18); }
-.lion-panel.p-vi { border-color: rgba(139,92,246,.45); box-shadow: 0 -12px 40px rgba(0,0,0,.45), 0 0 70px rgba(139,92,246,.18); }
-.lion-panel.p-or { border-color: rgba(251,146,60,.45); box-shadow: 0 -12px 40px rgba(0,0,0,.45), 0 0 70px rgba(251,146,60,.18); }
-.lion-panel-giant { font-size: clamp(2.6rem, 9vw, 5.5rem); font-weight: 800; line-height: 1.2; }
-.lion-panel.p-em .lion-panel-giant { color: #34d399; }
-.lion-panel.p-mg .lion-panel-giant { color: #ec4899; }
-.lion-panel.p-vi .lion-panel-giant { color: #8b5cf6; }
-.lion-panel.p-or .lion-panel-giant { color: #fb923c; }
-.lion-panel-desc { font-size: clamp(1rem, 2.6vw, 1.25rem); color: rgba(255,255,255,.78); margin-top: 16px; max-width: 560px; line-height: 1.9; }
-@media (max-width: 640px) {
-  .lion-panel { min-height: 62vh; border-radius: 22px; }
+@media (prefers-reduced-motion: reduce) {
+  .kg-tint, .kg-rail button { transition: none; }
 }
 
 /* ---------- templates-style portfolio cards (approved 2026-10-31) ----------

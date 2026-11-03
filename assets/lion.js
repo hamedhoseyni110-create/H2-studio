@@ -77,20 +77,54 @@
   if (swap && swap.parentNode) swap.parentNode.insertBefore(ret, swap.nextSibling);
   spyObserve(ret);
 
-  /* ---- why-us panels: stacked colour panels after the portfolio ----
-     Content comes from COPY (trilingual, like everything else); the
-     section survives language re-renders because it is a sibling of
-     #portfolio, not inside it. Sticky tops sit below the fixed nav so
-     the stack edges stay visible. */
+  /* ---- why-us panels: Kage chapters (approved 2026-11-03) ----
+     Port of the approved image-backed demo (kage-night-valley-demo.html):
+     scroll-driven sticky chapters over the valley backdrop, per-chapter
+     accent tint shift. Section keeps id 'lionPanels', stays after
+     #portfolio, and renders from COPY (trilingual) like everything else.
+     The demo's intro/outro are NOT injected: the live header (title +
+     sub) sits above the sticky stage and the page flows into #videos
+     below with no gap. Progress bar moved to the stage bottom so it
+     never clashes with the fixed nav; .kg-top dropped (demo chrome). */
   var portfolioSec = document.getElementById('portfolio');
   var panelsSec = document.createElement('section');
   panelsSec.className = 'lion-panels';
   panelsSec.id = 'lionPanels';
-  var panelsHTML = '<h2 class="section-title lion-panels-title"></h2><p class="lion-panels-sub"></p>';
-  var panelClasses = ['p-em', 'p-mg', 'p-vi', 'p-or'];
-  for (var pi = 0; pi < 4; pi++) {
-    panelsHTML += '<div class="lion-panel ' + panelClasses[pi] + '"><div class="lion-panel-giant"></div><div class="lion-panel-desc"></div></div>';
+  var kgAccents = ['#34d399', '#22d3ee', '#ec4899', '#fb923c'];
+  var kgNums = {
+    fa: ['۰۱', '۰۲', '۰۳', '۰۴'],
+    en: ['01', '02', '03', '04'],
+    ar: ['٠١', '٠٢', '٠٣', '٠٤']
+  };
+  function kgEye(lang, i) {
+    var n = (kgNums[lang] || kgNums.fa)[i];
+    if (lang === 'en') return 'Chapter ' + n + ' of 04';
+    if (lang === 'ar') return 'الفصل ' + n + ' من ٠٤';
+    return 'فصل ' + n + ' از ۰۴';
   }
+  var panelsHTML = '<h2 class="section-title lion-panels-title"></h2><p class="lion-panels-sub"></p>' +
+    '<div id="kgChapters"><div class="kg-sticky">' +
+    '<img class="kg-bg" src="assets/kage-night-valley-1280.webp" alt="">' +
+    '<div class="kg-scrim"></div>' +
+    '<div class="kg-tint" style="background:radial-gradient(ellipse at 75% 15%, rgba(52,211,153,.28) 0%, rgba(52,211,153,.10) 45%, transparent 70%)"></div>' +
+    '<div class="kg-tint" style="background:radial-gradient(ellipse at 75% 15%, rgba(34,211,238,.28) 0%, rgba(34,211,238,.10) 45%, transparent 70%)"></div>' +
+    '<div class="kg-tint" style="background:radial-gradient(ellipse at 75% 15%, rgba(236,72,153,.28) 0%, rgba(236,72,153,.10) 45%, transparent 70%)"></div>' +
+    '<div class="kg-tint" style="background:radial-gradient(ellipse at 75% 15%, rgba(251,146,60,.28) 0%, rgba(251,146,60,.10) 45%, transparent 70%)"></div>' +
+    '<div class="kg-progress"></div>';
+  for (var ci = 0; ci < 4; ci++) {
+    panelsHTML += '<div class="kg-num" data-ch="' + ci + '" style="--acc:' + kgAccents[ci] + '"></div>';
+  }
+  for (var gi = 0; gi < 4; gi++) {
+    panelsHTML += '<div class="kg-giant" data-ch="' + gi + '"></div>';
+  }
+  for (var ki = 0; ki < 4; ki++) {
+    panelsHTML += '<div class="kg-card" data-ch="' + ki + '" style="--acc:' + kgAccents[ki] + '">' +
+      '<div class="kg-eyebrow"></div><div class="kg-heading"></div><div class="kg-desc"></div></div>';
+  }
+  panelsHTML += '<div class="kg-rail">' +
+    '<button type="button" data-i="0"></button><button type="button" data-i="1"></button>' +
+    '<button type="button" data-i="2"></button><button type="button" data-i="3"></button>' +
+    '</div></div></div>';
   panelsSec.innerHTML = panelsHTML;
   if (portfolioSec && portfolioSec.parentNode) portfolioSec.parentNode.insertBefore(panelsSec, portfolioSec.nextSibling);
   spyObserve(panelsSec);
@@ -103,13 +137,24 @@
     var sub = panelsSec.querySelector('.lion-panels-sub');
     if (title) title.textContent = data.heading;
     if (sub) sub.textContent = data.sub;
-    var giants = panelsSec.querySelectorAll('.lion-panel-giant');
-    var descs = panelsSec.querySelectorAll('.lion-panel-desc');
+    var nums = panelsSec.querySelectorAll('.kg-num');
+    var giants = panelsSec.querySelectorAll('.kg-giant');
+    var cards = panelsSec.querySelectorAll('.kg-card');
+    var railBtns = panelsSec.querySelectorAll('.kg-rail button');
+    var ns = kgNums[lang] || kgNums.fa;
     data.items.forEach(function (it, i) {
+      if (nums[i]) nums[i].textContent = ns[i];
       if (giants[i]) giants[i].textContent = it.giant;
-      if (descs[i]) descs[i].textContent = it.desc;
+      if (cards[i]) {
+        var eb = cards[i].querySelector('.kg-eyebrow');
+        var hd = cards[i].querySelector('.kg-heading');
+        var ds = cards[i].querySelector('.kg-desc');
+        if (eb) eb.textContent = kgEye(lang, i);
+        if (hd) hd.textContent = it.giant;
+        if (ds) ds.textContent = it.desc;
+      }
+      if (railBtns[i]) railBtns[i].textContent = ns[i];
     });
-    updatePanelTops();
   }
   renderPanels();
   if ('MutationObserver' in window) {
@@ -117,6 +162,7 @@
       muts.forEach(function (m) {
         if (m.attributeName !== 'lang') return;
         renderPanels();
+        kgMeasure(); kgKick();
         /* Mid echo follows the language at once, even with no scroll
            (apply() only runs on scroll ticks). Observer callbacks run
            after setLang's synchronous render, so the title is already new. */
@@ -125,15 +171,97 @@
       });
     }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
   }
-  var navEl = document.getElementById('nav');
-  function updatePanelTops() {
+  /* ---- Kage scroll driver (ported from the approved demo) ----
+     Geometry is measured from the wrapper's own bounding rect, and
+     re-measured whenever layout above it can change (grids render,
+     load, resize, language switch) — this is the fix for the Argon
+     demo's mapping/geometry mismatch that left black voids mid-scroll.
+     The backdrop never fades, so every scroll position shows scene. */
+  var kgWrap = document.getElementById('kgChapters');
+  var kgBg = panelsSec.querySelector('.kg-bg');
+  var kgProgress = panelsSec.querySelector('.kg-progress');
+  var kgNumEls = Array.prototype.slice.call(panelsSec.querySelectorAll('.kg-num'));
+  var kgGiantEls = Array.prototype.slice.call(panelsSec.querySelectorAll('.kg-giant'));
+  var kgCardEls = Array.prototype.slice.call(panelsSec.querySelectorAll('.kg-card'));
+  var kgTintEls = Array.prototype.slice.call(panelsSec.querySelectorAll('.kg-tint'));
+  var kgRailBtns = Array.prototype.slice.call(panelsSec.querySelectorAll('.kg-rail button'));
+  var kgTop = 0, kgSpan = 1, kgRaf = false, kgLast = -1;
+  function kgClamp(v, a, b) { return v < a ? a : (v > b ? b : v); }
+  function kgRamp(t, a, b) { return kgClamp((t - a) / (b - a), 0, 1); }
+  function kgMeasure() {
+    if (!kgWrap) return;
+    var r = kgWrap.getBoundingClientRect();
+    kgTop = r.top + window.scrollY;
+    kgSpan = Math.max(1, kgWrap.offsetHeight - window.innerHeight);
+    /* Number top follows the measured fixed-nav height (nav wraps to two
+       rows at narrower desktop widths, e.g. 149px at 1024px) so the giant
+       number never slides under the nav. CSS top is only the fallback. */
+    var navEl = document.getElementById('nav');
     var navH = navEl ? navEl.offsetHeight : 0;
-    var panels = panelsSec.querySelectorAll('.lion-panel');
-    panels.forEach(function (el, i) {
-      el.style.top = (navH + i * 26) + 'px';
-    });
+    if (navH > 0) {
+      kgNumEls.forEach(function (n) { n.style.top = (navH + 16) + 'px'; });
+    }
   }
-  updatePanelTops();
+  function kgPaint() {
+    var y = window.scrollY;
+    var p = kgClamp((y - kgTop) / kgSpan, 0, 1);
+    var idx = Math.min(3, Math.floor(p * 4));
+    if (kgProgress) {
+      kgProgress.style.width = (p * 100) + '%';
+      kgProgress.style.background = kgAccents[idx];
+    }
+    if (idx !== kgLast) {
+      kgLast = idx;
+      kgRailBtns.forEach(function (b, j) { b.classList.toggle('on', j === idx); });
+      kgTintEls.forEach(function (t, j) { t.style.opacity = (j === idx) ? '1' : '0'; });
+    }
+    var isMobile = window.innerWidth <= 700;
+    if (reduced) {
+      if (kgBg) kgBg.style.transform = '';
+      for (var ri = 0; ri < 4; ri++) {
+        var on = (ri === idx) ? '1' : '0';
+        kgNumEls[ri].style.opacity = on;
+        kgNumEls[ri].style.transform = '';
+        kgGiantEls[ri].style.opacity = on;
+        kgGiantEls[ri].style.transform = 'translateX(-50%)';
+        kgCardEls[ri].style.opacity = on;
+        kgCardEls[ri].style.transform = isMobile ? 'translateX(50%)' : 'translateY(-50%)';
+      }
+    } else {
+      if (kgBg) kgBg.style.transform = 'translateY(' + (-p * 6) + '%) scale(1.02)';
+      for (var i = 0; i < 4; i++) {
+        var t = (p - i / 4) * 4;
+        var op = kgRamp(t, -0.05, 0.15) * (1 - kgRamp(t, 0.8, 1.05));
+        var tyCard = (1 - kgRamp(t, -0.05, 0.25)) * 50 + kgRamp(t, 0.7, 1.05) * (-40);
+        var tyNum = (1 - kgRamp(t, -0.05, 0.3)) * 30 + kgRamp(t, 0.7, 1.05) * (-30);
+        var scNum = 1 + (1 - kgRamp(t, -0.05, 0.3)) * 0.15;
+        var tyGiant = (1 - kgRamp(t, -0.05, 0.25)) * 30 + kgRamp(t, 0.7, 1.05) * (-30);
+        var baseCard = isMobile ? 'translateX(50%)' : 'translateY(-50%)';
+        kgCardEls[i].style.opacity = op.toFixed(3);
+        kgCardEls[i].style.transform = baseCard + ' translateY(' + tyCard.toFixed(1) + 'px)';
+        kgNumEls[i].style.opacity = op.toFixed(3);
+        kgNumEls[i].style.transform = 'translateY(' + tyNum.toFixed(1) + 'px) scale(' + scNum.toFixed(3) + ')';
+        kgGiantEls[i].style.opacity = op.toFixed(3);
+        kgGiantEls[i].style.transform = 'translateX(-50%) translateY(' + tyGiant.toFixed(1) + 'px)';
+      }
+    }
+    kgRaf = false;
+  }
+  function kgKick() {
+    if (!kgRaf) { kgRaf = true; requestAnimationFrame(kgPaint); }
+  }
+  window.addEventListener('scroll', kgKick, { passive: true });
+  window.addEventListener('resize', function () { kgMeasure(); kgKick(); });
+  document.addEventListener('DOMContentLoaded', function () { kgMeasure(); kgKick(); });
+  window.addEventListener('load', function () { kgMeasure(); kgKick(); });
+  window.addEventListener('h2:grids', function () { kgMeasure(); kgKick(); });
+  kgRailBtns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      var i = parseInt(b.getAttribute('data-i'), 10);
+      window.scrollTo({ top: kgTop + ((i + 0.5) / 4) * kgSpan, behavior: 'smooth' });
+    });
+  });
+  kgMeasure(); kgPaint();
 
   /* ---- templates-style portfolio cards (approved 2026-10-31) ----
      Frame restyle is CSS (.lion-tcard); here only: small WebP posters
@@ -500,7 +628,7 @@
     }
   }
   window.addEventListener('scroll', function () { target = window.scrollY; kick(); }, { passive: true });
-  window.addEventListener('resize', function () { vh = window.innerHeight; target = window.scrollY; updatePanelTops(); measureProcLine(); kick(); });
+  window.addEventListener('resize', function () { vh = window.innerHeight; target = window.scrollY; measureProcLine(); kick(); });
   var wtabs = document.getElementById('worksTabs');
   if (wtabs) wtabs.addEventListener('click', function () { kick(); });
   var raf = 0, lastTick = 0;
