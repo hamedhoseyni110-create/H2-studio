@@ -383,3 +383,34 @@ html[lang="ar"] #faqList .faq-item summary::before { content: counter(lionFaq, a
 @media (prefers-reduced-motion: reduce){
   .pf-card { transition: none; }
 }
+
+/* ============ Sylva layered cards (services + academy, injected 2026-11-03)
+   Port of the approved demo: halo / glass / floating visual / light-follow.
+   Tilt lives in app.js initSylvaTilt (glass-level only). The old card-level
+   --rx/--ry tilt no longer targets service cards, and the old emerald
+   spotlights (::before/::after) are replaced by the accent .sy-light. */
+#servicesGrid, #academyGrid { gap: 30px; }
+#servicesGrid .service-card, #academyGrid .video-card {
+  position: relative; perspective: 900px;
+  background: transparent; border-color: transparent; overflow: visible;
+  padding: 0;
+}
+#servicesGrid .service-card::before, #servicesGrid .service-card::after { display: none; }
+#academyGrid .video-card:hover { border-color: transparent; box-shadow: none; }
+.sy-halo { position: absolute; inset: 0; border-radius: 24px; background: var(--sy-acc, #34d399); opacity: .32; filter: blur(26px); transform: translate(10px, 12px) scale(.98); transition: transform .25s ease; z-index: 0; }
+#servicesGrid .service-card:hover .sy-halo, #academyGrid .video-card:hover .sy-halo { transform: translate(14px, 16px) scale(1); }
+.sy-glass { position: relative; z-index: 1; background: rgba(255,255,255,.04); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,.13); border-radius: 22px; padding: 18px; transform-style: preserve-3d; transition: transform .18s ease-out; will-change: transform; overflow: hidden; }
+.sy-light { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .25s ease; background: radial-gradient(320px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--sy-acc, #34d399) 26%, transparent), transparent 70%); }
+#servicesGrid .service-card:hover .sy-light, #academyGrid .video-card:hover .sy-light { opacity: 1; }
+.sy-visual { position: relative; z-index: 2; transform: translateZ(40px); transition: transform .25s ease; }
+#servicesGrid .service-card:hover .sy-visual, #academyGrid .video-card:hover .sy-visual { transform: translateZ(55px) translateY(-4px); }
+#servicesGrid .sy-visual img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; display: block; border-radius: 14px; box-shadow: 0 18px 40px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.08); }
+#academyGrid .sy-visual .video-media { border-radius: 14px; box-shadow: 0 18px 40px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.08); }
+#servicesGrid .sy-glass .service-num { position: relative; z-index: 2; }
+#servicesGrid .sy-glass h3, #academyGrid .sy-glass .video-cap h3 { position: relative; z-index: 2; font-size: 20px; margin: 16px 0 6px; padding-top: 12px; border-top: 3px solid var(--sy-acc, #34d399); }
+#servicesGrid .sy-glass p, #academyGrid .sy-glass .video-cap p { position: relative; z-index: 2; color: #bccdc3; font-size: 14px; line-height: 1.9; margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+#academyGrid .sy-glass .video-cap { position: relative; z-index: 2; padding: 0; }
+#servicesGrid .sy-glass .app-flow, #servicesGrid .sy-glass .service-go { position: relative; z-index: 2; }
+@media (prefers-reduced-motion: reduce) {
+  .sy-halo, .sy-glass, .sy-light, .sy-visual { transition: none; }
+}

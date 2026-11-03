@@ -76,6 +76,20 @@ var SERVICE_GO = {
   "app":       { sec: "portfolio", tab: "webapp" },
   "whitelabel": { sec: "portfolio", tab: "site" }
 };
+
+/* Sylva layered cards (injected 2026-11-03, approved demo): per-service
+   accent + poster. Academy uses its COPY poster (the fixed WP frame). */
+var SY_ACC = {
+  "video": "#34d399", "web": "#22d3ee", "editing": "#ec4899",
+  "app": "#8b5cf6", "whitelabel": "#fb923c"
+};
+var SY_POSTER = {
+  "video": "assets/previews/qatre-preview-480.webp",
+  "web": "assets/previews/ramin-berger-480.webp",
+  "editing": "assets/previews/h2-prism-480.webp",
+  "app": "assets/previews/loyalty-480.webp",
+  "whitelabel": "assets/previews/gym-site-demo-480.webp"
+};
 function goToWork(sec, tab) {
   if (tab) {
     worksFilter = tab;
@@ -347,7 +361,11 @@ function renderPage() {
   c.services.forEach(function(s, i){
     var card = document.createElement("article");
     card.className = "service-card";
-    var html = '<div class="service-num" aria-hidden="true">' + stepNum(i + 1) + "</div>" +
+    card.style.setProperty("--sy-acc", SY_ACC[s.id] || "#34d399");
+    var html = '<div class="sy-halo" aria-hidden="true"></div><div class="sy-glass">' +
+      '<div class="sy-light" aria-hidden="true"></div>' +
+      (SY_POSTER[s.id] ? '<div class="sy-visual"><img src="' + SY_POSTER[s.id] + '" alt="" loading="lazy"></div>' : "") +
+      '<div class="service-num" aria-hidden="true">' + stepNum(i + 1) + "</div>" +
       "<h3>" + esc(s.title) + "</h3><p>" + esc(s.desc) + "</p>";
     if (s.id === "app" && s.flow) {
       html += '<details class="app-flow"><summary>' + esc(u.app_flow_title) + "</summary><ol>" +
@@ -359,6 +377,7 @@ function renderPage() {
     if (go && u.service_go) {
       html += '<span class="service-go">' + esc(u.service_go) + ' <i aria-hidden="true"></i></span>';
     }
+    html += "</div>";
     card.innerHTML = html;
     if (go) {
       card.classList.add("clickable");
@@ -422,6 +441,7 @@ function renderPage() {
   });
   applyWorksFilter();
   initTilt();
+  initSylvaTilt();
   initLazyVideos();
   /* playful layer: re-collect scroll-parallax targets after grids re-render */
   try { window.dispatchEvent(new CustomEvent("h2:grids")); } catch (e) {}
@@ -462,14 +482,18 @@ function renderPage() {
   c.academy.items.forEach(function(item){
     var card = document.createElement("article");
     card.className = "video-card";
+    card.style.setProperty("--sy-acc", "#8b5cf6");
     card.innerHTML =
-      '<div class="video-media" tabindex="0" role="button" aria-label="' + esc(c.videos.watch + ": " + item.title) + '">' +
+      '<div class="sy-halo" aria-hidden="true"></div><div class="sy-glass">' +
+      '<div class="sy-light" aria-hidden="true"></div>' +
+      '<div class="sy-visual"><div class="video-media" tabindex="0" role="button" aria-label="' + esc(c.videos.watch + ": " + item.title) + '">' +
       '<img src="' + esc(item.poster) + '" alt="" loading="lazy">' +
       '<span class="play-btn" aria-hidden="true"><i></i></span>' +
       '<span class="duration-badge">' + esc(item.duration) + "</span>" +
       '<span class="sound-badge">' + esc(u.lightbox.sound_hint) + "</span>" +
-      "</div>" +
-      '<div class="video-cap"><h3>' + esc(item.title) + "</h3><p>" + esc(item.desc) + "</p></div>";
+      "</div></div>" +
+      '<div class="video-cap"><h3>' + esc(item.title) + "</h3><p>" + esc(item.desc) + "</p></div>" +
+      "</div>";
     (function(it){
       var media = card.querySelector(".video-media");
       function open(){ openLightbox(it.src, it.poster, it.title, it.desc); }
@@ -595,14 +619,17 @@ function renderPage() {
   try { if (window.H2MP && window.H2MP.refresh) window.H2MP.refresh(); } catch (e) {}
 }
 
-/* ================= 3D tilt on cards =================
+/* ================= 3D tilt on portfolio cards =================
    Writes --rx/--ry CSS vars; the actual transform lives in playful.css and
-   composes with the scroll-parallax --par var. Reduced-motion: untouched. */
+   composes with the scroll-parallax --par var. Reduced-motion: untouched.
+   NOTE (Sylva injection 2026-11-03): service cards no longer tilt here —
+   their tilt moved to initSylvaTilt below (glass-level, demo-exact), so the
+   two systems never double-tilt the same card. */
 
 function initTilt() {
   if (window.matchMedia("(hover: none)").matches) return;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  document.querySelectorAll("#portfolioGrid .portfolio-card, #servicesGrid .service-card").forEach(function(card){
+  document.querySelectorAll("#portfolioGrid .portfolio-card").forEach(function(card){
     card.addEventListener("mousemove", function(e){
       var r = card.getBoundingClientRect();
       var x = (e.clientX - r.left) / r.width - 0.5;
@@ -617,6 +644,60 @@ function initTilt() {
       card.style.setProperty("--ry", "0deg");
     });
   });
+}
+
+/* ================= Sylva layered-card tilt (services + academy) ==========
+   Demo-exact: glass tilts toward the pointer (max 5deg) + light follows
+   (--mx/--my on the glass); coarse pointers get gentle scroll-linked tilt
+   (max 3deg). Delegated on document so language re-renders never orphan
+   bindings. Owns ONLY .sy-glass transforms; card-level parallax (--par)
+   and reveal stay untouched. Reduced-motion: no bindings at all. */
+
+var sylvaTiltBound = false;
+function initSylvaTilt() {
+  if (sylvaTiltBound) return;
+  sylvaTiltBound = true;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  var SEL = "#servicesGrid .service-card, #academyGrid .video-card";
+  if (window.matchMedia("(pointer: fine)").matches) {
+    document.addEventListener("mousemove", function(e){
+      var card = e.target.closest ? e.target.closest(SEL) : null;
+      if (!card) return;
+      var glass = card.querySelector(".sy-glass");
+      if (!glass) return;
+      var r = card.getBoundingClientRect();
+      var px = (e.clientX - r.left) / r.width - 0.5;
+      var py = (e.clientY - r.top) / r.height - 0.5;
+      glass.style.transform = "rotateX(" + (-py * 10).toFixed(2) + "deg) rotateY(" + (px * 10).toFixed(2) + "deg)";
+      glass.style.setProperty("--mx", ((px + 0.5) * 100).toFixed(1) + "%");
+      glass.style.setProperty("--my", ((py + 0.5) * 100).toFixed(1) + "%");
+    });
+    document.addEventListener("mouseout", function(e){
+      var card = e.target.closest ? e.target.closest(SEL) : null;
+      if (!card) return;
+      if (card.contains(e.relatedTarget)) return;
+      var glass = card.querySelector(".sy-glass");
+      if (glass) glass.style.transform = "";
+    });
+  } else {
+    var ticking = false;
+    function onScroll(){
+      if (ticking) return; ticking = true;
+      requestAnimationFrame(function(){
+        ticking = false;
+        var vh = window.innerHeight;
+        document.querySelectorAll("#servicesGrid .service-card .sy-glass, #academyGrid .video-card .sy-glass").forEach(function(glass){
+          var r = glass.getBoundingClientRect();
+          if (r.bottom < 0 || r.top > vh) return;
+          var off = ((r.top + r.height / 2) - vh / 2) / (vh / 2);
+          off = Math.max(-1, Math.min(1, off));
+          glass.style.transform = "rotateX(" + (off * 3).toFixed(2) + "deg)";
+        });
+      });
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+  }
 }
 
 /* ================= 3D scroll entrance (generic) ================= */
