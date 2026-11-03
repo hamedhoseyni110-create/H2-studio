@@ -63,6 +63,11 @@
     ],
     "sub": "Short, honest answers to the things everyone asks."
   },
+  "finalCta": {
+    "btn": "Start your project on WhatsApp ↓",
+    "sub": "Tell me what's on your mind — I'll handle the rest.",
+    "title": "Now it's *your* turn"
+  },
   "footer": {
     "links_label": "Quick links",
     "rights": "All rights reserved to H2 Studio. © 2026",
@@ -133,7 +138,29 @@
       ],
       "title": "Cinematic prompt builder"
     },
-    "sub": "The studio's playground — small toys that show what AI can do."
+    "sub": "The studio's playground — small toys that show what AI can do.",
+    "explorer": {
+      "title": "Style explorer",
+      "desc": "Pick a style; see a real work of ours in that style and take its prompt template.",
+      "note": "This is a showcase, not a real generator: real studio works + prompt templates — nothing is generated here.",
+      "subject_label": "Custom subject (optional)",
+      "subject_placeholder": "e.g. a black lion",
+      "empty": "Pick a style to see a sample.",
+      "styles": [
+        "Watercolor film",
+        "Coffee journey",
+        "Fast-food ad",
+        "Luxury ad",
+        "Prism light"
+      ]
+    }
+  },
+  "manifesto": {
+    "lines": [
+      "I make your idea *cinematic*.",
+      "No templates. No *copies*.",
+      "Every frame, with a *film's* precision."
+    ]
   },
   "mascot": {
     "aria": "Tangerine, the studio guide",
@@ -160,6 +187,28 @@
     "services": "Services",
     "videos": "Videos",
     "webapps": "Web apps"
+  },
+  "panels": {
+    "heading": "Why choose us?",
+    "items": [
+      {
+        "desc": "No ready-made templates, no slapdash work; every project is crafted with a film's care.",
+        "giant": "Professional"
+      },
+      {
+        "desc": "A site that opens on your phone with no lag and never buckles under load.",
+        "giant": "Fast and stable"
+      },
+      {
+        "desc": "Design and video built to turn visitors into customers.",
+        "giant": "Built to sell"
+      },
+      {
+        "desc": "You preview, you approve, then you receive; revisions until approval are part of the process.",
+        "giant": "Until you're happy"
+      }
+    ],
+    "sub": "For building a site, making a video, or working with us — for these reasons:"
   },
   "portfolio": {
     "heading": "Work I've shipped",

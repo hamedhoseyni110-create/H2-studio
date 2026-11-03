@@ -219,14 +219,42 @@
 
   function buildPrompt(lab) {
     var P = lab.prompt;
-    var s = P.subjects_en[labState.sel[0]];
-    var a = P.actions_en[labState.sel[1]];
-    var c = P.cameras_en[labState.sel[2]];
-    var m = P.moods_en[labState.sel[3]];
-    return 'Photorealistic ultra-detailed cinematic shot: ' + s + ' ' + a + '. ' +
-      'Camera: ' + c + ', one smooth move only. ' +
-      m + ', volumetric light, shallow depth of field. ' +
+    return buildPromptFor(lab, P.subjects_en[labState.sel[0]],
+      labState.sel[1], labState.sel[2], labState.sel[3]);
+  }
+
+  /* ================= style explorer (lab toyC) =================
+     Showcase, not a generator: each style chip maps to one REAL video
+     work of the studio (COPY videos items, poster + src + title + desc).
+     The "prompt" is the lab builder's formula with a per-style preset
+     (action/camera/mood indices into the EN option lists, one short EN
+     subject phrase per style); a typed subject replaces the subject slot.
+     No API call, no network request, no new media — poster files only. */
+  var explorerState = { style: -1, subject: '' };
+  /* style order matches COPY lab.explorer.styles */
+  var EXPLORER_STYLES = [
+    { id: 'qatre-film', subj: 'a watercolor drop blooming into a flower', a: 1, c: 0, m: 3 },
+    { id: 'nozhe-coffee', subj: 'a barista pouring coffee on a golden morning', a: 1, c: 3, m: 0 },
+    { id: 'burger-ad', subj: 'a burger assembling itself in mid-air', a: 0, c: 1, m: 2 },
+    { id: 'h2-parfum', subj: 'a perfume bottle glowing in the dark', a: 2, c: 0, m: 1 },
+    { id: 'h2-prism', subj: 'a beam of light breaking through a glass prism', a: 3, c: 1, m: 2 }
+  ];
+  var pgTimer = 0;
+
+  function buildPromptFor(lab, subj, a, c, m) {
+    var P = lab.prompt;
+    return 'Photorealistic ultra-detailed cinematic shot: ' + subj + ' ' + P.actions_en[a] + '. ' +
+      'Camera: ' + P.cameras_en[c] + ', one smooth move only. ' +
+      P.moods_en[m] + ', volumetric light, shallow depth of field. ' +
       '8 seconds, 9:16 vertical. Film grain, teal-and-orange grade, cinematic color, no text, no watermark.';
+  }
+
+  function pgFindVideo(lang, id) {
+    var items = (((COPY[lang] || COPY.fa).videos) || {}).items || [];
+    for (var i = 0; i < items.length; i++) if (items[i].id === id) return items[i];
+    var faItems = ((COPY.fa.videos) || {}).items || [];
+    for (var j = 0; j < faItems.length; j++) if (faItems[j].id === id) return faItems[j];
+    return null;
   }
 
   function typeInto(elm, text) {
@@ -297,7 +325,27 @@
       '</div>' +
       '</article>';
 
-    grid.innerHTML = toyA + toyB;
+    var E = lab.explorer || null;
+    var watchLabel = (((COPY[lang] || COPY.fa).videos) || {}).watch || '';
+    var toyC = !E ? '' :
+      '<article class="lab-toy pg-toy" id="labExplorerToy">' +
+      '<h3>' + esc(E.title) + '</h3><p>' + esc(E.desc) + '</p>' +
+      '<div class="chips pg-chips" role="group">' + E.styles.map(function (s, i) {
+        return '<button type="button" class="chip" data-pgs="' + i +
+          '" aria-pressed="' + (i === explorerState.style) + '">' + esc(s) + '</button>';
+      }).join('') + '</div>' +
+      '<div class="lab-group"><span>' + esc(E.subject_label) + '</span>' +
+      '<input type="text" class="pg-subject" id="pgSubject" maxlength="40" autocomplete="off" placeholder="' +
+      esc(E.subject_placeholder) + '" value="' + esc(explorerState.subject) + '"></div>' +
+      '<div class="pg-stage" id="pgStage">' +
+      '<div class="pg-shimmer" id="pgShimmer" hidden></div>' +
+      '<div class="pg-reveal" id="pgReveal" hidden></div>' +
+      '<div class="pg-empty" id="pgEmpty">' + esc(E.empty) + '</div>' +
+      '</div>' +
+      '<p class="lab-note">' + esc(E.note) + '</p>' +
+      '</article>';
+
+    grid.innerHTML = toyA + toyB + toyC;
 
     /* reveal-on-scroll for toys (mirrors app.js initReveals contract) */
     if (window.H2Reveal) window.H2Reveal(grid.querySelectorAll('.lab-toy'));
@@ -353,6 +401,89 @@
       });
       palName.textContent = PL.palettes[previewIdx];
     }
+
+    /* explorer toy wiring (toyC) */
+    function pgPrompt(st) {
+      var subj = explorerState.subject.trim() || st.subj;
+      return buildPromptFor(lab, subj, st.a, st.c, st.m);
+    }
+    function pgFillReveal() {
+      var st = EXPLORER_STYLES[explorerState.style];
+      var rv = grid.querySelector('#pgReveal');
+      if (!st || !rv) return '';
+      var item = pgFindVideo(lang, st.id);
+      if (!item) { rv.innerHTML = ''; return ''; }
+      var prompt = pgPrompt(st);
+      rv.innerHTML =
+        '<div class="pg-work">' +
+        '<div class="pg-poster" role="button" tabindex="0" aria-label="' + esc(watchLabel + ': ' + item.title) + '">' +
+        '<img src="' + esc(item.poster) + '" alt="" loading="lazy">' +
+        '<span class="pg-play" aria-hidden="true">▶</span></div>' +
+        '<div class="pg-info"><h4>' + esc(item.title) + '</h4><p>' + esc(item.desc || '') + '</p></div>' +
+        '</div>' +
+        '<span class="lab-output-label">' + esc(P.output_label) + '</span>' +
+        '<div class="lab-output pg-prompt">' + esc(prompt) + '</div>' +
+        '<div class="lab-actions">' +
+        '<button type="button" class="btn btn-primary" id="pgWatch">' + esc(watchLabel) + '</button>' +
+        '<button type="button" class="btn btn-ghost" id="pgCopy">' + esc(P.copy) + '</button>' +
+        '<span class="lab-copy-ok" id="pgCopyOk" hidden>' + esc(P.copied) + '</span>' +
+        '</div>';
+      var open = function () {
+        if (typeof openLightbox === 'function') openLightbox(item.src, item.poster, item.title, item.desc);
+      };
+      var posterEl = rv.querySelector('.pg-poster');
+      posterEl.addEventListener('click', open);
+      posterEl.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); open(); }
+      });
+      rv.querySelector('#pgWatch').addEventListener('click', open);
+      rv.querySelector('#pgCopy').addEventListener('click', function () {
+        copyText(prompt, function () {
+          var ok = rv.querySelector('#pgCopyOk');
+          ok.hidden = false;
+          setTimeout(function () { ok.hidden = true; }, 2200);
+        });
+      });
+      return prompt;
+    }
+    function pgShow(instant) {
+      var shim = grid.querySelector('#pgShimmer');
+      var rv = grid.querySelector('#pgReveal');
+      var em = grid.querySelector('#pgEmpty');
+      if (!shim || !rv || !em) return;
+      if (pgTimer) { clearTimeout(pgTimer); pgTimer = 0; }
+      if (explorerState.style < 0) {
+        shim.hidden = true; rv.hidden = true; em.hidden = false; return;
+      }
+      em.hidden = true;
+      pgFillReveal();
+      if (REDUCED || instant) { shim.hidden = true; rv.hidden = false; return; }
+      rv.hidden = true; shim.hidden = false;
+      pgTimer = setTimeout(function () {
+        pgTimer = 0; shim.hidden = true; rv.hidden = false;
+      }, 1200);
+    }
+    var subjInput = grid.querySelector('#pgSubject');
+    if (subjInput) {
+      subjInput.addEventListener('input', function () {
+        explorerState.subject = subjInput.value;
+        var st = EXPLORER_STYLES[explorerState.style];
+        var rv = grid.querySelector('#pgReveal');
+        var pr = grid.querySelector('.pg-prompt');
+        if (st && rv && !rv.hidden && pr) pr.textContent = pgPrompt(st);
+      });
+    }
+    grid.querySelectorAll('[data-pgs]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var i = +b.getAttribute('data-pgs');
+        explorerState.style = i;
+        grid.querySelectorAll('[data-pgs]').forEach(function (x) {
+          x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
+        });
+        pgShow(false);
+      });
+    });
+    if (explorerState.style >= 0) pgShow(true); /* restore after language re-render, no shimmer */
   }
 
   window.H2Lab = { render: renderLab };

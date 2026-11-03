@@ -538,3 +538,31 @@ html[dir="rtl"] .fs-frame { direction: rtl; }
   .fs-track { flex-direction: column; gap: 20px; transform: none !important; }
   .fs-frame { flex: none; width: 100%; transform: none !important; }
 }
+
+/* ============ AI playground: style explorer (lab toyC) ============ */
+.pg-toy { grid-column: 1 / -1; }
+.pg-chips { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.pg-subject { width: 100%; background: #05080a; border: 1px solid rgba(52, 211, 153, .35); border-radius: 12px; padding: 12px 14px; font: inherit; color: var(--text); }
+.pg-subject::placeholder { color: var(--muted); opacity: .7; }
+.pg-stage { position: relative; margin-top: 16px; }
+.pg-empty { color: var(--muted); font-size: .92rem; padding: 14px 2px; }
+.pg-shimmer { height: 220px; border-radius: 12px; overflow: hidden; position: relative; background: rgba(255, 255, 255, .03); }
+.pg-shimmer::after { content: ""; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, rgba(52, 211, 153, .25), transparent); animation: pg-sweep 1.2s linear infinite; }
+@keyframes pg-sweep { to { transform: translateX(100%); } }
+.pg-reveal { animation: pg-in .35s ease both; }
+@keyframes pg-in { from { opacity: 0; transform: translateY(8px); } }
+.pg-work { display: flex; gap: 16px; align-items: flex-start; }
+.pg-poster { position: relative; flex: 0 0 220px; cursor: pointer; }
+.pg-poster img { width: 100%; display: block; border-radius: 12px; }
+.pg-play { position: absolute; inset: 0; display: grid; place-items: center; color: #fff; font-size: 1.6rem; text-shadow: 0 2px 12px rgba(0, 0, 0, .8); pointer-events: none; }
+.pg-info h4 { margin: 0 0 8px; font-size: 1.05rem; }
+.pg-info p { margin: 0; color: var(--muted); font-size: .92rem; line-height: 1.8; }
+.pg-prompt { direction: ltr; text-align: left; }
+@media (max-width: 700px) {
+  .pg-work { flex-direction: column; }
+  .pg-poster { flex-basis: auto; width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pg-shimmer::after { animation: none; }
+  .pg-reveal { animation: none; }
+}
