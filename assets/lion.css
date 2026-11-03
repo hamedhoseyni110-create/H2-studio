@@ -507,3 +507,34 @@ html[lang="ar"] #faqList .faq-item summary::before { content: counter(lionFaq, a
 @media (prefers-reduced-motion: reduce) {
   #heroCtaPrimary::before, #heroCtaPrimary::after { animation: none; opacity: 0; }
 }
+
+/* ---------- videos filmstrip (scroll-driven 3D strip) ----------
+   The videos grid becomes a tall scroll runway; .fs-stage sticks inside
+   it while vertical scroll drives .fs-track horizontally (driver in
+   lion.js). First frame centers at p=0, last at p=1; frames tilt
+   rotateY(22deg) off-center, straight at center, with the site's one
+   depth system (translateZ 60px at center). Track is pointer-events
+   none + frames auto — the proven rail fix for preserve-3d hit-testing.
+   No transition on track/frames: the strip is scroll-scrubbed, never
+   autoplay. Mobile + reduced-motion collapse to the static poster list. */
+#videosGrid.fs-runway { display: block; position: relative; height: calc(100svh + 1900px); grid-template-columns: none; grid-auto-rows: auto; }
+#videosGrid.fs-runway .video-card { height: auto; }
+#videosGrid.fs-runway .video-card:nth-child(3) { order: 0; grid-column: auto; grid-row: auto; }
+#videosGrid.fs-runway .video-card:nth-child(5) { grid-column: auto; }
+#videosGrid.fs-runway .video-media { flex: none; aspect-ratio: 16 / 9; }
+.fs-stage { position: sticky; top: 0; height: 100svh; display: flex; align-items: center; justify-content: flex-start; overflow: hidden; perspective: 1000px; direction: ltr; }
+.fs-track { display: flex; flex: 0 0 auto; gap: 40px; align-items: center; transform-style: preserve-3d; pointer-events: none; will-change: transform; direction: ltr; }
+.fs-frame { flex: 0 0 420px; width: 420px; pointer-events: auto; }
+html[dir="rtl"] .fs-frame { direction: rtl; }
+@media (max-width: 700px) {
+  #videosGrid.fs-runway { height: auto; }
+  .fs-stage { position: static; height: auto; overflow: visible; perspective: none; display: block; }
+  .fs-track { flex-direction: column; gap: 20px; transform: none !important; }
+  .fs-frame { flex: none; width: 100%; transform: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #videosGrid.fs-runway { height: auto; }
+  .fs-stage { position: static; height: auto; overflow: visible; perspective: none; display: block; }
+  .fs-track { flex-direction: column; gap: 20px; transform: none !important; }
+  .fs-frame { flex: none; width: 100%; transform: none !important; }
+}

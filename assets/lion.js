@@ -276,6 +276,74 @@
   });
   kgMeasure(); kgPaint();
 
+  /* ---- videos filmstrip (scroll-driven 3D strip) ----
+     Geometry from the runway's OWN rect (Kage lesson — never assumed
+     heights): fsTop from getBoundingClientRect + scrollY, fsSpan from
+     offsetHeight - innerHeight. Track offset from MEASURED stage width,
+     frame width and gap, so the first frame centers at p=0 and the last
+     at p=1. Posters stay at full opacity through the whole range; the
+     strip is scroll-scrubbed (no transition), never autoplay.
+     app.js owns the DOM (re-render on language switch rebuilds stage +
+     track + frames), so frames are re-collected on every measure and on
+     h2:grids. Mobile + reduced-motion collapse to a static list via CSS;
+     the driver resets transforms there so no desktop paint can linger. */
+  var fsGrid = document.getElementById('videosGrid');
+  var fsStage = null, fsTrack = null, fsFrames = [];
+  var fsTop = 0, fsSpan = 1, fsW = 0, fsF = 0, fsGap = 0, fsN = 0, fsRaf = false;
+  function fsClamp(v, a, b) { return v < a ? a : (v > b ? b : v); }
+  function fsCollect() {
+    if (!fsGrid) return;
+    fsStage = fsGrid.querySelector('.fs-stage');
+    fsTrack = fsGrid.querySelector('.fs-track');
+    fsFrames = fsTrack ? Array.prototype.slice.call(fsTrack.querySelectorAll('.fs-frame')) : [];
+  }
+  function fsMeasure() {
+    fsCollect();
+    if (!fsGrid || !fsStage || !fsTrack || !fsFrames.length) return;
+    var r = fsGrid.getBoundingClientRect();
+    fsTop = r.top + window.scrollY;
+    fsSpan = Math.max(1, fsGrid.offsetHeight - window.innerHeight);
+    fsW = fsStage.clientWidth;
+    fsF = fsFrames[0].offsetWidth;
+    fsN = fsFrames.length;
+    var g = 0;
+    try { g = parseFloat(window.getComputedStyle(fsTrack).gap) || 0; } catch (e) {}
+    fsGap = g;
+  }
+  function fsPaint() {
+    fsRaf = false;
+    if (!fsTrack || !fsFrames.length) return;
+    var isMobile = window.innerWidth <= 700;
+    if (reduced || isMobile) {
+      fsTrack.style.transform = '';
+      fsFrames.forEach(function (f) { f.style.transform = ''; });
+      return;
+    }
+    var y = window.scrollY;
+    var p = fsClamp((y - fsTop) / fsSpan, 0, 1);
+    var travel = Math.max(0, (fsN - 1) * (fsF + fsGap));
+    var x0 = (fsW - fsF) / 2;
+    var x = x0 - p * travel;
+    fsTrack.style.transform = 'translate3d(' + x.toFixed(1) + 'px,0,0)';
+    var c = fsW / 2;
+    for (var i = 0; i < fsN; i++) {
+      var cx = x + i * (fsF + fsGap) + fsF / 2;
+      var d = fsClamp((cx - c) / (c || 1), -1, 1);
+      /* Rail convention: right of center -> -22deg, left -> +22deg.
+         Depth system: translateZ 60px (top) at center, 0 at the edges. */
+      var rot = -d * 22;
+      var tz = (1 - Math.abs(d)) * 60;
+      fsFrames[i].style.transform = 'translateZ(' + tz.toFixed(1) + 'px) rotateY(' + rot.toFixed(2) + 'deg)';
+    }
+  }
+  function fsKick() { if (!fsRaf) { fsRaf = true; requestAnimationFrame(fsPaint); } }
+  window.addEventListener('scroll', fsKick, { passive: true });
+  window.addEventListener('resize', function () { fsMeasure(); fsKick(); });
+  document.addEventListener('DOMContentLoaded', function () { fsMeasure(); fsKick(); });
+  window.addEventListener('load', function () { fsMeasure(); fsKick(); });
+  window.addEventListener('h2:grids', function () { fsMeasure(); fsKick(); });
+  fsMeasure(); fsPaint();
+
   /* ---- templates-style portfolio cards (approved 2026-10-31) ----
      Frame restyle is CSS (.lion-tcard); here only: small WebP posters
      (poster-first, like the reference) + a watch pill for cards without

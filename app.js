@@ -450,10 +450,20 @@ function renderPage() {
   el("videosTitle").textContent = c.videos.heading;
   el("videosSub").textContent = c.videos.sub;
   var vg = el("videosGrid");
+  vg.classList.add("fs-runway");
   vg.innerHTML = "";
+  /* filmstrip: the grid becomes a tall scroll runway; the stage sticks
+     inside it while vertical scroll drives the track horizontally
+     (driver in lion.js). Cards keep the exact lightbox behavior. */
+  var fsStage = document.createElement("div");
+  fsStage.className = "fs-stage";
+  var fsTrack = document.createElement("div");
+  fsTrack.className = "fs-track";
+  fsStage.appendChild(fsTrack);
+  vg.appendChild(fsStage);
   c.videos.items.forEach(function(item){
     var card = document.createElement("article");
-    card.className = "video-card";
+    card.className = "video-card fs-frame";
     card.innerHTML =
       '<div class="video-media" tabindex="0" role="button" aria-label="' + esc(c.videos.watch + ": " + item.title) + '">' +
       '<img src="' + esc(item.poster) + '" alt="" loading="lazy">' +
@@ -470,7 +480,7 @@ function renderPage() {
         if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); }
       });
     })(item);
-    vg.appendChild(card);
+    fsTrack.appendChild(card);
   });
   try { window.dispatchEvent(new CustomEvent("h2:grids")); } catch (e) {}
 
