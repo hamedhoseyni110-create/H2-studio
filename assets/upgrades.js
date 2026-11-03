@@ -214,4 +214,21 @@
       if (!tiltTicking) { tiltTicking = true; requestAnimationFrame(renderScrollTilt); }
     });
   }
+
+  /* ---------- light-divider sweep around #stats (dividers injection) ---------- */
+  /* Lines are pure CSS pseudos on #stats (top) and #about (bottom); this only
+     adds .div-swept once each, when the divider scrolls into view. The
+     upgrades.js Number Ticker above remains the SOLE owner of stat-number
+     animation — no second counting system is added. */
+  (function () {
+    if (reducedMotion || !("IntersectionObserver" in window)) return;
+    var targets = [$("#stats"), $("#about")].filter(Boolean);
+    if (!targets.length) return;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { en.target.classList.add("div-swept"); io.unobserve(en.target); }
+      });
+    }, { threshold: 0.15 });
+    targets.forEach(function (t) { io.observe(t); });
+  })();
 })();
