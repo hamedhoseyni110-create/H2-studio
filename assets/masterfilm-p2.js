@@ -1,11 +1,13 @@
 /* masterfilm-p2.js — P2: Z-axis camera tunnel (Argon Priority 2).
  *
  * Sections fly toward the camera through a 1000px perspective tunnel instead
- * of sliding up in Y: deep Z (translateZ -750px, ~0.57 scale, faded) -> Z 0
- * (full size, readable) -> past the camera (+360px, ~1.5 scale, faded out),
+ * of sliding up in Y: deep Z (translateZ -320px, ~0.76 scale, faded) -> Z 0
+ * (full size, readable) -> past the camera (+85px, ~1.09 scale, faded out),
  * plus a velocity-driven pitch tilt (rotateX, lion.js's smoothed-velocity
  * pattern). Pure function of scrollY + scroll velocity. No autonomous
  * motion: frozen when scroll stops, forward only with scroll.
+ * (2026-11-09 ghost fix: enter -320 / exit +85, was -500..-750 / +240..+360;
+ * the old 1.32x-1.56x exit ballooned downward over the next chapter.)
  *
  * OWNERSHIP (plan §1): the tunnel owns ONLY the chapter elements'
  * transform/opacity/inert. app.js's reveal and lion.js keep owning the
@@ -73,14 +75,26 @@
       ch.active = true;
       ch.top = docTop(ch.el);
       ch.bottom = ch.top + h;
-      ch.s0 = ch.top - vh;          /* enter start  */
-      ch.s1 = ch.top - vh * 0.35;   /* enter end    */
-      ch.s2 = ch.bottom - vh * 0.65;/* exit start   */
-      ch.s3 = ch.bottom;            /* exit end     */
+      /* 2026-11-09 ghost fix: asymmetric ramps + guaranteed rest floor.
+       * Old: enter = exit = 0.65*vh (548px MOB) — adjacent chapters' ramps
+       * overlapped by 252px in scrollY, both at 0.7-0.9 alpha at once.
+       * New: enter 0.36*vh (~304px), exit 0.22*vh (~186px). For adjacent
+       * chapters N+1 finishes entering 354px BEFORE N starts exiting, so
+       * at most one chapter is mid-fade at any scrollY. Rest = h + 0.42*vh
+       * (>= 355px MOB) — #services (251px) and .lab-trigger-wrap (230px)
+       * finally rest at alpha 1. The minRest guard is a no-op at these
+       * constants; it enforces the invariant if ramps are ever retuned. */
+      var enterSpan = vh * 0.36, exitSpan = vh * 0.22, minRest = vh * 0.28;
+      ch.s0 = ch.top - vh;               /* enter start  */
+      ch.s1 = ch.top - vh + enterSpan;   /* enter end    */
+      ch.s2 = ch.bottom - exitSpan;      /* exit start   */
+      ch.s3 = ch.bottom;                 /* exit end     */
       if (ch.noExit) { ch.s2 = Infinity; ch.s3 = Infinity; return; }
-      /* Short chapter (focus window inverted): collapse s1/s2 to their
-       * midpoint so Z stays continuous (0 on both sides), no pop. */
-      if (ch.s2 <= ch.s1) { var m = (ch.s1 + ch.s2) / 2; ch.s1 = m; ch.s2 = m; }
+      if (ch.s2 - ch.s1 < minRest) {
+        var m = (ch.s1 + ch.s2) / 2;
+        ch.s1 = Math.max(ch.s0 + 1, m - minRest / 2);
+        ch.s2 = Math.min(ch.s3 - 1, m + minRest / 2);
+      }
     });
   }
 
@@ -129,12 +143,22 @@
   if (RM) return; /* tunnel never runs under reduced motion */
 
   /* ---- depth + tilt ---- */
+  /* 2026-11-09 ghost fix: exit Z capped at +85px (1.09x) — the old +240/+360
+   * (1.32x/1.56x) ballooned the exiting chapter downward over the next one.
+   * Enter -320px both viewports (0.76x at perspective 1000): still an
+   * unmistakable arrival, without unreadable tiny text.
+   * 2026-11-09 fling fix (کشش): tiltCap MOB 4 -> 1 — at fling speeds every
+   * section leaned back at the full 4 deg for the whole fling, which read
+   * as the page itself stretching. The cap only binds at high scroll
+   * speeds (below it the tilt is proportional: ~0.6 deg at 300 px/s), so
+   * slow/moderate scrolls keep their pitch cue; 1 deg keeps a whisper of
+   * it. DESK stays 8. */
   function depth() {
     var mob = window.innerWidth <= 900;
     return {
-      enter: mob ? -500 : -750,
-      exit: mob ? 240 : 360,
-      tiltCap: mob ? 4 : 8
+      enter: -320,
+      exit: 85,
+      tiltCap: mob ? 1 : 8
     };
   }
 
@@ -146,18 +170,23 @@
     if (y <= ch.s3) return 0.78 + (y - ch.s2) / Math.max(ch.s3 - ch.s2, 1) * 0.22;
     return 1 + (y - ch.s3) / Math.max(ch.s3 - ch.s2, 1) * 0.22;
   }
+  /* 2026-11-09 ghost fix: enter alpha eases in (t^2); exit alpha falls off
+   * fast ((1-t)^2.4: 0.19 at halfway, was 0.50 linear) and the exiting
+   * chapter lifts upward (-32px) instead of ballooning downward. No enter
+   * translateY: lion.js reads inner-node tops every frame — a Y shift
+   * during entry would move tops and risk entrance pops. */
   function stateFor(y, ch, d) {
-    if (y <= ch.s0) return { z: d.enter, alpha: 0 };
+    if (y <= ch.s0) return { z: d.enter, alpha: 0, y: 0 };
     if (y <= ch.s1) {
       var t = (y - ch.s0) / (ch.s1 - ch.s0);
-      return { z: d.enter * (1 - t), alpha: t };
+      return { z: d.enter * (1 - t), alpha: t * t, y: 0 };
     }
-    if (y <= ch.s2) return { z: 0, alpha: 1 };
+    if (y <= ch.s2) return { z: 0, alpha: 1, y: 0 };
     if (y <= ch.s3) {
       var t2 = (y - ch.s2) / (ch.s3 - ch.s2);
-      return { z: d.exit * t2, alpha: 1 - t2 };
+      return { z: d.exit * t2, alpha: Math.pow(1 - t2, 2.4), y: -32 * t2 };
     }
-    return { z: d.exit, alpha: 0 };
+    return { z: d.exit, alpha: 0, y: -32 };
   }
 
   function updateChapter(ch, y, d, tilt) {
@@ -169,20 +198,21 @@
     var st = stateFor(y, ch, d);
     var inert = st.alpha <= 0.02;
     /* Rest state: clear inline styles — chapter is pixel-identical to P1. */
-    if (Math.abs(st.z) < 0.5 && Math.abs(tilt) < 0.05 && st.alpha >= 0.999) {
+    if (Math.abs(st.z) < 0.5 && Math.abs(st.y) < 0.5 && Math.abs(tilt) < 0.05 && st.alpha >= 0.999) {
       clearChapter(ch);
       return;
     }
     var z = Math.round(st.z * 10) / 10;
+    var yy = Math.round(st.y * 10) / 10;
     var a = Math.round(st.alpha * 1000) / 1000;
     var t = Math.round(tilt * 100) / 100;
     var s = ch.state;
-    if (!s.cleared && s.z === z && s.a === a && s.t === t && s.inert === inert) return;
+    if (!s.cleared && s.z === z && s.yy === yy && s.a === a && s.t === t && s.inert === inert) return;
     ch.el.style.transform =
-      'perspective(1000px) translate3d(0, 0, ' + z + 'px) rotateX(' + t + 'deg)';
+      'perspective(1000px) translate3d(0, ' + yy + 'px, ' + z + 'px) rotateX(' + t + 'deg)';
     ch.el.style.opacity = String(a);
     ch.el.inert = inert;
-    ch.state = { cleared: false, z: z, a: a, t: t, inert: inert };
+    ch.state = { cleared: false, z: z, yy: yy, a: a, t: t, inert: inert };
   }
 
   /* ---- main loop: pure function of scrollY + smoothed velocity ---- */

@@ -183,7 +183,7 @@
       color: inherit;
       aspect-ratio: 16 / 10;
       border-radius: 22px;
-      background: rgba(4, 7, 6, 0.76);
+      background: rgba(6, 11, 9, 0.90);
       border: 1.5px solid color-mix(in srgb, var(--beat-accent, var(--emerald)) 60%, transparent);
       box-shadow:
         0 24px 60px rgba(0, 0, 0, 0.92),
@@ -594,7 +594,9 @@
     #main #processSteps li:nth-child(4) { --acc: #8b5cf6; }
     #main #processSteps li:nth-child(5) { --acc: #fb923c; }
     #main #processSteps li {
-      background: rgba(255, 255, 255, 0.04);
+      background: rgba(6, 11, 9, 0.90);
+      -webkit-backdrop-filter: blur(18px) saturate(1.4);
+      backdrop-filter: blur(18px) saturate(1.4);
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-top: 3px solid var(--acc, #34d399);
       border-radius: 20px;
@@ -705,7 +707,9 @@
       cursor: pointer;
       font: inherit;
       color: inherit;
-      background: rgba(4, 7, 6, 0.76);
+      background: rgba(6, 11, 9, 0.90);
+      -webkit-backdrop-filter: blur(18px) saturate(1.4);
+      backdrop-filter: blur(18px) saturate(1.4);
       border: 1.5px solid rgba(52, 211, 153, 0.35);
       border-radius: 22px;
       padding: 22px 26px;
