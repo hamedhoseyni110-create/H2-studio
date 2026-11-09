@@ -91,7 +91,11 @@
 
 /* ---- reduced motion: static stack + static ring, no autoplay ---- */
 .sr-reduced.sr-section { height: auto; }
-.sr-reduced .sr-sticky { position: static; height: auto; overflow: visible; }
+/* overflow stays hidden in RM too: the big .sr-word (nowrap, 9vw) is wider than
+   the viewport in Persian and otherwise stretches the whole document to 1.5x
+   (proven 2026-11-06: scrollWidth 2160 at 1440px in FA+RM). Nothing inside is
+   sticky in RM mode (all static), so the clip is safe here. */
+.sr-reduced .sr-sticky { position: static; height: auto; overflow: hidden; }
 .sr-reduced .sr-stack {
   position: static; display: flex; flex-direction: column;
   gap: 24px; align-items: center; padding: 24px 16px;

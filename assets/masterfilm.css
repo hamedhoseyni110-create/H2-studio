@@ -1,0 +1,787 @@
+/* Master Film (two-act) — adapted from the assembly's CSS: the film stage is
+   sticky (not fixed) so Act II slides over it; overlays/progress are absolute
+   inside the stage. Page body rules stay with the v2 stylesheets. */
+
+    :root {
+      --bg: #040706;
+      --emerald: #34d399;
+      --cyan: #22d3ee;
+      --magenta: #ec4899;
+      --violet: #8b5cf6;
+      --orange: #fb923c;
+      --text-main: #f3f7f5;
+      --text-muted: #94a3b8;
+    }
+
+    .story-scroll-container, .story-scroll-container *,
+    .film-stage, .film-stage * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+
+    /* بوم ثابت در کل صفحه: حلقه‌ی طلایی در پرده‌ی دوم هم پشت صفحه می‌ماند */
+    .film-backdrop-fixed {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100svh;
+      background-color: var(--bg);
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    /* بخش‌های پرده‌ی دوم باید بالای بوم ثابت بنشینند */
+    main > section, .footer {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* =========================================================
+       ۱. لایه‌ی فیلمِ پیوسته‌ی پس‌زمینه (حفظ دائمی نور واقعی ویدیو از بالا تا پایین)
+       ========================================================= */
+    .film-stage {
+      position: sticky;
+      top: 0;
+      inset-inline: 0;
+      width: 100%;
+      height: 100svh;
+      z-index: 2;
+      pointer-events: none;
+      overflow: hidden;
+      perspective: 1100px;
+      transform-style: preserve-3d;
+    }
+
+    #masterFilmCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      will-change: transform;
+    }
+
+    /* تگ ویدیوی کمکی (در صورتی که برای بخشی مستقیماً فایل mp4/webm داده شود) */
+    #auxiliaryVideo {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* نوار پیشرفت بسیار ظریف در لبه‌ی بالایی صفحه */
+    .scroll-progress-line {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--orange), var(--violet), var(--magenta), var(--cyan), var(--emerald));
+      transform-origin: 100% 50%;
+      transform: scaleX(0);
+      will-change: transform;
+      z-index: 90;
+      pointer-events: none;
+    }
+
+    /* =========================================================
+       ۲. ریل اسکرول داستان (۶۰۰vh) و لایه‌ی محتوای DOM روی ویدیو
+       ========================================================= */
+    .story-scroll-container {
+      position: relative;
+      width: 100%;
+      height: 750vh;
+      z-index: 10;
+    }
+
+    /* هر بخش در موقعیت زمانیِ متناظر با رسیدنِ نورِ ویدیو قرار می‌گیرد */
+    .beat-overlay {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100svh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.5rem;
+      opacity: 0;
+      transform: translate3d(0, 24px, 0);
+      transform-style: preserve-3d;
+      will-change: transform, opacity;
+      pointer-events: none;
+      z-index: 12;
+    }
+
+    .beat-overlay.is-interactive {
+      pointer-events: auto;
+    }
+
+    /* چیدمان هر ضرب متناسب با جایگاه نور در فیلمِ پس‌زمینه */
+    .beat-layout-center {
+      align-items: center;
+      text-align: center;
+    }
+
+    .beat-layout-start {
+      align-items: flex-start;
+      padding-right: clamp(1.25rem, 8vw, 7rem);
+    }
+
+    .beat-layout-end {
+      align-items: flex-end;
+      padding-left: clamp(1.25rem, 8vw, 7rem);
+    }
+
+    /* در ضرب ۳ (شیر سیاه)، هیچ کارتی روی صورت شیر نمی‌نشیند؛ فقط یک عنوان ظریف در پایین قاب */
+    .beat-layout-lion {
+      justify-content: flex-end;
+      align-items: center;
+      padding-bottom: 6vh;
+      text-align: center;
+    }
+
+    .beat-panel {
+      width: min(90vw, 540px);
+    }
+
+    .beat-panel-wide {
+      width: min(92vw, 740px);
+    }
+
+    .beat-tag {
+      display: inline-block;
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 0.25rem 0.8rem;
+      border-radius: 999px;
+      background: rgba(4, 7, 6, 0.78);
+      border: 1px solid var(--beat-accent, var(--emerald));
+      color: var(--beat-accent, var(--emerald));
+      margin-bottom: 0.65rem;
+    }
+
+    .beat-heading {
+      font-size: clamp(1.85rem, 4.6vw, 3.2rem);
+      font-weight: 900;
+      line-height: 1.25;
+      margin-bottom: 1rem;
+      color: var(--text-main);
+      text-shadow: 0 10px 30px rgba(4, 7, 6, 0.95);
+    }
+
+    /* کارت شیشه‌ای تیره که نورِ واقعیِ ویدیو از دور و پشت آن دیده می‌شود */
+    /* کارت‌ها لینک‌اند: کل کارت (نه فقط دکمه) قابل کلیک است */
+    .work-showcase-card {
+      position: relative;
+      width: 100%;
+      text-decoration: none;
+      color: inherit;
+      aspect-ratio: 16 / 10;
+      border-radius: 22px;
+      background: rgba(4, 7, 6, 0.76);
+      border: 1.5px solid color-mix(in srgb, var(--beat-accent, var(--emerald)) 60%, transparent);
+      box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.92),
+        0 0 35px color-mix(in srgb, var(--beat-accent, var(--emerald)) 18%, transparent);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
+    }
+
+    .work-showcase-card:hover {
+      transform: translate3d(0, -4px, 18px) scale(1.015);
+      box-shadow:
+        0 30px 70px rgba(0, 0, 0, 0.95),
+        0 0 48px color-mix(in srgb, var(--beat-accent, var(--emerald)) 36%, transparent);
+    }
+
+    .poster-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+    }
+
+    .poster-slot-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background: rgba(4, 7, 6, 0.82);
+      z-index: 1;
+    }
+
+    .slot-label {
+      font-family: monospace;
+      font-size: 0.78rem;
+      padding: 0.3rem 0.7rem;
+      border-radius: 8px;
+      background: #040706;
+      border: 1px solid var(--beat-accent, var(--emerald));
+      color: var(--beat-accent, var(--emerald));
+    }
+
+    .work-card-bar {
+      position: relative;
+      z-index: 3;
+      margin: auto 0.9rem 0.9rem;
+      padding: 0.65rem 0.95rem;
+      border-radius: 14px;
+      background: rgba(4, 7, 6, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .work-card-name {
+      font-size: 0.94rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .work-card-btn {
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--beat-accent, var(--emerald));
+      padding: 0.28rem 0.75rem;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--beat-accent, var(--emerald)) 15%, transparent);
+      border: 1px solid color-mix(in srgb, var(--beat-accent, var(--emerald)) 45%, transparent);
+    }
+
+    /* چیدمان دوتایی ضرب ۴ (عکس با نور بنفش + اپ با نور نارنجی) */
+    /* چیدمان دوتایی ضرب ۴ — ltr تا کارت عکس (بنفش) روی قاب بنفش چپ و کارت اپ
+       (نارنجی) روی قاب نارنجی راست بنشیند؛ خود کارت‌ها rtl می‌مانند */
+    .dual-works-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 1.15rem;
+      width: 100%;
+      direction: ltr;
+    }
+
+    .dual-works-grid .work-showcase-card {
+      aspect-ratio: auto;
+      min-height: 280px;
+      direction: rtl;
+    }
+
+    /* پوستر اپ حالا عمودی و دقیقاً هم‌نسبت قاب نارنجی است (۳:۵)؛ در موبایل
+       با contain کامل دیده می‌شود، در دسکتاپ با cover دقیقاً قاب را پر می‌کند */
+    .card-app {
+      background: radial-gradient(circle at 50% 42%, rgba(251, 146, 60, 0.22), rgba(4, 7, 6, 0.96) 78%);
+    }
+    .card-app .poster-img {
+      object-fit: contain;
+      object-position: center 38%;
+      padding: 0.85rem 0.85rem 4.8rem;
+    }
+
+    /* موبایل: کارت افقی است و پوستر عمودی — با cover برشِ بالای صفحه‌ی اپ
+       (نوار وضعیت + سربرگ + کارت امتیاز) دیده می‌شود، نه تمبر پستی وسط کارت */
+    @media (max-width: 899px) {
+      .card-app .poster-img {
+        object-fit: cover;
+        object-position: center 10%;
+        padding: 0;
+      }
+    }
+
+    /* ضرب ۴ در دسکتاپ: کارت‌ها دقیقاً هم‌اندازه‌ی قاب‌های نئونی خودِ فیلم‌اند
+       (مختصات از فریم واقعی سکانس ۴، با جبران زوم ۱٫۰۶ کانوس:
+       قاب بنفش ۱۲٫۷–۴۴٫۷٪ × ۲۴٫۳–۷۴٫۶٪، قاب نارنجی ۶۲٫۷–۸۶٪ × ۱۷٫۱–۷۹٫۵٪)
+       عنوان و تگ پایین صفحه می‌نشینند — بالای صفحه بین ناو (۷۴px) و بالای
+       قاب نارنجی (۱۷٫۱٪) جا برای تگ+عنوان نیست */
+    @media (min-width: 900px) {
+      [data-beat="4"] {
+        justify-content: flex-end;
+        padding-top: 0;
+        padding-bottom: 4vh;
+      }
+      [data-beat="4"] .dual-works-grid {
+        position: absolute;
+        inset: 0;
+        display: block;
+      }
+      [data-beat="4"] .work-showcase-card {
+        position: absolute;
+        min-height: 0;
+        aspect-ratio: auto;
+      }
+      [data-beat="4"] .card-photo {
+        left: 12.7%;
+        top: 24.3%;
+        width: 32%;
+        height: 50.3%;
+      }
+      [data-beat="4"] .card-app {
+        left: 62.7%;
+        top: 17.1%;
+        width: 23.3%;
+        height: 62.4%;
+      }
+      /* پوستر اپ عمودی و هم‌نسبت قاب است — در دسکتاپ cover دقیقاً قاب را پر
+         می‌کند، بدون برش و بدون فضای مرده (موبایل contain می‌ماند) */
+      [data-beat="4"] .card-app .poster-img {
+        object-fit: cover;
+        padding: 0;
+      }
+    }
+
+    /* ضرب ۴: کج‌شدن کارت‌ها به‌سمت انگشت + برق نور دنبال انگشت (دموی بچ ۲۷) */
+    [data-beat="4"] .work-showcase-card {
+      transform-style: preserve-3d;
+      transition: transform .12s ease-out, box-shadow .35s ease;
+      touch-action: pan-y;
+    }
+    [data-beat="4"] .work-showcase-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(circle at var(--sx, 50%) var(--sy, 50%), rgba(255, 255, 255, 0.28), transparent 55%);
+      pointer-events: none;
+      z-index: 5;
+      opacity: 0;
+      transition: opacity .25s ease;
+    }
+    [data-beat="4"] .work-showcase-card.tilt-on::before {
+      opacity: 1;
+    }
+
+    /* ضرب ۴، کارت عکس: افشای شیر با اشاره — لایه‌ی مرده (خاکستری) زیر،
+       لایه‌ی زنده (رنگی) با دایره‌ی دنبال‌کننده‌ی انگشت؛ در حالت عادی یک
+       روزنه‌ی ۶۴px زنده همیشه هست تا کارت خاکستریِ کامل خوانده نشود */
+    .card-photo .poster-img.reveal-dead {
+      filter: grayscale(1) brightness(.55) contrast(1.05);
+    }
+    .card-photo .poster-img.reveal-living {
+      z-index: 2;
+      pointer-events: none;
+    }
+    .reveal-ring {
+      position: absolute;
+      width: 110px;
+      height: 110px;
+      border: 2px solid rgba(255, 255, 255, 0.85);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 6;
+    }
+
+    /* =========================================================
+       ۳. ضرب ۵: پایان و دعوت (هم‌نشینی حلقه‌ی نور ویدیو با دکمه‌ی واقعی واتساپ)
+       ========================================================= */
+    .final-cta-stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.4rem;
+      padding: 2.2rem 1.75rem;
+      border-radius: 26px;
+      background: rgba(4, 7, 6, 0.72);
+      border: 1.5px solid rgba(52, 211, 153, 0.45);
+      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.95);
+    }
+
+    /* برش ۷ (آرگون): ضرب ۵ شد هاب پورتال — ۴ قرص درخشان برای پرش سریع به
+       سایت‌ها / ویدیوها / اپلیکیشن‌ها / شروع سفارش. پایان کاذب حذف شد؛
+       واتساپ در فینال استودیو می‌ماند. هر قرص رنگ خودش را دارد. */
+    .beat5-hub {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 1.1rem;
+    }
+    .beat5-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 24px;
+      border-radius: 999px;
+      border: 1.5px solid color-mix(in srgb, var(--pill-accent, #fb923c) 60%, transparent);
+      background: rgba(4, 7, 6, 0.6);
+      color: #fff;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 800;
+      text-decoration: none;
+      cursor: pointer;
+      box-shadow: 0 0 26px color-mix(in srgb, var(--pill-accent, #fb923c) 30%, transparent);
+      backdrop-filter: blur(6px);
+      transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .beat5-pill:hover,
+    .beat5-pill:focus-visible {
+      transform: translateY(-2px);
+      border-color: var(--pill-accent, #fb923c);
+      box-shadow: 0 0 40px color-mix(in srgb, var(--pill-accent, #fb923c) 50%, transparent);
+    }
+
+    /* نشانگر وضعیت فریم/سکانس در گوشه پایین برای تست و جایگذاری دارایی‌ها */
+    .seq-debug-pill {
+      display: none;
+      position: fixed;
+      bottom: 0.85rem;
+      left: 0.85rem;
+      z-index: 30;
+      font-family: monospace;
+      font-size: 0.72rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 6px;
+      background: rgba(4, 7, 6, 0.85);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      color: var(--emerald);
+      pointer-events: none;
+    }
+
+    @media (max-width: 768px) {
+      .beat-layout-start,
+      .beat-layout-end {
+        align-items: center;
+        padding-right: 1.15rem;
+        padding-left: 1.15rem;
+      }
+      .dual-works-grid {
+        grid-template-columns: 1fr;
+      }
+      .dual-works-grid .work-showcase-card {
+        min-height: 200px;
+      }
+      body.is-scrubbing-film #narengi {
+        opacity: 0.28;
+        pointer-events: none;
+      }
+    }
+
+    /* احترام کامل به Reduced Motion */
+    @media (prefers-reduced-motion: reduce) {
+      .story-scroll-container {
+        height: auto;
+        padding: 3rem 1rem 5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4rem;
+      }
+      .film-stage {
+        position: relative !important;
+        height: auto !important;
+        padding: 4rem 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3.5rem;
+        perspective: none;
+      }
+      .beat-overlay {
+        position: relative !important;
+        inset: auto !important;
+        height: auto !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
+        pointer-events: auto !important;
+      }
+      /* ضرب ۴ در RM: گرید دسکتاپ (absolute روی صحنه‌ی 100svh) روی اورلیِ
+         کوتاهِ RM می‌افتد و عنوان زیر کارت‌ها می‌ماند — در RM گرید به جریان
+         عادی برمی‌گردد تا عنوان بالا و کارت‌ها زیرش چیده شوند */
+      [data-beat="4"] .dual-works-grid {
+        position: static !important;
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+      }
+      [data-beat="4"] .work-showcase-card {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        width: auto !important;
+        height: auto !important;
+        min-height: 280px;
+      }
+    }
+  
+    /* برش ۱ (آرگون): تعرفه + سوالات کنار هم — دو سکشن روی هم به یک ردیف دو ستونه.
+       سکشن‌ها آی‌دی‌شان را نگه می‌دارند (app.js همان‌طور پرشان می‌کند)؛ فقط چیدمان عوض شده. */
+    .duo-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 0 56px;
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 96px 22px 20px;
+      align-items: start;
+    }
+    .duo-wrap > .section {
+      padding: 0;
+      max-width: none;
+      margin: 0;
+    }
+    @media (max-width: 900px) {
+      .duo-wrap {
+        grid-template-columns: 1fr;
+        gap: 64px 0;
+      }
+    }
+
+    /* برش ۶ (آرگون): فینال استودیو — آمار + درباره + تماس در یک سکشن واحد.
+       سکشن‌های درونی پدینگ ۹۶ پیکسلی‌شان را از دست می‌دهند؛ در دسکتاپ آمار و
+       درباره کنار هم‌اند، بیانیه وسط می‌نشیند و تماس تمام‌عرض پایین است. */
+    #studio-finale > .section {
+      padding: 0 0 56px;
+      max-width: none;
+      margin: 0;
+    }
+    #studio-finale > .section:last-child {
+      padding-bottom: 0;
+    }
+    @media (min-width: 901px) {
+      #studio-finale {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0 56px;
+      }
+      #studio-finale > #stats { grid-column: 1; grid-row: 1; }
+      #studio-finale > #about { grid-column: 2; grid-row: 1; }
+      #studio-finale > #lionManifesto { grid-column: 1 / -1; grid-row: 2; }
+      #studio-finale > #contact { grid-column: 1 / -1; grid-row: 3; }
+      #studio-finale > #lionManifesto {
+        padding: 48px 20px;
+      }
+      #studio-finale #about .about-wrap {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      #studio-finale #about .about-photo {
+        max-width: 260px;
+      }
+      #studio-finale #statsGrid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    /* برش ۵ (آرگون): فرایند به نوار بنتوی نئون — ۵ کارت در یک ردیف با رنگ
+       ویژه‌ی هر گام (سبز/فیروزه‌ای/سرخابی/بنفش/نارنجی، هم‌خانواده‌ی ضرب‌های
+       فیلم) + شیشه و لیفت سه‌بعدی روی هاور. صادقانه: سکشن همین حالا هم فقط
+       ۴۸۰ پیکسل بود — «کوه ۴۰۰vh» آرگون در این بیلد وجود نداشت (آنچه او در
+       ویدیو دیده بود، چمن و هاله‌ی خود فیلم بود که از پشت سکشن پیداست)؛ پس
+       این برش بیشتر نما را عوض می‌کند تا طول را. خط گرادیانی روند و روشن‌شدن
+       گام‌ها سر جاش است. */
+    #main #process {
+      padding: 56px 22px 16px;
+    }
+    #main #processSteps li:nth-child(1) { --acc: #34d399; }
+    #main #processSteps li:nth-child(2) { --acc: #22d3ee; }
+    #main #processSteps li:nth-child(3) { --acc: #ec4899; }
+    #main #processSteps li:nth-child(4) { --acc: #8b5cf6; }
+    #main #processSteps li:nth-child(5) { --acc: #fb923c; }
+    #main #processSteps li {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-top: 3px solid var(--acc, #34d399);
+      border-radius: 20px;
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s ease, box-shadow 0.35s ease;
+    }
+    #main #processSteps li:hover {
+      transform: translateY(-4px);
+      border-color: color-mix(in srgb, var(--acc, #34d399) 55%, transparent);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5), 0 0 24px color-mix(in srgb, var(--acc, #34d399) 22%, transparent);
+    }
+    #main #processSteps .step-num {
+      background: linear-gradient(135deg, var(--acc, #34d399), var(--acc, #34d399));
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    /* برش ۴ (آرگون): نمونه‌کار + ویدیو شدند یک ویترین (#showcase)؛ سکشن
+       آکادمی پنهان شد چون محتوایش (یک آموزش وردپرس) از قبل در تب «آکادمی»
+       ریل نمونه‌کار هست و با کلیک همان‌جا پخش می‌شود. سکشن در DOM می‌ماند
+       چون app.js آن را پر می‌کند (حذفش رندر صفحه را می‌شکند)؛ فقط دیده
+       نمی‌شود. فیلم‌استریپ ویدیوها دست نخورد — ۲ فیلم آن (مونتاژ برگر،
+       سفر قهوه) هیچ‌جای دیگری نیست و خودش یک لحظه‌ی سه‌بعدی است. */
+    .showcase-wrap {
+      position: relative;
+      z-index: 1;
+    }
+    #academy {
+      display: none;
+    }
+
+    /* برش ۳ (آرگون): خدمات به ردیف قرص — ۵ کارت بلند شدند یک ردیف قرص کوتاه
+       بالای نمونه‌کارها. کارت‌ها همان‌طور رندر می‌شوند و کلیکشان به نمونه‌ی
+       مربوطه می‌رود؛ فقط نمایش عوض شد: توضیح یک‌خطی، مراحل ساخت اپ و عکس
+       کارت‌ها پنهان می‌شود (داده‌شان در copy-data سر جاش است). */
+    #main #services {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px 18px;
+      padding: 44px 22px 6px;
+    }
+    #main #services .section-title {
+      font-size: 1.15rem;
+      margin: 0;
+      flex: none;
+    }
+    #main #servicesGrid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      flex: 1 1 auto;
+    }
+    #main #servicesGrid .service-card {
+      flex: none;
+    }
+    #main #servicesGrid .sy-glass {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 18px;
+      border-radius: 999px;
+    }
+    #main #servicesGrid .sy-halo,
+    #main #servicesGrid .sy-light,
+    #main #servicesGrid .sy-visual,
+    #main #servicesGrid .sy-glass p,
+    #main #servicesGrid .sy-glass .app-flow,
+    #main #servicesGrid .sy-glass .service-go {
+      display: none;
+    }
+    #main #servicesGrid .sy-glass .service-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      margin: 0;
+      font-size: 0.85rem;
+      flex: none;
+    }
+    #main #servicesGrid .sy-glass h3 {
+      font-size: 0.98rem;
+      margin: 0;
+      padding: 0;
+      border-top: none;
+    }
+    @media (max-width: 900px) {
+      #main #services {
+        padding: 36px 22px 4px;
+      }
+    }
+
+    /* برش ۲ (آرگون): آزمایشگاه به‌صورت مودال — کارت بازکننده در جریان صفحه،
+       خود آزمایشگاه در یک پنجره‌ی ثابت؛ آی‌دی‌ها دست نخورده‌اند تا app.js و
+       playful.js همان‌طور پرشان کنند. */
+    .lab-trigger-wrap {
+      position: relative;
+      z-index: 1;
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 64px 22px 8px;
+    }
+    .lab-trigger {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      text-align: start;
+      cursor: pointer;
+      font: inherit;
+      color: inherit;
+      background: rgba(4, 7, 6, 0.76);
+      border: 1.5px solid rgba(52, 211, 153, 0.35);
+      border-radius: 22px;
+      padding: 22px 26px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s ease;
+    }
+    .lab-trigger:hover {
+      transform: translate3d(0, -4px, 18px);
+      border-color: rgba(52, 211, 153, 0.7);
+    }
+    .lab-trigger-title {
+      display: block;
+      font-size: 1.35rem;
+      font-weight: 800;
+    }
+    .lab-trigger-sub {
+      display: block;
+      color: var(--muted);
+      font-size: 0.98rem;
+      margin-top: 4px;
+    }
+    .lab-trigger-arrow {
+      font-size: 1.6rem;
+      color: var(--emerald);
+      flex: none;
+    }
+    .lab-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(2, 4, 3, 0.85);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .lab-overlay[hidden] {
+      display: none;
+    }
+    .lab-dialog {
+      width: min(920px, 100%);
+      max-height: 88svh;
+      overflow: auto;
+      background: var(--bg);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      border-radius: 22px;
+      position: relative;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9);
+    }
+    .lab-close {
+      position: absolute;
+      top: 14px;
+      inset-inline-end: 14px;
+      z-index: 2;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(4, 7, 6, 0.8);
+      color: #fff;
+      font-size: 1.4rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .lab-dialog .lab-in-modal {
+      padding: 28px 28px 32px;
+    }
+    @media (max-width: 900px) {
+      .lab-trigger-wrap {
+        padding: 48px 22px 8px;
+      }
+      .lab-dialog {
+        max-height: 92svh;
+      }
+      .lab-dialog .lab-in-modal {
+        padding: 22px 18px 26px;
+      }
+    }

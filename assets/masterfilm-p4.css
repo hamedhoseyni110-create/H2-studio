@@ -1,0 +1,21 @@
+/* masterfilm-p4.css — P4: camera-spline coordinate projection (Argon Priority 4).
+ *
+ * One rule only: drop the transform easing on the two tracked cards, so the
+ * per-frame JS transform lands exactly instead of lagging 0.35s behind the
+ * anchor table (a 0.35s transition would fight every rAF write and the card
+ * would never settle on its table value). The hover-glow easing
+ * (box-shadow) is kept.
+ *
+ * The :hover transform lift is NOT overridden here: P4's inline transform
+ * beats it while P4 runs (inline-style precedence), and if P4's JS ever
+ * failed to load the CSS hover lift must still work — P4 composes the lift
+ * into its computed transform instead (masterfilm-p4.js §3).
+ * Scoped under no-preference: under reduced motion P4 never runs and the
+ * cards keep their stock transition + hover.
+ * No perspective anywhere; no Border Beam; no new assets. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-beat="1"] .work-showcase-card,
+  [data-beat="2"] .work-showcase-card {
+    transition: box-shadow 0.35s ease;
+  }
+}

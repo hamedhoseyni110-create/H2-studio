@@ -343,15 +343,15 @@ function renderPage() {
   el("stickyCta").textContent = u.sticky_order;
   el("stickyCta").setAttribute("aria-label", u.sticky_order);
 
-  /* hero */
-  el("heroTitle").textContent = c.hero.title;
-  el("heroSubtitle").textContent = c.hero.subtitle;
-  el("heroCtaPrimary").textContent = c.hero.cta_primary;
-  el("heroCtaSecondary").textContent = c.hero.cta_secondary;
-  el("scrollHintText").textContent = c.hero.hint;
-  el("interactHint").textContent = c.hero.interact || "";
+  /* hero (skipped on the two-act page: the Master Film replaces the hero) */
+  var _ht = el("heroTitle"); if (_ht) _ht.textContent = c.hero.title;
+  var _hs = el("heroSubtitle"); if (_hs) _hs.textContent = c.hero.subtitle;
+  var _hp = el("heroCtaPrimary"); if (_hp) _hp.textContent = c.hero.cta_primary;
+  var _hq = el("heroCtaSecondary"); if (_hq) _hq.textContent = c.hero.cta_secondary;
+  var _sh = el("scrollHintText"); if (_sh) _sh.textContent = c.hero.hint;
+  var _ih = el("interactHint"); if (_ih) _ih.textContent = c.hero.interact || "";
   window.addEventListener("hero:first-interact", function(){
-    el("interactHint").classList.add("gone");
+    var _ih2 = el("interactHint"); if (_ih2) _ih2.classList.add("gone");
   }, { once: true });
 
   /* services */

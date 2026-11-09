@@ -1,0 +1,27 @@
+/* masterfilm-p2.css — P2 camera tunnel (Argon Priority 2).
+ * The tunnel engine (masterfilm-p2.js) owns each chapter's transform/opacity.
+ * transform-origin 50% 0 (top edge): lion.js reads getBoundingClientRect().top
+ * of titles/cards/steps every frame — a top-anchored chapter keeps every top
+ * exact during flight, so their entrances never pop when the tunnel clears.
+ * NO perspective property anywhere: it would re-parent the fixed film
+ * backdrop. The tunnel uses the perspective() transform FUNCTION per chapter.
+ * Reduced motion: the tunnel JS never runs; this guard is belt-and-braces. */
+/* The tunnel scales chapters past the viewport width during exit (up to
+ * 1.56x desktop / 1.32x mobile). Clip the horizontal spill at <main> so the
+ * document never gains horizontal scroll. overflow-x: clip (NOT hidden):
+ * clip does not create a scroll container, so the sticky filmstrip/KAGE
+ * stages and the fixed film backdrop keep working exactly as in P1. */
+main {
+  overflow-x: clip;
+}
+
+.p2-chapter {
+  transform-origin: 50% 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .p2-chapter {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}

@@ -1,0 +1,61 @@
+/* masterfilm-p3.css — P3 multi-plane depth separation (Argon Priority 3).
+ * Foreground bokeh plane: a fixed, full-viewport layer of soft
+ * radial-gradient blobs (pure CSS, zero downloads) that rushes past the
+ * content at 1.35x scroll while the film canvas behind barely sways
+ * (±12px, zero during beat 4). The blobs pass IN FRONT of card edges —
+ * that is the depth cue. pointer-events: none, so taps pass through.
+ * The layer is TILE-taller than the viewport so the repeat-y wrap never
+ * exposes a gap; --p3-tile is set by masterfilm-p3.js (1400px desktop /
+ * 1100px mobile) and is the single source of truth.
+ * NO perspective property anywhere (it would re-parent the fixed film
+ * backdrop — P2 §2). NO Border Beam (revoked 2026-11-06). */
+
+.p3-foreground {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: calc(-1 * var(--p3-tile, 1400px));
+  height: calc(100svh + 2 * var(--p3-tile, 1400px));
+  z-index: 40; /* above sections (1) + film stage (2), below nav (100) / modals (150+) */
+  pointer-events: none;
+  overflow: hidden;
+  background-image: var(--p3-blobs);
+  background-size: 100% var(--p3-tile, 1400px);
+  background-repeat: repeat-y;
+  opacity: 0.9;
+  will-change: transform;
+}
+
+/* Desktop blob tile (6 blobs, edge-weighted, centre mostly clear).
+ * Alphas are blob-centre values; layer opacity 0.9 multiplies them. */
+.p3-foreground {
+  --p3-blobs:
+    radial-gradient(circle 170px at 8% 180px, rgba(52, 211, 153, 0.20) 0%, rgba(52, 211, 153, 0) 70%),
+    radial-gradient(circle 150px at 88% 520px, rgba(34, 211, 238, 0.18) 0%, rgba(34, 211, 238, 0) 70%),
+    radial-gradient(circle 140px at 92% 1080px, rgba(236, 72, 153, 0.16) 0%, rgba(236, 72, 153, 0) 70%),
+    radial-gradient(circle 190px at 6% 980px, rgba(139, 92, 246, 0.18) 0%, rgba(139, 92, 246, 0) 70%),
+    radial-gradient(circle 130px at 50% 700px, rgba(251, 146, 60, 0.10) 0%, rgba(251, 146, 60, 0) 70%),
+    radial-gradient(circle 100px at 78% 120px, rgba(255, 247, 230, 0.10) 0%, rgba(255, 247, 230, 0) 70%);
+}
+
+/* Mobile: fewer blobs, softer (centre + warm-white dropped). */
+@media (max-width: 900px) {
+  .p3-foreground {
+    --p3-blobs:
+      radial-gradient(circle 150px at 8% 180px, rgba(52, 211, 153, 0.16) 0%, rgba(52, 211, 153, 0) 70%),
+      radial-gradient(circle 130px at 88% 520px, rgba(34, 211, 238, 0.14) 0%, rgba(34, 211, 238, 0) 70%),
+      radial-gradient(circle 120px at 92% 900px, rgba(236, 72, 153, 0.13) 0%, rgba(236, 72, 153, 0) 70%),
+      radial-gradient(circle 160px at 6% 820px, rgba(139, 92, 246, 0.14) 0%, rgba(139, 92, 246, 0) 70%);
+  }
+}
+
+/* Reduced motion: P3 is fully off. The JS also returns before starting
+ * its loop; this is belt-and-braces (and hides the layer if JS never ran). */
+@media (prefers-reduced-motion: reduce) {
+  .p3-foreground {
+    display: none;
+  }
+  .film-backdrop-fixed {
+    transform: none !important;
+  }
+}

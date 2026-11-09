@@ -5,84 +5,12 @@
 (function () {
   'use strict';
   var hero = document.getElementById('top');
-  if (!hero) return;
   var reduced = window.matchMedia &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ---- hero: wrap in a tall sticky range, group media for the shrink ---- */
-  var wrap = document.createElement('div');
-  wrap.className = 'lion-hero-wrap';
-  hero.parentNode.insertBefore(wrap, hero);
-  wrap.appendChild(hero);
-  hero.classList.add('lion-sticky');
-
-  var media = document.createElement('div');
-  media.className = 'lion-hero-media';
-  hero.insertBefore(media, hero.firstChild);
-  var video = document.getElementById('heroVideo');
-  var shade = hero.querySelector('.hero-shade');
-  var tint = hero.querySelector('.up-hero-tint');
-  var fx = document.getElementById('heroFx');
-  if (video) media.appendChild(video);
-  if (shade) media.appendChild(shade);
-  if (tint) media.appendChild(tint);
-  if (fx) media.appendChild(fx);
-  var inner = hero.querySelector('.hero-inner');
-
-  /* ---- hero atmosphere glow (approved demo v2, stronger): appended INSIDE
-     .lion-hero-media so it sits above the video/shade/tint/particles AND
-     inherits the media scroll fade (apply() drives media opacity every
-     tick) — it can never linger as an orphan blob after the video fades.
-     Media is created once at parse time and never re-rendered by app.js
-     (language switches only change text), so this one-time append is
-     permanent across languages. Stacking: media (z 0) < mid echo (z 2) <
-     hero-inner (z 3), so the wash tints the video but never covers text. */
-  var heroGlow = document.createElement('div');
-  heroGlow.className = 'lion-hero-glow';
-  heroGlow.setAttribute('aria-hidden', 'true');
-  media.appendChild(heroGlow);
-
-  /* ---- mid-runway echo (2026-11-02, option A): the hero title re-appears
-     lower in the scroll runway so no viewport of the runway is empty.
-     Text is copied live from #heroTitle, so it follows the active language
-     with no new copy keys. CSS default opacity is 0; apply() drives it. */
-  var mid = document.createElement('div');
-  mid.className = 'lion-hero-mid';
-  mid.setAttribute('aria-hidden', 'true');
-  hero.appendChild(mid);
-
-  /* ---- aurora: 4th blob (violet) ---- */
-  var aurora = document.querySelector('.aurora');
-  if (aurora && !aurora.querySelector('.b4')) {
-    var b4 = document.createElement('span');
-    b4.className = 'blob b4';
-    aurora.appendChild(b4);
-  }
-
-  /* ---- aura strip (visual band, no text) after the hero ---- */
-  var strip = document.createElement('section');
-  strip.className = 'lion-aura-strip';
-  strip.setAttribute('aria-hidden', 'true');
-  strip.innerHTML = '<div class="lion-aura-bg"></div><div class="lion-aura-veil"></div>';
-  wrap.parentNode.insertBefore(strip, wrap.nextSibling);
-
-  /* ---- velocity strip (Argon #1, 2026-11-03): thin band in normal flow
-     right AFTER the aura strip, so it never touches the hero's 260vh sticky
-     geometry (it sits below the wrap). Content is the hero title repeated,
-     live-copied like the mid echo — approved copy only, no invented
-     slogans. Skew/tint are driven by apply() from scroll velocity; the CSS
-     default is static, so reduced-motion (where apply() never runs) stays
-     neutral with no JS needed. */
-  var velStrip = document.createElement('section');
-  velStrip.className = 'lion-vel-strip';
-  velStrip.setAttribute('aria-hidden', 'true');
-  velStrip.innerHTML = '<div class="lion-vel-glow lion-vel-glow-down"></div>' +
-    '<div class="lion-vel-glow lion-vel-glow-up"></div>' +
-    '<div class="lion-vel-inner"></div>';
-  strip.parentNode.insertBefore(velStrip, strip.nextSibling);
-  var velInner = velStrip.querySelector('.lion-vel-inner');
-  var velGlowDown = velStrip.querySelector('.lion-vel-glow-down');
-  var velGlowUp = velStrip.querySelector('.lion-vel-glow-up');
+  /* ---- hero: only when the hero section exists. The two-act page replaces
+     the hero with the Master Film, so this block is skipped there while the
+     return / KAGE / filmstrip / scroll code below still runs. ---- */
   function syncVelText() {
     var ht = document.getElementById('heroTitle');
     if (!ht || !velInner) return;
@@ -91,7 +19,83 @@
     var rep = t + ' ✦ ' + t + ' ✦ ' + t;
     if (velInner.textContent !== rep) velInner.textContent = rep;
   }
-  document.addEventListener('DOMContentLoaded', syncVelText);
+  if (hero) {
+    /* ---- hero: wrap in a tall sticky range, group media for the shrink ---- */
+    var wrap = document.createElement('div');
+    wrap.className = 'lion-hero-wrap';
+    hero.parentNode.insertBefore(wrap, hero);
+    wrap.appendChild(hero);
+    hero.classList.add('lion-sticky');
+  
+    var media = document.createElement('div');
+    media.className = 'lion-hero-media';
+    hero.insertBefore(media, hero.firstChild);
+    var video = document.getElementById('heroVideo');
+    var shade = hero.querySelector('.hero-shade');
+    var tint = hero.querySelector('.up-hero-tint');
+    var fx = document.getElementById('heroFx');
+    if (video) media.appendChild(video);
+    if (shade) media.appendChild(shade);
+    if (tint) media.appendChild(tint);
+    if (fx) media.appendChild(fx);
+    var inner = hero.querySelector('.hero-inner');
+  
+    /* ---- hero atmosphere glow (approved demo v2, stronger): appended INSIDE
+       .lion-hero-media so it sits above the video/shade/tint/particles AND
+       inherits the media scroll fade (apply() drives media opacity every
+       tick) — it can never linger as an orphan blob after the video fades.
+       Media is created once at parse time and never re-rendered by app.js
+       (language switches only change text), so this one-time append is
+       permanent across languages. Stacking: media (z 0) < mid echo (z 2) <
+       hero-inner (z 3), so the wash tints the video but never covers text. */
+    var heroGlow = document.createElement('div');
+    heroGlow.className = 'lion-hero-glow';
+    heroGlow.setAttribute('aria-hidden', 'true');
+    media.appendChild(heroGlow);
+  
+    /* ---- mid-runway echo (2026-11-02, option A): the hero title re-appears
+       lower in the scroll runway so no viewport of the runway is empty.
+       Text is copied live from #heroTitle, so it follows the active language
+       with no new copy keys. CSS default opacity is 0; apply() drives it. */
+    var mid = document.createElement('div');
+    mid.className = 'lion-hero-mid';
+    mid.setAttribute('aria-hidden', 'true');
+    hero.appendChild(mid);
+  
+    /* ---- aurora: 4th blob (violet) ---- */
+    var aurora = document.querySelector('.aurora');
+    if (aurora && !aurora.querySelector('.b4')) {
+      var b4 = document.createElement('span');
+      b4.className = 'blob b4';
+      aurora.appendChild(b4);
+    }
+  
+    /* ---- aura strip (visual band, no text) after the hero ---- */
+    var strip = document.createElement('section');
+    strip.className = 'lion-aura-strip';
+    strip.setAttribute('aria-hidden', 'true');
+    strip.innerHTML = '<div class="lion-aura-bg"></div><div class="lion-aura-veil"></div>';
+    wrap.parentNode.insertBefore(strip, wrap.nextSibling);
+  
+    /* ---- velocity strip (Argon #1, 2026-11-03): thin band in normal flow
+       right AFTER the aura strip, so it never touches the hero's 260vh sticky
+       geometry (it sits below the wrap). Content is the hero title repeated,
+       live-copied like the mid echo — approved copy only, no invented
+       slogans. Skew/tint are driven by apply() from scroll velocity; the CSS
+       default is static, so reduced-motion (where apply() never runs) stays
+       neutral with no JS needed. */
+    var velStrip = document.createElement('section');
+    velStrip.className = 'lion-vel-strip';
+    velStrip.setAttribute('aria-hidden', 'true');
+    velStrip.innerHTML = '<div class="lion-vel-glow lion-vel-glow-down"></div>' +
+      '<div class="lion-vel-glow lion-vel-glow-up"></div>' +
+      '<div class="lion-vel-inner"></div>';
+    strip.parentNode.insertBefore(velStrip, strip.nextSibling);
+    var velInner = velStrip.querySelector('.lion-vel-inner');
+    var velGlowDown = velStrip.querySelector('.lion-vel-glow-down');
+    var velGlowUp = velStrip.querySelector('.lion-vel-glow-up');
+    document.addEventListener('DOMContentLoaded', syncVelText);
+  }
 
   /* nav-spy hookup: lion.js runs at parse time, app.js creates H2NavSpy
      on DOMContentLoaded, so observe now if present, else after DOM ready. */
@@ -604,8 +608,10 @@
        viewport of the 2.6-viewport runway is ever empty. Fade-in-place
        (2026-10-31, Hamed's correction) is kept: no drift, no shrink. */
     var hp = clamp(y / (vh * 2.4), 0, 1);
-    media.style.transform = '';
-    media.style.opacity = (1 - hp).toFixed(2);
+    if (media) {
+      media.style.transform = '';
+      media.style.opacity = (1 - hp).toFixed(2);
+    }
     if (inner) {
       inner.style.transform = 'translate3d(0,' + (-y * 0.12) + 'px,0)';
       inner.style.opacity = Math.max(0, 1 - hp * 2.4).toFixed(2);

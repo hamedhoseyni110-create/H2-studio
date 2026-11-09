@@ -1,0 +1,155 @@
+/* masterfilm-p5.css — P5: Kinetic Word-Split Typography (Argon Priority 5).
+ *
+ * .kinetic-word base + beat-overlay trigger states are Argon's CSS
+ * verbatim (gap file §PRIORITY 5). Section-title states are the plan §4
+ * C1 addition, CORRECTED 2026-11-08 (plan §7): reveal owns the H2
+ * element, P5 owns only the child word spans, keyed off `.in` (lab
+ * modal title) OR `.p5-in` (the 12 tunnel titles, added by P5's JS
+ * when lion.js starts driving the H2's inline styles).
+ *
+ * Reduced motion: P5's JS never splits under RM, so no .kinetic-word
+ * spans exist and these rules never match. No RM block needed here.
+ * NOTHING in this file touches cards, canvas, sections, or reveal
+ * classes — only .kinetic-word descendants of .beat-overlay / .section-title.
+ */
+
+.kinetic-word {
+  display: inline-block;
+  will-change: transform, opacity;
+  transition:
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.55s ease;
+  transition-delay: calc(var(--word-idx, 0) * 45ms);
+}
+
+/* Beat headings: hidden until the overlay turns interactive (masterfilm.js
+   toggles .is-interactive when the overlay alpha crosses 0.55). */
+.beat-overlay:not(.is-interactive) .kinetic-word {
+  opacity: 0;
+  transform: translate3d(0, 22px, -60px) rotateX(35deg);
+}
+
+.beat-overlay.is-interactive .kinetic-word {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) rotateX(0deg);
+}
+
+/* Section titles: hidden until the entrance driver fires.
+ * TWO triggers, because the page has two different drivers (proven
+ * live 2026-11-08, probes p5-probe1..5 — plan §7):
+ *  - `.in` — app.js reveal's IntersectionObserver. Lands ONLY on the
+ *    lab-modal title (fixed overlay, outside the tunnel); it NEVER
+ *    lands on the 11 titles inside tunnel-transformed sections — the
+ *    observer stays silent there even with the title in view for 3s.
+ *  - `.p5-in` — added by masterfilm-p5.js when lion.js `apply()`
+ *    (the REAL driver: inline transform + opacity on the H2) starts
+ *    writing styles to the title. Covers the 12 tunnel titles.
+ * Either class shows the words; both are one-way (never removed). */
+.section-title:not(.in):not(.p5-in) .kinetic-word {
+  opacity: 0;
+  transform: translate3d(0, 22px, -60px) rotateX(35deg);
+}
+
+.section-title.in .kinetic-word,
+.section-title.p5-in .kinetic-word {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) rotateX(0deg);
+}
+
+/* ---- Pre-Publish Hit-Testing & Conversion Shields (Fixes P-EX1, P-EX2, P-EX3) ----
+ * Adapted from Argon's verbatim shield (review 2026-11-08) — deviations
+ * recorded in work/p5-shield-plan.md §7. Grounding proved the verbatim
+ * form wrong in three places: (1) `.header .nav-actions` matches
+ * nothing (the header is `.nav`, already fixed z-index 100);
+ * (2) the `[data-wizard-open]` pointer-events rule would have
+ * re-armed the INVISIBLE sticky CTA (playful.css `.cta-hidden` sets
+ * pointer-events:none) and downgraded it from z-index 110 to 85;
+ * (3) the P-EX4 JS bypass would have left app.js wizard state
+ * inconsistent (`wiz.open` stuck true) and silently discarded the
+ * in-progress brief — the real P-EX4 cause is the deliberate
+ * `window.confirm` guard in closeWizard, not a broken button, so no
+ * JS shield is installed for P-EX4 (see §7). */
+
+/* P-EX2 & P-EX3: a beat-overlay is 100vw x 100svh. Even when
+ * .is-interactive, the empty space around the beat panel must NEVER
+ * eat taps meant for underlying triggers. Only the actual
+ * cards/links capture pointer events. (P1's D1 fix already does this
+ * without !important; the !important here hardens it.)
+ * NOTE (2026-11-08, P-EX1-fix step — inspector §10.1): `.final-cta-stage`
+ * was REMOVED from the auto list below. It is a container DIV, not a
+ * card/link, and giving it auto made the beat-5 hub's empty space
+ * swallow taps that fell through to the page on P4. The 4 hub pills
+ * are A x3 + BUTTON x1 (grounding G6) and keep `auto` via the `a` /
+ * `button` selectors in this same rule. */
+.beat-overlay.is-interactive {
+  pointer-events: none !important;
+}
+.beat-overlay.is-interactive .work-showcase-card,
+.beat-overlay.is-interactive a,
+.beat-overlay.is-interactive button {
+  pointer-events: auto !important;
+}
+
+/* P-EX1: lift portfolio filter tabs above the 3D coverflow fan.
+ * NOTE (grounding §7): the tabs live inside .showcase-wrap (relative,
+ * z-index 1) while the film stage is fixed z-index 2, so this lift
+ * cannot beat the stage — it is kept as harmless hardening. The
+ * pill 16-21 overlap is fixed by the option-4 toggle at the bottom
+ * (`.work-showcase-card.p5-pex1-off`), not by this lift. */
+.works-tabs,
+#worksTabs {
+  position: relative;
+  z-index: 30;
+  /* NO translateZ here (removed 2026-11-08 after the tz-probe):
+   * the P2 tunnel keeps a LIVE perspective() transform on #portfolio
+   * during flight, so translateZ(120px) is NOT flattened — it scales
+   * the tab row ~1.12x (1100/(1100-120)) and shifts tab centres up to
+   * ~18px (tabs rect 385x109 vs P4's 343x97 at MOB frac 0.65), moving
+   * tab 1's centre under the beat-1 card link and BREAKING the MOB D1
+   * parity at 0.65 (P5 hit A.work-showcase-card vs P4 BUTTON.works-tab,
+   * stable 3/3 runs). The z-30 lift alone is kept: it reorders only
+   * inside the .showcase-wrap context and is geometrically harmless. */
+}
+
+/* P-EX3: lift in-flow wizard entries above tunnel/overlay planes.
+ * #stickyCta EXCLUDED: already position:fixed + z-index:110
+ * (playful.css) — the verbatim rule would have DOWNGRADED it to 85.
+ * :not(.cta-hidden): the verbatim pointer-events:auto would have
+ * re-armed the INVISIBLE sticky CTA — an invisible button must
+ * never eat taps. */
+[data-wizard-open]:not(#stickyCta):not(.cta-hidden) {
+  position: relative;
+  z-index: 85;
+  pointer-events: auto !important;
+}
+#stickyCta {
+  position: fixed !important;
+}
+#wizardClose {
+  position: relative;
+  z-index: 10;
+  pointer-events: auto !important;
+}
+
+/* ---- P-EX1 fix (option 4, 2026-11-08 — plan §7) ----
+ * The beat-1 card ([data-beat="1"] .work-showcase-card, href #portfolio)
+ * flies over the portfolio rail tabs on DESK at film frames 16–21
+ * (inspector §9 said 17–21; the boundary probe proved 16 is dead too
+ * while 15 is free). masterfilm-p5.js watches #seqStatusPill and adds
+ * class `p5-pex1-off` to that ONE card only while the frame is inside
+ * 16–21; this rule then turns off its tap-catching so the tabs below
+ * receive the tap, and the link returns the moment the frame leaves
+ * the window (class removed). Zero visual change — only pointer-events
+ * toggles; the card's rects, opacity and transform are untouched.
+ * Specificity (0,4,0) beats the shield's auto rule above (0,3,0);
+ * !important beats !important; later in the file wins ties.
+ * The `.is-interactive` scoping is deliberate: the card only eats
+ * taps when the overlay is interactive (base `.beat-overlay` is
+ * pointer-events:none; P1 gives a/button auto only under
+ * .is-interactive) — outside that state the card is already
+ * non-clickable by inheritance, so this rule only fires where the
+ * bug lives. Under RM the class is never added (P5 JS never runs),
+ * so this rule never matches there either. */
+.beat-overlay.is-interactive .work-showcase-card.p5-pex1-off {
+  pointer-events: none !important;
+}
