@@ -284,10 +284,91 @@
     pex1Apply();
   }
 
+  /* ---- LAB fix (Defect 1, 2026-11-09 — plan work/lab-defect-fix-plan.md) ----
+   * The lab trigger (#labTrigger) slides up behind the two stacked beat-4
+   * cards on MOB at film frames ~86–93 (peak window): the cards sit nearly
+   * still on screen while the trigger's centre passes through their rects,
+   * so a centre-tap hits the card link and the modal never opens. DESK is
+   * unaffected (the trigger centre falls in the horizontal gap between the
+   * side-by-side cards). Same shape as the P-EX1 fix: watch #seqStatusPill
+   * and add class `p5-lab-off` to the ONE beat-4 card that actually covers
+   * the trigger centre right now (hit-test-gated, fresh rects every apply),
+   * so the tap falls through to the trigger; the link returns the moment
+   * coverage ends. The class only toggles pointer-events (CSS below); the
+   * cards' rects and rendering are untouched — zero visual change, and the
+   * beat-4 frame lock (cards never move) is preserved. RM: this IIFE
+   * returns early under RM, so this section never runs there — under RM the
+   * film is a static stacked column with no flying card and no cover. */
+  var LAB_FIRST = 80, LAB_LAST = 96;
+  var labTrigger = null;
+  var labCards = [];
+  var labCoveredState = null; /* the covering card, or null */
+
+  /* Which beat-4 card (if any) covers the lab trigger's centre right now?
+     Callers MUST neutralize the off-class first (see labApply):
+     with the class on, elementFromPoint skips the pe:none card and always
+     reads "not covered" — the P-EX1 v2 lesson. */
+  function labCovered() {
+    if (!labTrigger || labCards.length === 0) return null;
+    var r = labTrigger.getBoundingClientRect();
+    if (r.width === 0 || r.height === 0) return null; /* defensive: no trigger, no fix */
+    var el = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+    if (!el) return null; /* centre outside the viewport: nothing to protect */
+    var anc = el.closest ? el.closest('.work-showcase-card') : null;
+    if (!anc) return null;
+    for (var i = 0; i < labCards.length; i++) {
+      if (anc === labCards[i]) return labCards[i];
+    }
+    return null;
+  }
+
+  function labApply() {
+    if (!labTrigger || labCards.length === 0) return;
+    var f = pex1Frame();
+    var inWindow = (f !== null && f >= LAB_FIRST && f <= LAB_LAST);
+    /* Neutralize-measure-restore, synchronous: remove the off-class from
+       BOTH cards so elementFromPoint sees them clickable, measure, then set
+       the final state. No early return before the final toggle — each card
+       must always end in its computed state. No paint happens inside this
+       task. */
+    for (var i = 0; i < labCards.length; i++) {
+      if (labCards[i].classList.contains('p5-lab-off')) {
+        labCards[i].classList.remove('p5-lab-off');
+      }
+    }
+    var covering = inWindow ? labCovered() : null;
+    labCoveredState = covering;
+    for (var j = 0; j < labCards.length; j++) {
+      labCards[j].classList.toggle('p5-lab-off', labCards[j] === covering);
+    }
+  }
+
+  function labState() {
+    return {
+      frame: pex1Frame(),
+      off: labCards.map(function (c) { return c.classList.contains('p5-lab-off'); }),
+      covered: labCoveredState ? labCards.indexOf(labCoveredState) : -1,
+      triggerFound: labTrigger !== null,
+      cardsFound: labCards.length
+    };
+  }
+
+  function labInit() {
+    labTrigger = document.querySelector('#labTrigger');
+    labCards = Array.prototype.slice.call(document.querySelectorAll('[data-beat="4"] .work-showcase-card'));
+    if (!labTrigger || labCards.length === 0) return; /* defensive: no trigger/cards, no fix */
+    var pill = document.getElementById('seqStatusPill');
+    if (!pill || !window.MutationObserver) return;
+    var obs = new MutationObserver(labApply);
+    obs.observe(pill, { childList: true, characterData: true, subtree: true });
+    labApply();
+  }
+
   /* ---- lifecycle ---- */
   function init() {
     splitAll();
     pex1Init();
+    labInit();
     /* h2:grids fires mid-renderPage — defer to end of task (see header). */
     window.addEventListener('h2:grids', function () {
       setTimeout(splitAll, 0);
@@ -332,7 +413,8 @@
           }
           return n;
         })(),
-        pex1: pex1State()
+        pex1: pex1State(),
+        lab: labState()
       };
     }
   };

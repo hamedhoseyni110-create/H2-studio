@@ -153,3 +153,25 @@
 .beat-overlay.is-interactive .work-showcase-card.p5-pex1-off {
   pointer-events: none !important;
 }
+
+/* ---- Lab fix (Defect 1, 2026-11-09 — plan work/lab-defect-fix-plan.md) ----
+ * The lab trigger (#labTrigger) slides up behind the two stacked beat-4
+ * cards on MOB at film frames ~86–93 (peak window), so a centre-tap hits
+ * the card link and the modal never opens. masterfilm-p5.js watches
+ * #seqStatusPill and adds class `p5-lab-off` to the ONE beat-4 card that
+ * actually covers the trigger centre right now (hit-test-gated, fresh
+ * rects every apply); this rule then turns off its tap-catching so the
+ * tap falls through to the trigger below, and the link returns the moment
+ * coverage ends. Zero visual change — only pointer-events toggles; the
+ * cards' rects, opacity and transform are untouched, and the beat-4 frame
+ * lock is preserved. Specificity (0,4,0) beats the shield's auto rule
+ * above (0,3,0); !important beats !important; later in the file wins
+ * ties. The `.is-interactive` scoping is deliberate (same argument as
+ * P-EX1): the card only eats taps when the overlay is interactive —
+ * outside that state the card is already non-clickable by inheritance,
+ * so this rule only fires where the bug lives. Under RM the class is
+ * never added (P5 JS never runs), so this rule never matches there
+ * either. */
+.beat-overlay.is-interactive .work-showcase-card.p5-lab-off {
+  pointer-events: none !important;
+}

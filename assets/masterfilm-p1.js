@@ -230,7 +230,7 @@ const beat4Grid = document.querySelector('[data-beat="4"] .dual-works-grid');
 // ضرب ۲ پیش از فیلم‌استریپ، ضرب ۵ پیش از فینال).
 const BEAT_WINDOWS = [
   { start: 0,  peakStart: 0,   peakEnd: 8,   end: 14 }, // ضرب ۰: عنوان تولد نور
-  { start: 8,  peakStart: 13,  peakEnd: 20,  end: 24 }, // ضرب ۱: سایت ساخته می‌شود
+  { start: 8,  peakStart: 13,  peakEnd: 19,  end: 23 }, // ضرب ۱: سایت ساخته می‌شود — پایان در فریم ۲۳ (۲۰۲۶-۱۱-۰۹: باگ زنده؛ محو شدن باید پیش از پلاتوی اول تمام شود، نه وسط آن)
   { start: 27, peakStart: 32,  peakEnd: 43,  end: 47 }, // ضرب ۲: ویدیو ساخته می‌شود
   { start: 50, peakStart: 56,  peakEnd: 68,  end: 72 }, // ضرب ۳: شیر سیاه (فریم ۴۹ تا ۷۲)
   { start: 80, peakStart: 86,  peakEnd: 93,  end: 96 }, // ضرب ۴: عکس و اپ
@@ -607,7 +607,15 @@ if (!reducedMotion) {
 measureTimeline();
 document.addEventListener('DOMContentLoaded', measureTimeline);
 window.addEventListener('load', measureTimeline);
-window.addEventListener('resize', () => { measureTimeline(); lastRenderedFrame = -1; });
+/* ۲۰۲۶-۱۱-۰۹ باگ زنده ۲: تغییر ارتفاع پنجره از پنهان/نمایان شدن نوار ابزار
+   موبایل وسط اسکرول نباید خط زمانی را دوباره اندازه بگیرد — فقط تغییر
+   واقعی عرض (چرخش، تقسیم صفحه) اندازه‌گیری دوباره می‌خواهد. */
+var lastP1Width = window.innerWidth;
+window.addEventListener('resize', () => {
+  if (window.innerWidth === lastP1Width) return; // toolbar toggle — ignore
+  lastP1Width = window.innerWidth;
+  measureTimeline(); lastRenderedFrame = -1;
+});
 document.addEventListener('h2:grids', measureTimeline);
 setTimeout(measureTimeline, 800);
 setTimeout(measureTimeline, 2000);

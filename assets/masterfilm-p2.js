@@ -101,15 +101,28 @@
     suspendedUntil = Math.max(suspendedUntil, performance.now() + ms);
   }
   /* Clear transforms, then force every rect-reader (P1 timeline, KAGE,
-   * filmstrip) to re-measure with true rects in the same task, before the
-   * next paint. Guarded against re-dispatch loops. */
+   * filmstrip) to re-measure with true rects in the same task, then
+   * immediately re-apply the tunnel in the SAME task — no suspend
+   * window, no un-tunneled paint (2026-11-09 live bug 2: the old
+   * suspend(600) left chapters un-transformed for 600ms on every
+   * toolbar resize, so a chunk visibly popped to full scale and snapped
+   * back). Guarded against re-dispatch loops. */
   function heal() {
     var now = performance.now();
     if (healing || now - lastHeal < 150) return;
     healing = true;
     lastHeal = now;
-    suspend(600);
+    clearAll();
     document.dispatchEvent(new Event('h2:grids'));
+    /* Synchronous re-apply: the same code the tick runs (depth + tilt
+     * from current velocity), so chapters are never un-tunneled for a
+     * paint. suspend() is NOT used here — it stays only for the
+     * language-click path, which needs to cover P1's +400ms async
+     * re-measure. */
+    var d = depth();
+    var tilt = clamp(vel * 0.12, -d.tiltCap, d.tiltCap);
+    var y = window.scrollY || 0;
+    for (var i = 0; i < chapters.length; i++) updateChapter(chapters[i], y, d, tilt);
     setTimeout(function () { healing = false; }, 150);
   }
 
@@ -186,8 +199,16 @@
     for (var i = 0; i < chapters.length; i++) updateChapter(chapters[i], y, d, tilt);
   }
 
-  /* ---- triggers (mirror P1's measurement triggers) ---- */
-  window.addEventListener('resize', function () { measure(); heal(); });
+  /* ---- triggers (mirror P1's measurement triggers) ----
+     2026-11-09 live bug 2: a height-only resize is the mobile toolbar
+     hiding/showing mid-scroll — it must not re-measure or heal. Only a
+     real width change (rotate, split-screen) runs measure()+heal(). */
+  var lastP2Width = window.innerWidth;
+  window.addEventListener('resize', function () {
+    if (window.innerWidth === lastP2Width) return; // toolbar toggle — ignore
+    lastP2Width = window.innerWidth;
+    measure(); heal();
+  });
   document.addEventListener('h2:grids', function () {
     if (healing) return;
     measure();
