@@ -217,7 +217,8 @@
     }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
   }
   /* ---- Kage scroll driver (ported from the approved demo) ----
-     Geometry is measured from the wrapper's own bounding rect, and
+     Geometry is measured from the wrapper's own offsetTop chain
+     (2026-11-10: rect under a P2 transform was wrong), and
      re-measured whenever layout above it can change (grids render,
      load, resize, language switch) — this is the fix for the Argon
      demo's mapping/geometry mismatch that left black voids mid-scroll.
@@ -235,8 +236,11 @@
   function kgRamp(t, a, b) { return kgClamp((t - a) / (b - a), 0, 1); }
   function kgMeasure() {
     if (!kgWrap) return;
-    var r = kgWrap.getBoundingClientRect();
-    kgTop = r.top + window.scrollY;
+    /* 2026-11-10 قدم ۲ (5a): زنجیره‌ی offsetTop جای getBoundingClientRect —
+       اگر P2 همان لحظه روی فصل ترنسفورم داشته باشد، kgTop غلط می‌شد. */
+    var kn = kgWrap, kt = 0;
+    while (kn) { kt += kn.offsetTop || 0; kn = kn.offsetParent; }
+    kgTop = kt;
     kgSpan = Math.max(1, kgWrap.offsetHeight - window.innerHeight);
     /* Number top follows the measured fixed-nav height (nav wraps to two
        rows at narrower desktop widths, e.g. 149px at 1024px) so the giant
@@ -276,11 +280,17 @@
       if (kgBg) kgBg.style.transform = 'translateY(' + (-p * 6) + '%) scale(1.02)';
       for (var i = 0; i < 4; i++) {
         var t = (p - i / 4) * 4;
-        var op = kgRamp(t, -0.05, 0.15) * (1 - kgRamp(t, 0.8, 1.05));
-        var tyCard = (1 - kgRamp(t, -0.05, 0.25)) * 50 + kgRamp(t, 0.7, 1.05) * (-40);
-        var tyNum = (1 - kgRamp(t, -0.05, 0.3)) * 30 + kgRamp(t, 0.7, 1.05) * (-30);
-        var scNum = 1 + (1 - kgRamp(t, -0.05, 0.3)) * 0.15;
-        var tyGiant = (1 - kgRamp(t, -0.05, 0.25)) * 30 + kgRamp(t, 0.7, 1.05) * (-30);
+        /* 2026-11-10 دور دوم (قدم ۳): سواپ ترتیبیِ فشرده — فید-اوت t
+           ۰٫۹۵→۰٫۹۷، فید-این فصل بعد t ‏۰٫۹۵→۰٫۹۷ (t ورودی = t خروجی − ۱)؛
+           در هر لحظه مجموع دو فصل = ۱ (کراس‌فید ~۱۲px)، نه ناحیه‌ی خالی
+           ۴۲px دور اول و نه دوبل (هر دو > ۰٫۵ هرگز). */
+        var inR  = (i === 0) ? 1 : kgRamp(t, -0.05, -0.03);
+        var outR = (i === 3) ? 0 : kgRamp(t, 0.95, 0.97);
+        var op = inR * (1 - outR);
+        var tyCard  = (1 - inR) * 24 + outR * (-16);
+        var tyNum   = (1 - inR) * 16 + outR * (-12);
+        var scNum   = 1 + (1 - inR) * 0.08;
+        var tyGiant = (1 - inR) * 16 + outR * (-12);
         var baseCard = isMobile ? 'translateX(50%)' : 'translateY(-50%)';
         kgCardEls[i].style.opacity = op.toFixed(3);
         kgCardEls[i].style.transform = baseCard + ' translateY(' + tyCard.toFixed(1) + 'px)';
@@ -310,7 +320,8 @@
 
   /* ---- videos filmstrip (scroll-driven 3D strip) ----
      Geometry from the runway's OWN rect (Kage lesson — never assumed
-     heights): fsTop from getBoundingClientRect + scrollY, fsSpan from
+     heights): fsTop from the offsetTop chain (2026-11-10: rect under a
+     P2 transform was wrong), fsSpan from
      offsetHeight - innerHeight. Track offset from MEASURED stage width,
      frame width and gap, so the first frame centers at p=0 and the last
      at p=1. Posters stay at full opacity through the whole range; the
@@ -332,8 +343,10 @@
   function fsMeasure() {
     fsCollect();
     if (!fsGrid || !fsStage || !fsTrack || !fsFrames.length) return;
-    var r = fsGrid.getBoundingClientRect();
-    fsTop = r.top + window.scrollY;
+    /* 2026-11-10 قدم ۲ (5a): زنجیره‌ی offsetTop جای getBoundingClientRect. */
+    var fn = fsGrid, ft = 0;
+    while (fn) { ft += fn.offsetTop || 0; fn = fn.offsetParent; }
+    fsTop = ft;
     fsSpan = Math.max(1, fsGrid.offsetHeight - window.innerHeight);
     fsW = fsStage.clientWidth;
     fsF = fsFrames[0].offsetWidth;
@@ -375,6 +388,17 @@
   window.addEventListener('load', function () { fsMeasure(); fsKick(); });
   window.addEventListener('h2:grids', function () { fsMeasure(); fsKick(); });
   fsMeasure(); fsPaint();
+
+  /* 2026-11-10 قدم ۲: ResizeObserver با debounce ‏۱۲۰ms — جابه‌جایی لی‌اوت
+     (پر شدن سکشن‌ها) خودش اندازه‌گیری KAGE و فیلم‌استریپ را تازه می‌کند. */
+  if ('ResizeObserver' in window) {
+    var lionROTimer = 0;
+    var lionRO = new ResizeObserver(function () {
+      clearTimeout(lionROTimer);
+      lionROTimer = setTimeout(function () { kgMeasure(); fsMeasure(); kgKick(); fsKick(); }, 120);
+    });
+    lionRO.observe(document.documentElement);
+  }
 
   /* ---- templates-style portfolio cards (approved 2026-10-31) ----
      Frame restyle is CSS (.lion-tcard); here only: small WebP posters

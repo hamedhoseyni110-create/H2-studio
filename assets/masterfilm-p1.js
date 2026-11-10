@@ -158,6 +158,7 @@ loadSequenceChunk(0);
 const canvas = document.getElementById('masterFilmCanvas');
 const ctx = canvas.getContext('2d', { alpha: false });
 const statusPill = document.getElementById('seqStatusPill');
+let lastPillText = ''; // قدم ۴: pill فقط وقتی متن عوض شد نوشته می‌شود
 
 // فقط به عقب نگاه می‌کند تا هرگز به فریمِ سکانسِ جلوتر نپرد (حذف کامل پرش زمانی)
 function getSafeFrame(targetIdx) {
@@ -188,7 +189,8 @@ function renderFilmFrame(exactFrameFloat) {
   const seqNum = Math.floor(idxA / 24) + 1;
   const localFrame = (idxA % 24) + 1;
   if (statusPill) {
-    statusPill.textContent = `SEQ ${seqNum} • FRAME ${String(idxA + 1).padStart(3, '0')} / ${TOTAL_FRAMES}`;
+    const pillText = `SEQ ${seqNum} • FRAME ${String(idxA + 1).padStart(3, '0')} / ${TOTAL_FRAMES}`;
+    if (pillText !== lastPillText) { statusPill.textContent = pillText; lastPillText = pillText; }
   }
 
   const frameA = getSafeFrame(idxA);
@@ -229,8 +231,8 @@ const beat4Grid = document.querySelector('[data-beat="4"] .dual-works-grid');
 // همتایش محو می‌شود تا کارت ضرب روی سکشنِ هم‌نامش ننشیند (ضرب ۱ پیش از ریل،
 // ضرب ۲ پیش از فیلم‌استریپ، ضرب ۵ پیش از فینال).
 const BEAT_WINDOWS = [
-  { start: 0,  peakStart: 0,   peakEnd: 8,   end: 14 }, // ضرب ۰: عنوان تولد نور
-  { start: 8,  peakStart: 13,  peakEnd: 19,  end: 23 }, // ضرب ۱: سایت ساخته می‌شود — پایان در فریم ۲۳ (۲۰۲۶-۱۱-۰۹: باگ زنده؛ محو شدن باید پیش از پلاتوی اول تمام شود، نه وسط آن)
+  { start: 0,  peakStart: 0,   peakEnd: 7,   end: 10 }, // ضرب ۰: عنوان تولد نور (۲۰۲۶-۱۱-۱۰ دور دوم: سواپ ترتیبی ۰→۱ — محو ۷→۱۰ پیش از ورود ضرب ۱ تمام می‌شود)
+  { start: 10, peakStart: 13,  peakEnd: 19,  end: 23 }, // ضرب ۱: سایت ساخته می‌شود — ورود ۱۰→۱۳ (پس از محو کامل ضرب ۰)؛ پایان در فریم ۲۳ (۲۰۲۶-۱۱-۰۹: باگ زنده؛ محو شدن باید پیش از پلاتوی اول تمام شود، نه وسط آن)
   { start: 27, peakStart: 32,  peakEnd: 43,  end: 47 }, // ضرب ۲: ویدیو ساخته می‌شود
   { start: 50, peakStart: 56,  peakEnd: 68,  end: 72 }, // ضرب ۳: شیر سیاه (فریم ۴۹ تا ۷۲)
   { start: 80, peakStart: 86,  peakEnd: 90,  end: 93 }, // ضرب ۴: عکس و اپ (۲۰۲۶-۱۱-۰۹: R1؛ دم کوتاه شد تا سایه‌اش روی پروسس نماند)
@@ -248,15 +250,124 @@ const norm = (v, a, b) => clamp((v - a) / Math.max(0.0001, b - a), 0, 1);
    ===================================================================== */
 let p1Breakpoints = [[0, 0], [1, TOTAL_FRAMES - 1]]; // [scrollY, frame]
 let p1Plateaus = []; // [{start, end}] به ترتیب scrollY
+let p1FinaleTop = 0; // کش موقعیت فیناله — خواندن rect در هر فریم حذف شد (قدم ۲)
 
-function p1RectTop(el) {
-  if (!el) return null;
-  return el.getBoundingClientRect().top + window.scrollY;
+/* 2026-11-10 دور دوم — گیت رکت‌به‌رکت (جایگزین گیت کل‌ویوپورت دور اول):
+   گیت از هم‌پوشانیِ رکتِ خودِ پنلِ اورلی (pill + title + card) با رکت‌های
+   محتوای واقعی (عناصر متن‌دار/تصویری سکشن‌ها) محاسبه می‌شود، نه پوشش کل
+   ویوپورت. رکت‌های محتوا در measureTimeline ساخته می‌شوند (زنجیره‌ی
+   offsetTop — مصون از ترنسفورم P2) و در doc ذخیره می‌شوند؛ رکت پنل در هر
+   تیک از getBoundingClientRect خوانده می‌شود (موقعیت واقعیِ نقاشی‌شده،
+   شامل shiftY فعلی). حاشیه‌ی بالا ۱۶px کشش ورود P2 را پوشش می‌دهد؛
+   پایین بدون حاشیه است (دلیل در p1BuildFineBlocks). رمپ تند ۲٪→۵٪ است
+   تا معیار «α>۰٫۰۵ در حالی که هم‌پوشانی > ۵٪ = ۰ فریم» دقیقاً برقرار باشد
+   (با رمپ ۴٪/۱۸٪ دور اول، ۲–۴ نمونه در هر ضرب نقض می‌شد — سویپ کامل
+   ۷۳۵ نمونه‌ای ۴۱۲×۹۱۵، ۲۰۲۶-۱۱-۱۰). رکت‌های محتوا ادغام نمی‌شوند؛
+   union در هر گیت حساب می‌شود تا فاصله‌ی خالی بین عناصر، محتوا شمرده نشود.
+   ⚠️ اصلاح ۲۰۲۶-۱۱-۱۰ (سویپ زنده: ضرب ۲، ۹ نقض — همه از IMG .kg-bg):
+   offsetTop برای محتوای داخل کانتینرِ sticky (مانند .kg-sticky فصل‌ها،
+   .fs-stage فیلم‌استریپ، .sr-sticky، .lion-curtain) با اسکرول جابه‌جا
+   می‌شود — رکت کش‌شده در doc ثابت نیست و گیت نسبت به آن کور می‌ماند
+   (kg-bg در build در [۳۳۴۸،۴۴۰۰] کش شد ولی در y=۵۹۹۰ واقعاً در
+   [۵۶۵۴،۶۷۲۷] نقاشی می‌شود — ۲۳۷۹px اختلاف = دقیقاً kgSpan). پس
+   عناصری که جدِ sticky دارند در p1StickyEls نگه داشته می‌شوند و رکتشان
+   در هر تیک زنده خوانده می‌شود (کش بر اساس scrollY واقعی — هر ۶ گیتِ
+   یک تیک یک بار می‌خوانند). رکت زنده دقیق است و حاشیه نمی‌خواهد. */
+const P1_CONTENT = ['#services', '#portfolio', '#lionPanels', '#videos', '#academy',
+  '#lab', '.lab-trigger-wrap', '#process', '#faq', '#pricing', '#stats',
+  '#lionManifesto', '#about', '#contact', '.duo-wrap', '.lion-curtain-wrap'];
+const P1_CONTENT_ELS = 'h1,h2,h3,h4,p,li,a,button,img,video,.kg-num,.kg-giant';
+let p1FineBlocks = []; // [top, bottom] doc px — sorted by top (فقط محتوای غیر-sticky)
+let p1StickyEls = []; // المنت‌های داخل کانتینر sticky — رکت زنده در گیت
+let p1StickyCache = { y: -1, rects: [] }; // کش بر اساس scrollY واقعی
+let lastOvY = -1;
+const p1Panels = overlays.map(function (ov) { return ov.querySelector('.beat-panel,.beat-panel-wide'); });
+
+function p1IsSticky(el) {
+  let n = el;
+  while (n) {
+    if (getComputedStyle(n).position === 'sticky') return true;
+    n = n.parentElement;
+  }
+  return false;
 }
-function p1RectBottom(el) {
-  if (!el) return null;
-  return el.getBoundingClientRect().top + window.scrollY + el.offsetHeight;
+
+function p1BuildFineBlocks() {
+  const raw = [];
+  p1StickyEls = [];
+  p1StickyCache = { y: -1, rects: [] };
+  P1_CONTENT.forEach(function (sel) {
+    const sec = document.querySelector(sel);
+    if (!sec) return;
+    sec.querySelectorAll(P1_CONTENT_ELS).forEach(function (el) {
+      if (el.closest('.beat-overlay,.film-stage')) return;
+      if (el.offsetHeight < 4 || el.offsetWidth < 4) return;
+      // محتوای sticky: رکت layout (offsetTop) با اسکرول جابه‌جا می‌شود و
+      // کش‌کردنش گیت را کور می‌کند — المنت نگه داشته می‌شود تا رکتش در
+      // گیت زنده خوانده شود (kg-bg، کارت‌های فصل، فیلم‌استریپ، ...).
+      if (p1IsSticky(el)) { p1StickyEls.push(el); return; }
+      const t = p1DocTop(el);
+      // حاشیه‌ی بالا ۱۶px: کشش واقعیِ ورود P2 (محتوای در حال ورود تا ۱۲px
+      // بالاتر از layout نقاشی می‌شود — اندازه‌گیری زنده‌ی دکمه‌ی lab-trigger
+      // در y ‏۱۱۸۰۰–۱۲۷۰۰؛ با +۴px حاشیه‌ی امن). حاشیه‌ی پایین صفر است:
+      // محتوای ورودی (که گیت را می‌بندد) در فاز ورود کوچک‌تر از layout
+      // نقاشی می‌شود — یعنی layout خودش محافظه‌کارانه است؛ حاشیه‌ی بیشتر
+      // فقط اسپن اوج را می‌خورد (با ‎-۳۲px، اسپن ضرب ۴ به ۲۳۲px می‌رسید —
+      // زیر کف ۲۴۰px؛ با ‎-۱۶px به ~۲۴۸px برمی‌گردد).
+      raw.push([t - 16, t + el.offsetHeight]);
+    });
+  });
+  raw.sort(function (a, b) { return a[0] - b[0]; });
+  p1FineBlocks = raw;
 }
+function p1RectGate(i, y, rect) {
+  const panel = p1Panels[i];
+  if (!panel) return 1;
+  const r = rect || panel.getBoundingClientRect();
+  if (!r || r.height < 4) return 1;
+  const top = y + r.top, bot = y + r.bottom;
+  const ivs = [];
+  for (let k = 0; k < p1FineBlocks.length; k++) {
+    const b = p1FineBlocks[k];
+    if (b[0] > bot) break; // sorted — از اینجا به بعد هم‌پوشانی نیست
+    if (b[1] > top) ivs.push([Math.max(b[0], top), Math.min(b[1], bot)]);
+  }
+  // رکت‌های زنده‌ی محتوای sticky — کش بر اساس scrollY واقعی (نه y
+  // فرضیِ ریپورت): هر ۶ گیتِ یک تیک یک بار می‌خوانند؛ در ریپورت هم یک
+  // بار. توجه: در ریپورت (y فرضی) این رکت‌ها در موقعیت فعلیِ صفحه
+  // فریز می‌شوند — پس اسپن ریپورت برای ضرب ۲ (که kg-bg در fade-in
+  // گیت را می‌بندد) ~۵۰px بیشتر از واقعیت است؛ سویپ زنده مرجع است.
+  const sy = window.scrollY;
+  if (sy !== p1StickyCache.y) {
+    p1StickyCache.y = sy;
+    p1StickyCache.rects = p1StickyEls.map(function (el) {
+      const q = el.getBoundingClientRect();
+      return [sy + q.top, sy + q.bottom];
+    }).filter(function (b) { return b[1] - b[0] >= 4; });
+  }
+  for (let k = 0; k < p1StickyCache.rects.length; k++) {
+    const b = p1StickyCache.rects[k];
+    if (b[1] > top && b[0] < bot) ivs.push([Math.max(b[0], top), Math.min(b[1], bot)]);
+  }
+  ivs.sort(function (a, b) { return a[0] - b[0]; });
+  let cov = 0, cs = -1, ce = -1;
+  for (let k = 0; k < ivs.length; k++) {
+    const s = ivs[k][0], e = ivs[k][1];
+    if (cs < 0) { cs = s; ce = e; }
+    else if (s <= ce) { if (e > ce) ce = e; }
+    else { cov += ce - cs; cs = s; ce = e; }
+  }
+  if (cs >= 0) cov += ce - cs;
+  const frac = cov / Math.max(1, r.height);
+  return 1 - clamp((frac - 0.02) / 0.03, 0, 1); // <=2%: 1، >=5%: 0
+}
+
+/* 2026-11-10 ghost-stretch fix قدم ۲: زنجیره‌ی offsetTop جای
+   getBoundingClientRect — زیر ترنسفورم P2، rect غلط می‌شود؛ offsetTop
+   مصون از ترنسفورم است. */
+function p1DocTop(el) { var t = 0, n = el; while (n) { t += n.offsetTop || 0; n = n.offsetParent; } return t; }
+function p1RectTop(el) { return el ? p1DocTop(el) : null; }
+function p1RectBottom(el) { return el ? p1DocTop(el) + el.offsetHeight : null; }
 // بازه‌ی سکشن: [min(top, bottom−vh), max(top, bottom−vh)] — برای سکشن بلند
 // «بالا تا پایینِ کامل» و برای سکشن کوتاه «کاملاً دیده‌شدن» را می‌دهد.
 function p1PlateauRange(topEl, bottomEl) {
@@ -313,6 +424,8 @@ function measureTimeline() {
     lastF = pt[1];
   }
   if (clean.length >= 2) p1Breakpoints = clean;
+  p1BuildFineBlocks();
+  p1FinaleTop = finaleSection ? p1DocTop(finaleSection) : 0;
   window.__p1Timeline = { breakpoints: p1Breakpoints, plateaus: p1Plateaus, measuredAt: Date.now() };
 }
 
@@ -429,10 +542,10 @@ function tick(nowMs) {
   const targetFrame = mapped.frame;
   // کم‌نور شدن بوم روی سکشن‌ها (خوانایی) + بازگشت حلقه‌ی طلایی در فینال.
   const plateauDim = plateauDimAt(window.scrollY);
+  // قدم ۲: موقعیت فیناله کش‌شده (مصون از ترنسفورم) — به‌جای rect در هر فریم.
   let finaleRebound = 0;
   if (finaleSection) {
-    const fRect = finaleSection.getBoundingClientRect();
-    finaleRebound = clamp(1 - (fRect.top / vh), 0, 1);
+    finaleRebound = clamp(1 - ((p1FinaleTop - window.scrollY) / vh), 0, 1);
   }
   const baseDim = 1 - plateauDim * 0.78;
   canvas.style.opacity = clamp(baseDim + finaleRebound * 0.78, 0.22, 1).toFixed(3);
@@ -515,7 +628,9 @@ function tick(nowMs) {
   // (قدم ۱). تنها ورودی همگام‌سازی فریم است، پس شرط همان frameDirty است؛
   // تغییر اندازه‌ی پنجره هم با forceDirty (روی resize) همگام‌سازی را دوباره
   // اجرا می‌کند (قانون translate-only ضرب ۴ به عرض پنجره وابسته است).
-  if (frameDirty) {
+  const yNow = window.scrollY;
+  if (frameDirty || yNow !== lastOvY) {
+  lastOvY = yNow;
   overlays.forEach((ov, i) => {
     const w = BEAT_WINDOWS[i];
     const fadeIn = (i === 0) ? 1 : norm(exactFrame, w.start, w.peakStart);
@@ -524,7 +639,7 @@ function tick(nowMs) {
     // اگر اینجا ۱ بماند هاب پورتال برای همیشه روی فینال می‌ماند (باگی که
     // اسکرین‌شات ته صفحه در تست P1 گرفت: ضرب ۵ با opacity 1 سر جایش مانده بود).
     const fadeOut = 1 - norm(exactFrame, w.peakEnd, w.end);
-    const alphaVal = Math.min(fadeIn, fadeOut);
+    const alphaVal = Math.min(fadeIn, fadeOut, i === 0 ? 1 : p1RectGate(i, yNow));
     if (exactFrame < w.start || (exactFrame > w.end && i < BEAT_WINDOWS.length - 1) || alphaVal <= 0.02) {
       ov.style.opacity = '0';
       ov.classList.remove('is-interactive');
@@ -634,17 +749,81 @@ window.addEventListener('load', measureTimeline);
    موبایل وسط اسکرول نباید خط زمانی را دوباره اندازه بگیرد — فقط تغییر
    واقعی عرض (چرخش، تقسیم صفحه) اندازه‌گیری دوباره می‌خواهد. */
 var lastP1Width = window.innerWidth;
+var p1ResizeTimer = 0;
 window.addEventListener('resize', () => {
-  if (window.innerWidth === lastP1Width) return; // toolbar toggle — ignore
-  lastP1Width = window.innerWidth;
-  measureTimeline(); lastRenderedFrame = -1;
+  if (window.innerWidth !== lastP1Width) {
+    lastP1Width = window.innerWidth;
+    measureTimeline(); lastRenderedFrame = -1;
+    return;
+  }
+  // تغییر فقط-ارتفاع (نوار ابزار کروم موبایل وسط اسکرول): اندازه‌گیری با
+  // debounce — نه نادیده (کهنه می‌شود)، نه heal هم‌زمان (می‌پرد).
+  clearTimeout(p1ResizeTimer);
+  p1ResizeTimer = setTimeout(function () { measureTimeline(); lastRenderedFrame = -1; }, 120);
 });
 document.addEventListener('h2:grids', measureTimeline);
-setTimeout(measureTimeline, 800);
-setTimeout(measureTimeline, 2000);
+/* 2026-11-10 ghost-stretch fix قدم ۲: تایمرهای ثابت +۸۰۰/+۲۰۰۰ حذف —
+   ResizeObserver با debounce ‏۱۲۰ms جای آن‌ها را می‌گیرد: هر جابه‌جایی
+   واقعی لی‌اوت (پر شدن سکشن‌ها توسط app.js) خودش اندازه‌گیری را صدا
+   می‌زند. */
+if ('ResizeObserver' in window) {
+  var p1ROTimer = 0;
+  var p1RO = new ResizeObserver(function () {
+    clearTimeout(p1ROTimer);
+    p1ROTimer = setTimeout(function () { measureTimeline(); lastRenderedFrame = -1; }, 120);
+  });
+  p1RO.observe(document.documentElement);
+}
 document.querySelectorAll('[data-lang]').forEach((b) => {
   b.addEventListener('click', () => setTimeout(measureTimeline, 400));
 });
+
+/* 2026-11-10 دور دوم — گزارش تشخیصی ضرب‌ها با معیار px (جایگزین max-alpha
+   دور اول که اوج تک‌نقطه‌ای را پنهان می‌کرد): در کنسول __p1BeatReport()
+   را اجرا کن؛ هر ضرب اسپن α≥۰٫۹۵ (px اسکرول) + بازه‌اش را می‌دهد. رکت پنل
+   در حالت اوج (ترنسفورم خنثی) خوانده می‌شود؛ shiftY هنگام فید (±۲۸/‎-۴۸px)
+   در آن نیست — مدرک قطعی سویپ زنده است، نه این گزارش. */
+window.__p1BeatReport = function () {
+  // رکت اوج هر پنل: ترنسفورم تیک را هم‌زمان خنثی می‌کنیم (بدون paint وسط کار —
+  // همان تسک سینکرون) تا رکتِ بدون ترنسفورم خوانده شود؛ وگرنه رکتِ ضرب‌های
+  // بیرون از پنجره‌شان همان translate3d(0,24px,0) اولیه‌ی CSS است (+۲۴px).
+  const peakRects = overlays.map(function (ov, i) {
+    const panel = p1Panels[i];
+    if (!panel) return null;
+    const oldT = ov.style.transform;
+    ov.style.transform = 'translate3d(0,0,0)';
+    const r = panel.getBoundingClientRect();
+    ov.style.transform = oldT;
+    return r && r.height >= 4 ? { top: r.top, bottom: r.bottom, height: r.height } : null;
+  });
+  const maxY = document.documentElement.scrollHeight - window.innerHeight;
+  const res = BEAT_WINDOWS.map(function () { return { max: 0, px95: 0, px50: 0, y95a: -1, y95b: -1 }; });
+  for (let y = 0; y <= maxY; y += 8) {
+    const f = mapFrame(y).frame;
+    BEAT_WINDOWS.forEach(function (w, i) {
+      const a = Math.min(norm(f, w.start, w.peakStart), 1 - norm(f, w.peakEnd, w.end), i === 0 ? 1 : p1RectGate(i, y, peakRects[i]));
+      if (f < w.start || f > w.end) return;
+      const r = res[i];
+      if (a > r.max) r.max = a;
+      if (a >= 0.95) { r.px95 += 8; if (r.y95a < 0) r.y95a = y; r.y95b = y; }
+      if (a >= 0.5) r.px50 += 8;
+    });
+  }
+  return res.map(function (r, i) {
+    const span = r.y95a < 0 ? '—' : ('[' + r.y95a + '..' + r.y95b + ']');
+    return 'beat ' + i + ': max ' + r.max.toFixed(2) + ' | px>=0.95: ' + r.px95 + ' ' + span + ' | px>=0.5: ' + r.px50;
+  });
+};
+
+/* 2026-11-10 دور دوم — هلپرهای دیباگ P1 بیرون از IIFE (بازرس §۷): */
+window.__p1Debug = {
+  p1RectGate: p1RectGate,
+  p1FineBlocks: function () { return p1FineBlocks; },
+  p1StickyEls: function () { return p1StickyEls; },
+  mapFrame: mapFrame,
+  BEAT_WINDOWS: BEAT_WINDOWS,
+  p1BuildFineBlocks: p1BuildFineBlocks
+};
 
 window.requestAnimationFrame(tick);
 

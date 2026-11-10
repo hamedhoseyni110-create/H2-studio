@@ -183,7 +183,7 @@
       color: inherit;
       aspect-ratio: 16 / 10;
       border-radius: 22px;
-      background: rgba(6, 11, 9, 0.90);
+      background: rgba(6, 11, 9, 0.97);
       border: 1.5px solid color-mix(in srgb, var(--beat-accent, var(--emerald)) 60%, transparent);
       box-shadow:
         0 24px 60px rgba(0, 0, 0, 0.92),
@@ -594,7 +594,7 @@
     #main #processSteps li:nth-child(4) { --acc: #8b5cf6; }
     #main #processSteps li:nth-child(5) { --acc: #fb923c; }
     #main #processSteps li {
-      background: rgba(6, 11, 9, 0.90);
+      background: rgba(6, 11, 9, 0.97);
       -webkit-backdrop-filter: blur(18px) saturate(1.4);
       backdrop-filter: blur(18px) saturate(1.4);
       border: 1px solid rgba(255, 255, 255, 0.12);
@@ -707,7 +707,7 @@
       cursor: pointer;
       font: inherit;
       color: inherit;
-      background: rgba(6, 11, 9, 0.90);
+      background: rgba(6, 11, 9, 0.97);
       -webkit-backdrop-filter: blur(18px) saturate(1.4);
       backdrop-filter: blur(18px) saturate(1.4);
       border: 1.5px solid rgba(52, 211, 153, 0.35);
@@ -787,5 +787,13 @@
       }
       .lab-dialog .lab-in-modal {
         padding: 22px 18px 26px;
+      }
+      /* 2026-11-10 قدم ۴: در موبایل blur شیشه‌ای کارت‌های متن‌دار حذف
+         می‌شود — هم هزینه‌ی کامپوزیتور کم می‌شود، هم کارتِ نیمه‌شفاف روی
+         سکشن زیرش «شبح» خوانده نمی‌شود. */
+      #main #processSteps li,
+      .lab-trigger {
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
       }
     }

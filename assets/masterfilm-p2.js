@@ -2,12 +2,14 @@
  *
  * Sections fly toward the camera through a 1000px perspective tunnel instead
  * of sliding up in Y: deep Z (translateZ -320px, ~0.76 scale, faded) -> Z 0
- * (full size, readable) -> past the camera (+85px, ~1.09 scale, faded out),
+ * (full size, readable) -> fade out in place (exit Z 0, no lift, no balloon).
  * plus a velocity-driven pitch tilt (rotateX, lion.js's smoothed-velocity
- * pattern). Pure function of scrollY + scroll velocity. No autonomous
- * motion: frozen when scroll stops, forward only with scroll.
+ * pattern) — tiltCap is 0 since 2026-11-10 (the top-anchored rotateX on
+ * thousand-px chapters moved content by tens of px with finger speed:
+ * that WAS the stretch).
  * (2026-11-09 ghost fix: enter -320 / exit +85, was -500..-750 / +240..+360;
- * the old 1.32x-1.56x exit ballooned downward over the next chapter.)
+ * the old 1.32x-1.56x exit ballooned downward over the next chapter.
+ * 2026-11-10 ghost-stretch fix: exit 0, tiltCap 0 both viewports.)
  *
  * OWNERSHIP (plan §1): the tunnel owns ONLY the chapter elements'
  * transform/opacity/inert. app.js's reveal and lion.js keep owning the
@@ -37,8 +39,8 @@
   var CHAPTERS = [
     { sel: '#services',         noExit: false },
     { sel: '#portfolio',        noExit: false },
-    { sel: '#lionPanels',       noExit: false },
-    { sel: '#videos',           noExit: false },
+    { sel: '#lionPanels',       noExit: true },  /* 2026-11-10 قدم ۵: pinned KAGE stage inside — no exit fade */
+    { sel: '#videos',           noExit: true },  /* 2026-11-10 قدم ۵: pinned filmstrip — no exit fade */
     { sel: '.lab-trigger-wrap', noExit: false },
     { sel: '#process',          noExit: false },
     { sel: '.duo-wrap',         noExit: false },
@@ -78,13 +80,14 @@
       /* 2026-11-09 ghost fix: asymmetric ramps + guaranteed rest floor.
        * Old: enter = exit = 0.65*vh (548px MOB) — adjacent chapters' ramps
        * overlapped by 252px in scrollY, both at 0.7-0.9 alpha at once.
-       * New: enter 0.36*vh (~304px), exit 0.22*vh (~186px). For adjacent
-       * chapters N+1 finishes entering 354px BEFORE N starts exiting, so
-       * at most one chapter is mid-fade at any scrollY. Rest = h + 0.42*vh
-       * (>= 355px MOB) — #services (251px) and .lab-trigger-wrap (230px)
-       * finally rest at alpha 1. The minRest guard is a no-op at these
-       * constants; it enforces the invariant if ramps are ever retuned. */
-      var enterSpan = vh * 0.36, exitSpan = vh * 0.22, minRest = vh * 0.28;
+       * New: enter 0.36*vh (~304px), exit 0.12*vh (~110px at 915, was
+       * 0.22*vh until 2026-11-10). For adjacent chapters N+1 finishes
+       * entering well BEFORE N starts exiting, so at most one chapter is
+       * mid-fade at any scrollY. Rest = h + 0.52*vh — #services (251px)
+       * and .lab-trigger-wrap (230px) rest at alpha 1. The minRest guard
+       * is a no-op at these constants; it enforces the invariant if ramps
+       * are ever retuned. */
+      var enterSpan = vh * 0.36, exitSpan = vh * 0.12, minRest = vh * 0.28;
       ch.s0 = ch.top - vh;               /* enter start  */
       ch.s1 = ch.top - vh + enterSpan;   /* enter end    */
       ch.s2 = ch.bottom - exitSpan;      /* exit start   */
@@ -99,7 +102,7 @@
   }
 
   /* ---- suspend-and-heal (plan §2) ---- */
-  var suspendedUntil = performance.now() + 2500; /* covers P1's +800/+2000ms delayed passes */
+  var suspendedUntil = performance.now() + 2500; /* initial settle window while app.js fills sections */
   var healing = false, lastHeal = 0;
 
   function clearChapter(ch) {
@@ -143,22 +146,16 @@
   if (RM) return; /* tunnel never runs under reduced motion */
 
   /* ---- depth + tilt ---- */
-  /* 2026-11-09 ghost fix: exit Z capped at +85px (1.09x) — the old +240/+360
-   * (1.32x/1.56x) ballooned the exiting chapter downward over the next one.
-   * Enter -320px both viewports (0.76x at perspective 1000): still an
-   * unmistakable arrival, without unreadable tiny text.
-   * 2026-11-09 fling fix (کشش): tiltCap MOB 4 -> 1 — at fling speeds every
-   * section leaned back at the full 4 deg for the whole fling, which read
-   * as the page itself stretching. The cap only binds at high scroll
-   * speeds (below it the tilt is proportional: ~0.6 deg at 300 px/s), so
-   * slow/moderate scrolls keep their pitch cue; 1 deg keeps a whisper of
-   * it. DESK stays 8. */
+  /* 2026-11-10 ghost-stretch fix قدم ۱: exit Z ‏۰ (بود +۸۵) — فصلِ در حال
+   * خروج دیگر روی فصل بعد باد نمی‌کند؛ tiltCap ‏۰ هر دو ویوپورت (بود
+   * موبایل ۱°، دسکتاپ ۸°) — rotateX با لنگر بالا روی فصل‌های هزاران‌پیکسلی
+   * محتوا را ده‌ها پیکسل با سرعت انگشت جابه‌جا می‌کرد و همان «کشش» بود.
+   * Enter ‏−۳۲۰ دست نخورده. */
   function depth() {
-    var mob = window.innerWidth <= 900;
     return {
       enter: -320,
-      exit: 85,
-      tiltCap: mob ? 1 : 8
+      exit: 0,
+      tiltCap: 0
     };
   }
 
@@ -170,11 +167,9 @@
     if (y <= ch.s3) return 0.78 + (y - ch.s2) / Math.max(ch.s3 - ch.s2, 1) * 0.22;
     return 1 + (y - ch.s3) / Math.max(ch.s3 - ch.s2, 1) * 0.22;
   }
-  /* 2026-11-09 ghost fix: enter alpha eases in (t^2); exit alpha falls off
-   * fast ((1-t)^2.4: 0.19 at halfway, was 0.50 linear) and the exiting
-   * chapter lifts upward (-32px) instead of ballooning downward. No enter
-   * translateY: lion.js reads inner-node tops every frame — a Y shift
-   * during entry would move tops and risk entrance pops. */
+  /* 2026-11-10 قدم ۱: خروج دیگر Z و lift ندارد — فقط محو شدن
+   * (alpha ‏1−t²) در ۰٫۱۲vh؛ «خروج عادی» همان اسکرول عادی است. ورود
+   * دست نخورده (alpha ‏t²). */
   function stateFor(y, ch, d) {
     if (y <= ch.s0) return { z: d.enter, alpha: 0, y: 0 };
     if (y <= ch.s1) {
@@ -184,9 +179,9 @@
     if (y <= ch.s2) return { z: 0, alpha: 1, y: 0 };
     if (y <= ch.s3) {
       var t2 = (y - ch.s2) / (ch.s3 - ch.s2);
-      return { z: d.exit * t2, alpha: Math.pow(1 - t2, 2.4), y: -32 * t2 };
+      return { z: 0, alpha: 1 - t2 * t2, y: 0 };
     }
-    return { z: d.exit, alpha: 0, y: -32 };
+    return { z: 0, alpha: 0, y: 0 };
   }
 
   function updateChapter(ch, y, d, tilt) {
@@ -230,19 +225,26 @@
   }
 
   /* ---- triggers (mirror P1's measurement triggers) ----
-     2026-11-09 live bug 2: a height-only resize is the mobile toolbar
-     hiding/showing mid-scroll — it must not re-measure or heal. Only a
-     real width change (rotate, split-screen) runs measure()+heal(). */
+     2026-11-10 (آشتی با گیت عرض): تغییر واقعی عرض (چرخش، تقسیم صفحه)
+     measure()+heal() می‌خواهد؛ تغییر فقط-ارتفاع (نوار ابزار موبایل
+     وسط اسکرول) فقط measure با debounce ‏۱۲۰ms — نه نادیده (کهنه
+     می‌شود)، نه heal هم‌زمان (می‌پرد). */
   var lastP2Width = window.innerWidth;
+  var p2ResizeTimer = 0;
   window.addEventListener('resize', function () {
-    if (window.innerWidth === lastP2Width) return; // toolbar toggle — ignore
-    lastP2Width = window.innerWidth;
-    measure(); heal();
+    if (window.innerWidth !== lastP2Width) {
+      lastP2Width = window.innerWidth;
+      measure(); heal();
+      return;
+    }
+    clearTimeout(p2ResizeTimer);
+    p2ResizeTimer = setTimeout(measure, 120);
   });
   document.addEventListener('h2:grids', function () {
-    if (healing) return;
+    /* 2026-11-10 قدم ۲: فقط measure — اندازه‌گیری با زنجیره‌ی offsetTop
+       مصون از ترنسفورم است، پس heal لازم نیست. (heal فقط برای resize با
+       تغییر عرض می‌ماند.) */
     measure();
-    heal();
   });
   document.addEventListener('click', function (e) {
     var t = e.target && e.target.closest ? e.target.closest('[data-lang]') : null;

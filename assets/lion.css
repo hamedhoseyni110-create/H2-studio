@@ -211,7 +211,7 @@
 .lion-panels { position: relative; padding: 40px 0 0; }
 .lion-panels-title { text-align: center; }
 .lion-panels-sub { color: rgba(255,255,255,.75); text-align: center; margin: 10px 16px 36px; }
-#kgChapters { position: relative; height: 480vh; }
+#kgChapters { position: relative; height: 360vh; } /* 2026-11-10 قدم ۵: ۴۸۰→۳۶۰vh — ۴×۶۵vh اسکرول + یک ارتفاع استیج؛ هر فصل ~۶۵vh به‌جای ~۹۵vh (ریشه‌ی «۲–۳ سوایپ») */
 .kg-sticky { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; background: #040706; }
 .kg-bg { position: absolute; left: 0; top: 0; width: 100%; height: 115%; object-fit: cover; will-change: transform; }
 .kg-scrim { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(4,7,6,.55) 0%, rgba(4,7,6,.25) 40%, rgba(4,7,6,.55) 100%); }
